@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing — Quotewright</title>
+<meta name="description" content="Quotewright pricing: plans by quote volume, one-time setup, annual savings, and answers to the questions every factory asks first.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2320284A'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23F8F6F0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23E9B93A' stroke-width='2.4' stroke-linecap='round'/></svg>">
+</head>
+<body>
+
+<div class="selvedge" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html" aria-label="Quotewright home">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="#20284A"/>
+        <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#F8F6F0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 25h20" stroke="#E9B93A" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      Quotewright
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="product.html">Product</a></li>
+      <li><a href="pricing.html" class="active">Pricing</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="btn btn-primary btn-sm nav-cta">Book a pilot</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#171C33" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</nav>
+
+<main>
+<header class="page-hero">
+  <div class="wrap">
+    <div class="kicker center rv">Pricing</div>
+    <h1 class="rv rv-d1">Priced by the quote, a fraction of the desk it replaces.</h1>
+    <p class="sub rv rv-d2">One processed RFQ email — including all its follow-up messages in the same thread — counts as one quote.</p>
+    <div class="toggle-wrap rv rv-d3">
+      <span id="lblMonthly" style="font-weight:700">Monthly</span>
+      <button class="toggle" id="billToggle" role="switch" aria-checked="false" aria-label="Switch to annual billing">
+        <span class="knob"></span>
+      </button>
+      <span id="lblAnnual" style="color:var(--soft)">Annual</span>
+      <span class="save-badge">save 15%</span>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:26px">
+  <div class="wrap">
+    <div class="plans">
+      <div class="plan rv">
+        <h4>Starter</h4>
+        <div class="vol">up to 300 quotes / month</div>
+        <div class="price"><span class="cur">$</span><span class="amt" data-m="349" data-a="297">349</span><span class="per">/mo</span></div>
+        <div class="annual-note">&nbsp;</div>
+        <ul>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>1 mailbox, 1 catalog</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Cash + term pricing, daily FX</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Phone approvals</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Email support</li>
+        </ul>
+        <a href="contact.html" class="btn btn-ghost" data-plan="Starter">Start with Starter</a>
+      </div>
+      <div class="plan hot rv rv-d1">
+        <span class="flag">Most factories pick this</span>
+        <h4>Standard</h4>
+        <div class="vol">up to 1,000 quotes / month</div>
+        <div class="price"><span class="cur">$</span><span class="amt" data-m="549" data-a="467">549</span><span class="per">/mo</span></div>
+        <div class="annual-note">&nbsp;</div>
+        <ul>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Everything in Starter</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Multi-product &amp; thread handling</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Monthly catalog refreshes</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Priority support</li>
+        </ul>
+        <a href="contact.html" class="btn btn-primary" data-plan="Standard">Start with Standard</a>
+      </div>
+      <div class="plan rv rv-d2">
+        <h4>Pro</h4>
+        <div class="vol">up to 3,000 quotes / month</div>
+        <div class="price"><span class="cur">$</span><span class="amt" data-m="999" data-a="849">999</span><span class="per">/mo</span></div>
+        <div class="annual-note">&nbsp;</div>
+        <ul>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Everything in Standard</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Up to 3 mailboxes</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Weekly catalog refreshes</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Quote log &amp; export</li>
+        </ul>
+        <a href="contact.html" class="btn btn-ghost" data-plan="Pro">Start with Pro</a>
+      </div>
+      <div class="plan custom rv rv-d3">
+        <h4>Enterprise</h4>
+        <div class="vol">3,000+ quotes / multiple sites</div>
+        <div class="price"><span class="amt">Custom</span></div>
+        <div class="annual-note">&nbsp;</div>
+        <ul>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Unlimited mailboxes</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>ERP catalog sync</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Custom approval chains</li>
+          <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2E9E6B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>Dedicated onboarding</li>
+        </ul>
+        <a href="contact.html" class="btn btn-ghost" data-plan="Enterprise">Talk to us</a>
+      </div>
+    </div>
+    <p class="setup-note rv">One-time setup — catalog extraction, mailbox wiring, testing, go-live: <b>$1,500</b>.<br>Overage beyond plan volume: <b>$0.30 per quote</b> · Prices exclude VAT.<br><b>Pilot offer:</b> the first three factories get 50% off setup and their first three months.</p>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:40px">
+  <div class="wrap center">
+    <div class="kicker center rv">Questions, answered</div>
+    <h2 class="rv rv-d1" style="margin:0 auto">The things every factory asks first.</h2>
+    <div class="faq-list rv rv-d2">
+      <div class="faq">
+        <button class="q" aria-expanded="false">Does anything send to a customer without a human seeing it?
+          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="a"><p>No. Every quote is created as a draft and waits for approval. You get the full quote text and totals on your phone; only your approval sends it. If you do nothing, it simply stays a draft in your mailbox.</p></div>
+      </div>
+      <div class="faq">
+        <button class="q" aria-expanded="false">Where do the prices come from?
+          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="a"><p>Exclusively from your own price catalog, which we load from the cost files you already maintain. Quotewright never computes a sale price from cost or margin, and never estimates. If a product has no price on file, the quote says pricing will follow from your sales team — and you get a list of exactly which products and fields need completing.</p></div>
+      </div>
+      <div class="faq">
+        <button class="q" aria-expanded="false">What happens when a customer replies with missing details?
+          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="a"><p>Quotewright reads the entire email thread, not just the newest message. If the first email asked for a product and the third email finally supplied the quantity, it assembles the complete request across all of them and quotes accordingly — the way a good salesperson would.</p></div>
+      </div>
+      <div class="faq">
+        <button class="q" aria-expanded="false">Do we need to change our email or install anything?
+          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="a"><p>No. Quotewright connects to a mailbox you designate — most clients use a dedicated address like rfq@yourcompany.com. You keep your existing email provider, your existing address book, and your existing habits. Nothing is installed on your computers.</p></div>
+      </div>
+      <div class="faq">
+        <button class="q" aria-expanded="false">Our cost Excel is… not tidy. Is that a problem?
+          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="a"><p>It's expected. Quotewright was built on a real factory's workbooks — vertical blocks, per-customer sheets, mixed currencies, blank cells. Setup includes extracting your catalog from whatever you have, showing you the result for approval before anything goes live, and flagging every product with missing data.</p></div>
+      </div>
+      <div class="faq">
+        <button class="q" aria-expanded="false">Which languages and currencies are supported?
+          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="a"><p>Quotes are written in the customer's language — Turkish and English today, with more on request. Pricing supports multiple currencies per product line (for example EUR for one division, USD for another) with local-currency equivalents at the central bank's daily rate.</p></div>
+      </div>
+      <div class="faq">
+        <button class="q" aria-expanded="false">How long does setup take?
+          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="a"><p>Typically under a week: one working session to receive your price files and mailbox access, extraction and your review of the loaded catalog, then live testing with real RFQs before we switch it on. You approve every step.</p></div>
+      </div>
+      <div class="faq">
+        <button class="q" aria-expanded="false">What counts as "one quote"?
+          <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="a"><p>One processed RFQ email. If the customer replies in the same thread with missing details and a revised quote is drafted, that follow-up is part of the same conversation — we count the processing runs, and a typical back-and-forth stays well within plan volumes. Overage beyond your plan is $0.30 per quote, so a busy month never blocks you.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2 class="rv" style="margin:0 auto">Not sure which plan? Start with a pilot.</h2>
+    <p class="sub rv rv-d1">Half off setup and the first three months, for the first three factories.</p>
+    <div class="hero-ctas rv rv-d2">
+      <a href="contact.html" class="btn btn-light">Book a pilot
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-inner">
+      <div>
+        <a class="logo" href="index.html" aria-label="Quotewright home">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect width="32" height="32" rx="7" fill="#F8F6F0"/>
+            <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#20284A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 25h20" stroke="#E9B93A" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+          Quotewright
+        </a>
+        <p class="foot-desc">RFQ emails in, finished quotes out. Built on the floor of a working textile factory, for every made-to-order manufacturer drowning in requests for quotation.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h6>Product</h6>
+          <ul>
+            <li><a href="product.html">How it works</a></li>
+            <li><a href="product.html#integrity">Pricing integrity</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h6>Company</h6>
+          <ul>
+            <li><a href="pricing.html#faq">FAQ</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="contact.html">Book a pilot</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span id="yr">2026</span> Quotewright. All rights reserved.</span>
+      <span>Woven in İstanbul &amp; London</span>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

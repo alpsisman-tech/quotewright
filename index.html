@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quotewright — RFQ emails in, finished quotes out</title>
+<meta name="description" content="Quotewright reads your RFQ inbox, matches requests to your own price catalog, and drafts complete quotes with cash and term prices — approved by you before anything sends.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2320284A'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23F8F6F0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23E9B93A' stroke-width='2.4' stroke-linecap='round'/></svg>">
+</head>
+<body>
+
+<div class="selvedge" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html" aria-label="Quotewright home">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="#20284A"/>
+        <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#F8F6F0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 25h20" stroke="#E9B93A" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      Quotewright
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="product.html">Product</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="btn btn-primary btn-sm nav-cta">Book a pilot</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#171C33" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="wrap">
+    <span class="badge rv"><span class="dot"></span>Running live on a factory's real RFQ inbox</span>
+    <h1 class="rv rv-d1">Quotes, <span class="woven">woven</span> from your inbox.</h1>
+    <p class="sub rv rv-d2">Quotewright reads every request-for-quotation email you receive, matches it to your own price catalog, and drafts a complete quote — cash and term prices, box math done, in the customer's language. You approve with one tap. Nothing sends without you.</p>
+    <div class="hero-ctas rv rv-d3">
+      <a href="contact.html" class="btn btn-primary">Book a pilot
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="product.html" class="btn btn-ghost">See how it works</a>
+    </div>
+    <div class="proof rv rv-d4">
+      <span>Email → draft in ~2 minutes</span>
+      <span>Cash &amp; term pricing</span>
+      <span>Multi-currency, daily FX</span>
+      <span>No price ever invented</span>
+    </div>
+  </div>
+</header>
+
+<div class="loom-wrap">
+  <div class="wrap">
+    <div class="loom rv" id="loom" aria-label="Live demonstration: an RFQ email becomes a finished quote">
+      <div class="loom-panel">
+        <h3>Incoming RFQ <span class="tag tag-in">customer email</span></h3>
+        <div class="email-card">
+          <div class="email-meta">From: purchasing@customer-example.com<br>Subject: Fiyat talebi — mikrofiber bez</div><span id="typed"></span><span class="caret" id="caret"></span>
+        </div>
+      </div>
+      <div class="loom-shuttle" aria-hidden="true">
+        <div class="threadline t1"></div>
+        <div class="threadline t2"></div>
+        <div class="threadline t3"></div>
+        <div class="shuttle">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F8F6F0" stroke-width="2.6" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.2 2.2M16.2 16.2l2.2 2.2M18.4 5.6l-2.2 2.2M7.8 16.2l-2.2 2.2"/></svg>
+        </div>
+      </div>
+      <div class="loom-panel">
+        <h3>Finished quote <span class="tag tag-out">draft, awaiting your approval</span></h3>
+        <div class="quote-card">
+          <div class="q-row q-head"><span>Microfibre cloth · 40×40 cm · overlock</span><span class="sku">SKU 2102271</span></div>
+          <div>
+            <div class="q-row q-line"><span class="ql">Match</span><span class="qr">40×40 · 295 gsm (closest to 260)</span></div>
+            <div class="q-row q-line"><span class="ql">Packaging</span><span class="qr">5 pcs/pack · 40 packs/box</span></div>
+            <div class="q-row q-line"><span class="ql">Quantity</span><span class="qr">300 boxes · EXW</span></div>
+            <div class="q-row q-line"><span class="ql">FX (central bank, today)</span><span class="qr">USD/TRY 46.72</span></div>
+          </div>
+          <div class="q-row q-price">
+            <div class="pbox cash"><div class="plabel">Peşin · cash</div><div class="pval">$29,880</div></div>
+            <div class="pbox term"><div class="plabel">Vadeli · 90 days</div><div class="pval">$33,017</div></div>
+          </div>
+          <div class="q-row q-approve">
+            <span class="chip ok">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg>
+              Approve &amp; send
+            </span>
+            <span class="chip">Keep as draft</span>
+            <span>→ your phone, one tap</span>
+          </div>
+        </div>
+      </div>
+      <div class="loom-bar">
+        <div class="steps" aria-hidden="true">
+          <span class="step" data-s="1"><i></i>classify</span>
+          <span class="step" data-s="2"><i></i>read thread</span>
+          <span class="step" data-s="3"><i></i>match catalog</span>
+          <span class="step" data-s="4"><i></i>price · cash + term</span>
+          <span class="step" data-s="5"><i></i>await approval</span>
+        </div>
+        <button class="replay" id="replayBtn" aria-label="Replay demonstration">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          Replay
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Fiyat talebi</span><span>Request for quotation</span><span>gsm · size · colour · packaging</span><span>Peşin / Vadeli</span><span>EXW · FOB · CIF</span><span>per m² · per pack · per box</span><span>drafted, never auto-sent</span>
+    <span>Fiyat talebi</span><span>Request for quotation</span><span>gsm · size · colour · packaging</span><span>Peşin / Vadeli</span><span>EXW · FOB · CIF</span><span>per m² · per pack · per box</span><span>drafted, never auto-sent</span>
+  </div>
+</div>
+
+<section class="band">
+  <div class="wrap band-grid">
+    <div>
+      <div class="kicker rv">Forged on a factory floor</div>
+      <h2 class="rv rv-d1">Not trained on tidy demos. Trained on a real inbox.</h2>
+      <p class="sub rv rv-d2">Quotewright was built inside a working made-to-order textile manufacturer in Istanbul — on messy cost workbooks, multi-message email threads, half-specified requests, and customers who decide the quantity later. The hard parts are already survived, so your setup doesn't have to rediscover them.</p>
+    </div>
+    <div class="fact-list rv rv-d2">
+      <div class="fact"><span class="fk">Reads the whole thread, not just the last email</span><span class="fv">follow-ups merged</span></div>
+      <div class="fact"><span class="fk">Two price columns on every line</span><span class="fv">cash + term</span></div>
+      <div class="fact"><span class="fk">Multi-currency with daily central-bank FX</span><span class="fv">auto-converted</span></div>
+      <div class="fact"><span class="fk">Prices come only from your catalog</span><span class="fv">zero invented</span></div>
+      <div class="fact"><span class="fk">Every send gated by a human</span><span class="fv">one tap on your phone</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap center">
+    <div class="kicker center rv">Why factories keep it</div>
+    <h2 class="rv rv-d1">Built for how manufacturers actually get asked for prices.</h2>
+    <div class="cards">
+      <div class="card rv">
+        <div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></div>
+        <h4>Every line answered</h4>
+        <p>A five-product request gets a five-section reply. Priced lines get prices; incomplete lines get a named list of exactly what's still needed. Nothing silently dropped.</p>
+        <div class="fx"><b>Information we still need:</b> item 2 — order quantity</div>
+      </div>
+      <div class="card rv rv-d1">
+        <div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.5H9.8a2.8 2.8 0 0 0 0 5.6h4.4a2.8 2.8 0 0 1 0 5.6H6.5"/></svg></div>
+        <h4>Cash &amp; term, side by side</h4>
+        <p>Both payment options priced on every line, with the term days your price list defines, and local-currency equivalents at today's central bank rate. The customer chooses.</p>
+        <div class="fx">Cash <b>$3.11/m²</b> · Term 90 days <b>$3.44/m²</b></div>
+      </div>
+      <div class="card rv rv-d2">
+        <div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-5-2-8-5.5-8-10V5.5L12 3l8 2.5V11c0 4.5-3 8-8 10z"/><path d="M9 11.5l2.2 2.2L15.5 9"/></svg></div>
+        <h4>Never invents a price</h4>
+        <p>Prices come from your files — only your files. If a product has no price yet, the quote says so and routes it to your sales team instead of guessing. Auditable by design.</p>
+        <div class="fx">No price on file → <b>"our sales team will follow up"</b></div>
+      </div>
+    </div>
+    <a class="more-link rv" href="product.html">See the full product
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <div class="kicker center rv" style="color:#9BA4C6">Start small, see it on your own emails</div>
+    <h2 class="rv rv-d1">Send us one real RFQ. We'll send back the quote.</h2>
+    <p class="sub rv rv-d2">A pilot takes days to set up, runs on a mailbox you choose, and never sends anything without your approval.</p>
+    <div class="hero-ctas rv rv-d3">
+      <a href="contact.html" class="btn btn-light">Book a pilot
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="pricing.html" class="btn btn-ghost" style="color:#F8F6F0;border-color:#F8F6F0">See pricing</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-inner">
+      <div>
+        <a class="logo" href="index.html" aria-label="Quotewright home">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect width="32" height="32" rx="7" fill="#F8F6F0"/>
+            <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#20284A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 25h20" stroke="#E9B93A" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+          Quotewright
+        </a>
+        <p class="foot-desc">RFQ emails in, finished quotes out. Built on the floor of a working textile factory, for every made-to-order manufacturer drowning in requests for quotation.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h6>Product</h6>
+          <ul>
+            <li><a href="product.html">How it works</a></li>
+            <li><a href="product.html#integrity">Pricing integrity</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h6>Company</h6>
+          <ul>
+            <li><a href="pricing.html#faq">FAQ</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="contact.html">Book a pilot</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span id="yr">2026</span> Quotewright. All rights reserved.</span>
+      <span>Woven in İstanbul &amp; London</span>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — Quotewright</title>
+<meta name="description" content="How Quotewright turns an RFQ email into a finished, approvable quote: classification, thread reading, catalog matching, dual pricing, and human approval.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2320284A'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23F8F6F0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23E9B93A' stroke-width='2.4' stroke-linecap='round'/></svg>">
+</head>
+<body>
+
+<div class="selvedge" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html" aria-label="Quotewright home">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="#20284A"/>
+        <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#F8F6F0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 25h20" stroke="#E9B93A" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      Quotewright
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="product.html" class="active">Product</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="btn btn-primary btn-sm nav-cta">Book a pilot</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#171C33" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</nav>
+
+<main>
+<header class="page-hero">
+  <div class="wrap">
+    <div class="kicker center rv">The product</div>
+    <h1 class="rv rv-d1">From "fiyat talebi" to a finished draft in five passes.</h1>
+    <p class="sub rv rv-d2">You keep your mailbox, your price files, and the final word. Quotewright does the reading, the matching, and the arithmetic in between — then waits for you.</p>
+  </div>
+</header>
+
+<section style="padding-top:36px">
+  <div class="wrap">
+    <div class="pipeline" id="pipeline">
+      <div class="pipe-thread" aria-hidden="true"></div>
+      <div class="pstep rv">
+        <div class="node"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></div>
+        <span class="pn">Pass 01</span>
+        <h4>Reads the inbox</h4>
+        <p>Every incoming email is classified. RFQs are picked out; newsletters, invoices, and noise are ignored without a trace.</p>
+      </div>
+      <div class="pstep rv rv-d1">
+        <div class="node"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-8.5 8.5c-1.6 0-3.2-.4-4.5-1.2L3 21l1.7-5A8.5 8.5 0 1 1 21 12z"/><path d="M8 10.5h8M8 14h5"/></svg></div>
+        <span class="pn">Pass 02</span>
+        <h4>Reads the whole thread</h4>
+        <p>Customer sent the quantity in a second email? The size in a third? It assembles the full request across every message — like a good salesperson would.</p>
+      </div>
+      <div class="pstep rv rv-d2">
+        <div class="node"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.6-4.6"/></svg></div>
+        <span class="pn">Pass 03</span>
+        <h4>Matches your catalog</h4>
+        <p>Weight, size, colour, packaging — matched against your own product master, loaded from the cost files you already keep.</p>
+      </div>
+      <div class="pstep rv rv-d3">
+        <div class="node"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.5H9.8a2.8 2.8 0 0 0 0 5.6h4.4a2.8 2.8 0 0 1 0 5.6H6.5"/></svg></div>
+        <span class="pn">Pass 04</span>
+        <h4>Prices both ways</h4>
+        <p>Cash and term prices from your list — per m², per pack, per box, line totals — with today's central bank FX rates applied.</p>
+      </div>
+      <div class="pstep rv rv-d4">
+        <div class="node"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5l2.2 2.2L15.5 9"/><path d="M12 21c-5-2-8-5.5-8-10V5.5L12 3l8 2.5V11c0 4.5-3 8-8 10z"/></svg></div>
+        <span class="pn">Pass 05</span>
+        <h4>Waits for you</h4>
+        <p>The draft lands in your mailbox and a summary lands on your phone. Approve to send, or keep editing. You are the gate.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px">
+  <div class="wrap center">
+    <div class="kicker center rv">What a finished quote contains</div>
+    <h2 class="rv rv-d1">Complete enough to send. Honest enough to trust.</h2>
+    <p class="sub rv rv-d2" style="margin-left:auto;margin-right:auto">This is the shape of a real draft — a multi-line request where one product matched at a slightly different weight, and one couldn't be priced yet.</p>
+    <div class="sample rv rv-d3">
+      <div class="sample-head">
+        <span>DRAFT · Re: Fiyat talebi — reply in the customer's language</span>
+        <span>awaiting approval</span>
+      </div>
+      <div class="sample-body">Dear Customer,
+
+Thank you for your inquiry. Our offer, per line item:
+
+<span class="hl-blue">1) Microfibre cloth · 40×40 cm · blue</span>
+   Closest match: SKU 2102271, 40×40 cm, <span class="hl-warn">295 gsm (you asked 260 — please confirm)</span>
+   Cash:  <span class="hl-ok">$3.11 /m²</span> → $99.60 /box → 300 boxes = <span class="hl-ok">$29,880.00</span>
+   Term (90 days): <span class="hl-blue">$3.44 /m²</span> → $110.06 /box → 300 boxes = <span class="hl-blue">$33,017.28</span>
+
+<span class="hl-blue">2) Drying cloth, retail series · grey</span>
+   This product is in our range; our sales team will contact
+   you shortly with pricing.
+
+Information we still need from you:
+ · Item 1 — confirmation of the 295 gsm match
+ · Item 2 — will follow from our sales team
+
+Delivery EXW · prices exclude VAT · offer valid 7 days.
+
+Kind regards,
+Sales Team</div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="integrity">
+  <div class="wrap center">
+    <div class="kicker center rv">The pricing rule</div>
+    <h2 class="rv rv-d1" style="margin:0 auto">Your prices are yours.</h2>
+    <p class="bigquote rv rv-d2">Quotewright will happily do the reading and the arithmetic all day. But it will <em>never make up a number</em> — not from cost, not from margin, not from a hunch.</p>
+    <div class="rules">
+      <div class="rule rv"><h5>Only catalog values</h5><p>Every price in every quote traces to a cell in your own price file. If it's not in the file, it's not in the quote.</p></div>
+      <div class="rule rv rv-d1"><h5>Gaps are flagged, not filled</h5><p>Products with missing data are named to the customer with "our sales team will follow up" — and listed for you to complete.</p></div>
+      <div class="rule rv rv-d2"><h5>You are the send button</h5><p>Every quote waits for a human approval before it reaches a customer. On your phone, in one tap.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap center">
+    <div class="kicker center rv">Everything in the box</div>
+    <h2 class="rv rv-d1">Six things it does that a template can't.</h2>
+    <div class="cards">
+      <div class="card rv">
+        <div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></div>
+        <h4>Every line answered</h4>
+        <p>Each requested product gets its own numbered section: priced, pending your customer's missing detail, or pending your own pricing. The quote ends with a single "information we still need" list.</p>
+        <div class="fx"><b>5 items asked → 5 sections answered</b></div>
+      </div>
+      <div class="card rv rv-d1">
+        <div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.5H9.8a2.8 2.8 0 0 0 0 5.6h4.4a2.8 2.8 0 0 1 0 5.6H6.5"/></svg></div>
+        <h4>Cash &amp; term, side by side</h4>
+        <p>Both payment options on every line, with the term days your list defines — 30, 60, 90 — and local-currency equivalents at today's central bank rate.</p>
+        <div class="fx">Cash <b>$3.11/m²</b> · Term 90d <b>$3.44/m²</b></div>
+      </div>
+      <div class="card rv rv-d2">
+        <div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-5-2-8-5.5-8-10V5.5L12 3l8 2.5V11c0 4.5-3 8-8 10z"/><path d="M9 11.5l2.2 2.2L15.5 9"/></svg></div>
+        <h4>Never invents a price</h4>
+        <p>No estimating, no "cost plus margin," no filling gaps with plausible numbers. If your file has no price, the customer is told your team will follow up — and you get the gap list.</p>
+        <div class="fx">No price on file → <b>routed to your sales team</b></div>
+      </div>
+      <div class="card rv rv-d3">
+        <div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 4.5l-9.5 15-3-6.5-6.5-3z"/><path d="M21.5 4.5L9 13"/></svg></div>
+        <h4>One-tap approval</h4>
+        <p>Each quote pings your phone with the totals and the full text. Approve to send the reply from your mailbox; decline to keep it as an editable draft. Nothing sends itself.</p>
+        <div class="fx">Totals + full text → <b>approve / keep as draft</b></div>
+      </div>
+      <div class="card rv rv-d4">
+        <div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3.5 12h17M12 3c2.5 2.4 4 5.6 4 9s-1.5 6.6-4 9c-2.5-2.4-4-5.6-4-9s1.5-6.6 4-9z"/></svg></div>
+        <h4>Answers in their language</h4>
+        <p>A Turkish request gets a Turkish quote; an English request gets an English one — colour names, units, and trade terms translated correctly in both directions.</p>
+        <div class="fx">"navy blue" → <b>lacivert</b> · "2'li paket" → 2 pcs/pack</div>
+      </div>
+      <div class="card rv rv-d5">
+        <div class="ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#20284A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><path d="M17.25 13.5v7.5M13.5 17.25H21"/></svg></div>
+        <h4>Your Excel is the catalog</h4>
+        <p>Upload the cost workbook you already maintain — even the messy one. We extract products, packaging, and both price columns, and flag any rows with data missing for your review before go-live.</p>
+        <div class="fx">Your workbook → <b>a clean product master</b>, keyed by SKU</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2 class="rv" style="margin:0 auto">See it on your own emails.</h2>
+    <p class="sub rv rv-d1">A pilot runs on a mailbox you choose, with your real catalog, in days.</p>
+    <div class="hero-ctas rv rv-d2">
+      <a href="contact.html" class="btn btn-light">Book a pilot
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="pricing.html" class="btn btn-ghost" style="color:#F8F6F0;border-color:#F8F6F0">See pricing</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-inner">
+      <div>
+        <a class="logo" href="index.html" aria-label="Quotewright home">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect width="32" height="32" rx="7" fill="#F8F6F0"/>
+            <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#20284A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 25h20" stroke="#E9B93A" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+          Quotewright
+        </a>
+        <p class="foot-desc">RFQ emails in, finished quotes out. Built on the floor of a working textile factory, for every made-to-order manufacturer drowning in requests for quotation.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h6>Product</h6>
+          <ul>
+            <li><a href="product.html">How it works</a></li>
+            <li><a href="product.html#integrity">Pricing integrity</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h6>Company</h6>
+          <ul>
+            <li><a href="pricing.html#faq">FAQ</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="contact.html">Book a pilot</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span id="yr">2026</span> Quotewright. All rights reserved.</span>
+      <span>Woven in İstanbul &amp; London</span>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
