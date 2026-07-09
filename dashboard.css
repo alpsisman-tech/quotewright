@@ -1,4 +1,7 @@
 /* Quote console — internal dashboard, Quotewright "dye house" palette. */
+/* The `hidden` attribute must always win over the display rules below, or the
+   login view never hides after sign-in (the dashboard would render behind it). */
+[hidden] { display: none !important; }
 body.qc { background: var(--bg, #F8F6F0); min-height: 100vh; }
 
 .qc-top {
