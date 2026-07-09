@@ -2,28 +2,67 @@
 (function () {
   "use strict";
 
-  var cfg = window.QW_CONFIG || {};
-  var boot = document.getElementById("bootError");
-  if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_ANON_KEY.indexOf("PASTE_") === 0) {
-    boot.hidden = false;
-    boot.textContent = "Not configured: set SUPABASE_ANON_KEY in dashboard-config.js (Supabase → Project Settings → API → anon public).";
-    return;
-  }
-
-  var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
-
   var el = function (id) { return document.getElementById(id); };
-  var loginView = el("loginView"), dashView = el("dashView");
-  var logoutBtn = el("logoutBtn"), whoami = el("whoami");
+  var cfg = window.QW_CONFIG || {};
+  var boot = el("bootError");
+  var sb = null;
   var quotes = [];
 
+  // ── SECURITY: attach the submit interceptor FIRST and unconditionally, so the
+  //    login form can NEVER fall back to a native GET submit (which would put the
+  //    email + password into the URL). This runs even if the app isn't configured.
+  var loginForm = el("loginForm");
+  if (loginForm) loginForm.addEventListener("submit", onLoginSubmit);
+
+  var configured = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY &&
+                   cfg.SUPABASE_ANON_KEY.indexOf("PASTE_") !== 0;
+  if (!configured) {
+    if (boot) {
+      boot.hidden = false;
+      boot.textContent = "Not configured: set SUPABASE_ANON_KEY in dashboard-config.js (Supabase → Project Settings → API → anon public).";
+    }
+    return; // form is already safe; nothing else to wire until configured
+  }
+
+  sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+
+  // events (only wired when configured)
+  el("logoutBtn").addEventListener("click", function () { sb.auth.signOut().then(showLogin); });
+  el("refreshBtn").addEventListener("click", loadQuotes);
+  el("search").addEventListener("input", renderTable);
+  el("statusFilter").addEventListener("change", renderTable);
+
+  // boot: restore session if present
+  sb.auth.getSession().then(function (res) {
+    var s = res.data && res.data.session;
+    if (s && s.user) { showDash(s.user.email); loadQuotes(); }
+    else showLogin();
+  });
+
+  // ── functions (declarations => hoisted, safe to reference above) ─────────────
+  function onLoginSubmit(e) {
+    e.preventDefault(); // <- the critical line: no native navigation, ever
+    var err = el("loginError");
+    if (err) err.textContent = "";
+    if (!sb) { if (err) err.textContent = "Dashboard isn't configured yet (missing Supabase key)."; return; }
+    var btn = el("loginBtn");
+    btn.disabled = true; btn.textContent = "Signing in…";
+    sb.auth.signInWithPassword({ email: el("email").value.trim(), password: el("password").value })
+      .then(function (res) {
+        btn.disabled = false; btn.textContent = "Sign in";
+        if (res.error) { if (err) err.textContent = res.error.message; return; }
+        showDash(res.data.user && res.data.user.email); loadQuotes();
+      })
+      .catch(function () { btn.disabled = false; btn.textContent = "Sign in"; if (err) err.textContent = "Network error."; });
+  }
+
   function showLogin() {
-    loginView.hidden = false; dashView.hidden = true;
-    logoutBtn.hidden = true; whoami.textContent = "";
+    el("loginView").hidden = false; el("dashView").hidden = true;
+    el("logoutBtn").hidden = true; el("whoami").textContent = "";
   }
   function showDash(email) {
-    loginView.hidden = true; dashView.hidden = false;
-    logoutBtn.hidden = false; whoami.textContent = email || "";
+    el("loginView").hidden = true; el("dashView").hidden = false;
+    el("logoutBtn").hidden = false; el("whoami").textContent = email || "";
   }
 
   function money(n, cur) {
@@ -37,13 +76,15 @@
     return isNaN(d) ? "—" : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   }
   function bucket(q) { return (q.status || "").toLowerCase() === "draft" ? "draft" : "sent"; }
-  function esc(s) { return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) {
-    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function esc(s) {
+    return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
 
   function renderTiles() {
     var drafts = quotes.filter(function (q) { return bucket(q) === "draft"; }).length;
     var sent = quotes.length - drafts;
-    var needsInfo = quotes.filter(function (q) { return Number(q.unmatched_lines) > 0; }).length;
     var byCur = {};
     quotes.forEach(function (q) {
       if (q.total == null || isNaN(q.total)) return;
@@ -74,8 +115,7 @@
     el("emptyState").hidden = rows.length !== 0;
     el("quotesBody").innerHTML = rows.map(function (r) {
       var b = bucket(r);
-      var needs = Number(r.unmatched_lines) > 0
-        ? '<span class="pill info">' + esc(r.unmatched_lines) + "</span>" : "—";
+      var needs = Number(r.unmatched_lines) > 0 ? '<span class="pill info">' + esc(r.unmatched_lines) + "</span>" : "—";
       var idShort = r.id != null ? String(r.id).slice(0, 8) : "—";
       return "<tr>" +
         "<td>" + esc(fmtDate(r.created_at)) + "</td>" +
@@ -100,28 +140,4 @@
       render();
     });
   }
-
-  // events
-  el("loginForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var btn = el("loginBtn"), err = el("loginError");
-    err.textContent = ""; btn.disabled = true; btn.textContent = "Signing in…";
-    sb.auth.signInWithPassword({ email: el("email").value.trim(), password: el("password").value })
-      .then(function (res) {
-        btn.disabled = false; btn.textContent = "Sign in";
-        if (res.error) { err.textContent = res.error.message; return; }
-        showDash(res.data.user && res.data.user.email); loadQuotes();
-      });
-  });
-  logoutBtn.addEventListener("click", function () { sb.auth.signOut().then(showLogin); });
-  el("refreshBtn").addEventListener("click", loadQuotes);
-  el("search").addEventListener("input", renderTable);
-  el("statusFilter").addEventListener("change", renderTable);
-
-  // boot: restore session if present
-  sb.auth.getSession().then(function (res) {
-    var s = res.data && res.data.session;
-    if (s && s.user) { showDash(s.user.email); loadQuotes(); }
-    else showLogin();
-  });
 })();
