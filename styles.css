@@ -540,3 +540,19 @@ footer .foot-desc{font-size:13.5px;max-width:330px;line-height:1.68;margin-top:1
   form{padding:26px 22px}
   .proof span{padding:0 10px}
 }
+
+
+/* ── Cookie consent banner ───────────────────────────────────────────────── */
+.cookie-consent{position:fixed;left:0;right:0;bottom:0;z-index:9999;padding:14px;transform:translateY(130%);transition:transform .32s cubic-bezier(.22,1,.36,1)}
+.cookie-consent.is-open{transform:translateY(0)}
+.cc-inner{max-width:960px;margin:0 auto;background:#20284A;color:#F8F6F0;border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:15px 18px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-shadow:0 12px 44px rgba(0,0,0,.30)}
+.cc-text{margin:0;font-size:14px;line-height:1.5;flex:1 1 300px}
+.cc-text a{color:#E9B93A;text-decoration:underline;text-underline-offset:2px}
+.cc-actions{display:flex;gap:10px;flex-shrink:0}
+.cc-btn{cursor:pointer;font:inherit;font-size:14px;font-weight:600;padding:9px 20px;border-radius:100px;border:1px solid transparent;transition:transform .15s ease,filter .15s ease,background .15s ease}
+.cc-btn:hover{transform:translateY(-1px)}
+.cc-decline{background:transparent;color:#F8F6F0;border-color:rgba(255,255,255,.16)}
+.cc-decline:hover{border-color:#F8F6F0}
+.cc-accept{background:#E9B93A;color:#20284A;border-color:#E9B93A}
+.cc-accept:hover{filter:brightness(1.06)}
+@media (max-width:520px){.cc-inner{padding:14px}.cc-actions{width:100%}.cc-btn{flex:1}}
