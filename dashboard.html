@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Quote console — Quotewright</title>
+<meta name="description" content="Internal Quotewright quote console.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2320284A'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23F8F6F0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23E9B93A' stroke-width='2.4' stroke-linecap='round'/></svg>">
+</head>
+<body class="qc">
+
+<header class="qc-top">
+  <a class="logo" href="dashboard.html" aria-label="Quotewright quote console">
+    <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="7" fill="#20284A"/>
+      <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#F8F6F0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 25h20" stroke="#E9B93A" stroke-width="2.4" stroke-linecap="round"/>
+    </svg>
+    Quotewright <span class="qc-tag">Quote console</span>
+  </a>
+  <div class="qc-top-right">
+    <span id="whoami" class="qc-who"></span>
+    <button id="logoutBtn" class="btn btn-ghost btn-sm" hidden>Sign out</button>
+  </div>
+</header>
+
+<main class="qc-main">
+
+  <!-- Login -->
+  <section id="loginView" class="qc-login" hidden>
+    <div class="qc-login-card">
+      <div class="kicker">Internal access</div>
+      <h1>Quote console</h1>
+      <p class="sub">Sign in to review quotes drafted by the RFQ pipeline.</p>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="username" required placeholder="you@hassan.com.tr">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" id="loginBtn">Sign in</button>
+        <div id="loginError" class="qc-error" role="alert"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="dashView" class="wrap" hidden>
+    <div class="qc-head">
+      <div>
+        <div class="kicker">Quotes</div>
+        <h1 class="qc-h1">Quote activity</h1>
+      </div>
+      <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
+    </div>
+
+    <div class="qc-tiles" id="tiles"></div>
+
+    <div class="qc-controls">
+      <input id="search" type="search" placeholder="Search customer…" class="qc-search">
+      <select id="statusFilter" class="qc-select">
+        <option value="all">All statuses</option>
+        <option value="draft">Draft (pending send)</option>
+        <option value="sent">Sent</option>
+      </select>
+      <span id="rowCount" class="qc-count"></span>
+    </div>
+
+    <div class="qc-tablewrap">
+      <table class="qc-table" id="quotesTable">
+        <thead>
+          <tr>
+            <th>Date</th><th>Customer</th><th class="num">Total</th>
+            <th>Status</th><th class="num">Needs info</th><th>Quote ID</th>
+          </tr>
+        </thead>
+        <tbody id="quotesBody"></tbody>
+      </table>
+      <div id="emptyState" class="qc-empty" hidden>No quotes match.</div>
+    </div>
+  </section>
+
+  <div id="bootError" class="qc-boot-error" hidden></div>
+</main>
+
+<script src="vendor/supabase.js"></script>
+<script src="dashboard-config.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>
