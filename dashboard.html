@@ -8,19 +8,19 @@
 <meta name="description" content="Internal Quotewright quote console.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="dashboard.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2320284A'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23F8F6F0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23E9B93A' stroke-width='2.4' stroke-linecap='round'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
 </head>
 <body class="qc">
 
 <header class="qc-top">
   <a class="logo" href="dashboard.html" aria-label="Quotewright quote console">
     <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <rect width="32" height="32" rx="7" fill="#20284A"/>
-      <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#F8F6F0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M6 25h20" stroke="#E9B93A" stroke-width="2.4" stroke-linecap="round"/>
+      <rect width="32" height="32" rx="7" fill="#111"/>
+      <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
     </svg>
     Quotewright <span class="qc-tag">Quote console</span>
   </a>
@@ -41,11 +41,11 @@
       <form id="loginForm" novalidate>
         <div class="field">
           <label for="email">Email</label>
-          <input id="email" type="email" autocomplete="username" required placeholder="you@hassan.com.tr">
+          <input id="email" type="email" autocomplete="username" required placeholder="you@company.com">
         </div>
         <div class="field">
           <label for="password">Password</label>
-          <input id="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+          <input id="password" type="password" autocomplete="current-password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
         </div>
         <button type="submit" class="btn btn-primary" id="loginBtn">Sign in</button>
         <div id="loginError" class="qc-error" role="alert"></div>
@@ -65,12 +65,29 @@
 
     <div class="qc-tiles" id="tiles"></div>
 
+    <div class="qc-chart" id="chartCard">
+      <div class="qc-chart-head">
+        <h3>Quotes over time</h3>
+        <div class="qc-legend">
+          <span><i style="background:var(--lime-2)"></i>Won</span>
+          <span><i style="background:var(--line-strong)"></i>Other</span>
+        </div>
+      </div>
+      <div id="chart"></div>
+    </div>
+
     <div class="qc-controls">
-      <input id="search" type="search" placeholder="Search customer…" class="qc-search">
+      <input id="search" type="search" placeholder="Search customer&hellip;" class="qc-search">
       <select id="statusFilter" class="qc-select">
-        <option value="all">All statuses</option>
+        <option value="all">All send states</option>
         <option value="draft">Draft (pending send)</option>
         <option value="sent">Sent</option>
+      </select>
+      <select id="outcomeFilter" class="qc-select">
+        <option value="all">All outcomes</option>
+        <option value="pending">Pending decision</option>
+        <option value="won">Won</option>
+        <option value="lost">Lost</option>
       </select>
       <span id="rowCount" class="qc-count"></span>
     </div>
@@ -80,7 +97,7 @@
         <thead>
           <tr>
             <th>Date</th><th>Customer</th><th class="num">Total</th>
-            <th>Status</th><th class="num">Needs info</th><th>Quote ID</th>
+            <th>Send</th><th class="num">Needs info</th><th>Outcome</th><th>Set outcome</th>
           </tr>
         </thead>
         <tbody id="quotesBody"></tbody>
@@ -90,6 +107,7 @@
   </section>
 
   <div id="bootError" class="qc-boot-error" hidden></div>
+  <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
 </main>
 
 <script src="vendor/supabase.js"></script>
