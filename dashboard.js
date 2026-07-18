@@ -154,26 +154,30 @@
     var data = keys.map(function (k) { return months[k]; });
     var maxN = data.reduce(function (m, x) { return Math.max(m, x.total); }, 1);
 
-    var barW = 30, gap = 14, padL = 8, padB = 22, padT = 8, h = 150;
-    var innerH = h - padB - padT;
-    var w = padL * 2 + data.length * barW + (data.length - 1) * gap;
+    // Fixed landscape viewBox + fixed CSS height (see dashboard.css) so the chart
+    // never balloons when only one or two months have data.
+    var VBW = 1000, VBH = 250, padT = 30, padB = 42, padX = 16;
+    var innerH = VBH - padT - padB;
+    var n = data.length;
+    var slot = (VBW - padX * 2) / n;
+    var barW = Math.max(12, Math.min(88, slot * 0.5));
     var parts = [];
     data.forEach(function (x, i) {
-      var bx = padL + i * (barW + gap);
-      var totH = Math.round(x.total / maxN * innerH);
+      var cx = padX + slot * i + slot / 2;
+      var bx = cx - barW / 2;
+      var totH = x.total > 0 ? Math.max(4, Math.round(x.total / maxN * innerH)) : 0;
       var wonH = Math.round(x.won / maxN * innerH);
       var restH = totH - wonH;
       var yTop = padT + (innerH - totH);
-      // rest (non-won) on top, won at the base
-      if (restH > 0) parts.push('<rect class="bar-rest" x="' + bx + '" y="' + yTop + '" width="' + barW + '" height="' + restH + '" rx="4"/>');
-      if (wonH > 0) parts.push('<rect class="bar-won" x="' + bx + '" y="' + (padT + innerH - wonH) + '" width="' + barW + '" height="' + wonH + '" rx="4"/>');
-      // count label above bar
-      parts.push('<text class="axis-lbl" x="' + (bx + barW / 2) + '" y="' + (yTop - 4) + '" text-anchor="middle">' + x.total + '</text>');
+      if (restH > 0) parts.push('<rect class="bar-rest" x="' + bx.toFixed(1) + '" y="' + yTop + '" width="' + barW.toFixed(1) + '" height="' + restH + '" rx="6"/>');
+      if (wonH > 0) parts.push('<rect class="bar-won" x="' + bx.toFixed(1) + '" y="' + (padT + innerH - wonH) + '" width="' + barW.toFixed(1) + '" height="' + wonH + '" rx="6"/>');
+      // count above the bar
+      parts.push('<text class="axis-lbl cnt" x="' + cx.toFixed(1) + '" y="' + (yTop - 9) + '" text-anchor="middle" font-size="20" fill="#131313" font-weight="600">' + x.total + '</text>');
       // month label
       var lbl = x.d.toLocaleDateString("en-GB", { month: "short" });
-      parts.push('<text class="axis-lbl" x="' + (bx + barW / 2) + '" y="' + (h - 6) + '" text-anchor="middle">' + lbl + '</text>');
+      parts.push('<text class="axis-lbl" x="' + cx.toFixed(1) + '" y="' + (VBH - 12) + '" text-anchor="middle" font-size="16">' + lbl + '</text>');
     });
-    host.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Quotes per month">' + parts.join("") + '</svg>';
+    host.innerHTML = '<svg viewBox="0 0 ' + VBW + ' ' + VBH + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Quotes per month">' + parts.join("") + '</svg>';
   }
 
   // ── table ─────────────────────────────────────────────────────────────────
