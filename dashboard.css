@@ -93,3 +93,49 @@ body.qc { background: var(--bg); min-height: 100vh; color: var(--ink); }
 
 /* login form sits inside the login card — drop the global form card styling */
 .qc-login-card form { background: none; border: none; padding: 0; box-shadow: none; }
+
+/* ============================================================
+   Craft pass — micro-interactions + real loading / empty / error states
+   ============================================================ */
+
+/* tiles: physical hover lift */
+.qc-tile { transition: transform .32s var(--expo), box-shadow .32s var(--expo), border-color .32s; }
+.qc-tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--line-strong); }
+.qc-tile.accent:hover { box-shadow: 0 16px 36px -18px var(--lime-glow); border-color: var(--lime); }
+.qc-login-card { transition: transform .5s var(--expo), box-shadow .5s var(--expo); }
+
+/* chart: bars grow up on first paint (no layout shift — fixed viewBox) */
+@keyframes qc-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.qc-chart svg rect { transform-box: fill-box; transform-origin: bottom; animation: qc-grow .6s var(--expo) both; }
+
+/* table rows: hover highlight + crafted outcome buttons */
+.qc-table tbody tr { transition: background .16s var(--ease); }
+.qc-table tbody tr:hover { background: var(--row); }
+.qc-act { transition: transform .3s var(--spring), background .15s, border-color .15s, color .15s; }
+.qc-act:hover { transform: translateY(-1px); }
+.qc-act:active { transform: scale(.92); transition-duration: .08s; }
+.qc-act.win:hover:not(.on) { border-color: var(--lime); color: var(--ink); background: var(--lime-dim); }
+.qc-act.lose:hover:not(.on) { border-color: var(--ink); color: var(--ink); }
+#refreshBtn.is-loading { opacity: .6; pointer-events: none; }
+
+/* skeleton shimmer (reduced-motion: static) */
+@keyframes qc-shimmer { 100% { background-position: -200% 0; } }
+.sk { background: linear-gradient(100deg, var(--row) 28%, #ececec 48%, var(--row) 68%); background-size: 200% 100%; animation: qc-shimmer 1.25s ease-in-out infinite; border-radius: 8px; }
+.sk-tile { height: 92px; border-radius: var(--r-md); border: 1px solid var(--hair); }
+.sk-chart { height: 230px; border-radius: 12px; }
+.sk-line { display: inline-block; height: 11px; border-radius: 6px; vertical-align: middle; }
+.qc-skrow td { border-bottom: 1px solid var(--hair); }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
+
+/* empty + error panels inside the table card */
+.qc-empty { padding: 54px 32px; text-align: center; color: var(--soft); }
+.qc-empty .ico { width: 52px; height: 52px; border-radius: 15px; background: var(--row); border: 1px solid var(--hair); display: grid; place-items: center; margin: 0 auto 16px; }
+.qc-empty .ico svg { stroke: var(--grey); }
+.qc-empty h4 { font-family: var(--font); font-size: 18px; font-weight: 600; letter-spacing: -.025em; color: var(--ink); margin-bottom: 6px; }
+.qc-empty p { font-size: 14px; line-height: 1.6; max-width: 360px; margin: 0 auto; }
+.qc-tableerror { padding: 48px 32px; text-align: center; }
+.qc-tableerror .ico { width: 52px; height: 52px; border-radius: 15px; background: #fbe3df; display: grid; place-items: center; margin: 0 auto 16px; }
+.qc-tableerror .ico svg { stroke: #b42318; }
+.qc-tableerror h4 { font-family: var(--font); font-size: 18px; font-weight: 600; letter-spacing: -.025em; color: var(--ink); margin-bottom: 6px; }
+.qc-tableerror p { font-size: 13.5px; line-height: 1.6; color: var(--soft); max-width: 420px; margin: 0 auto 4px; word-break: break-word; }
+.qc-tableerror .btn { margin-top: 18px; }

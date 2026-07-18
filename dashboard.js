@@ -8,6 +8,8 @@
   var boot = el("bootError");
   var sb = null;
   var quotes = [];
+  var hasLoaded = false;   // first successful load complete?
+  var loading = false;
 
   // SECURITY: attach the submit interceptor FIRST and unconditionally, so the
   // login form can NEVER fall back to a native GET submit (email+password in URL).
@@ -180,6 +182,54 @@
     host.innerHTML = '<svg viewBox="0 0 ' + VBW + ' ' + VBH + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Quotes per month">' + parts.join("") + '</svg>';
   }
 
+  // ── loading / empty / error states ──────────────────────────────────────────
+  function renderSkeleton() {
+    el("tiles").innerHTML = "<div class=\"sk sk-tile\"></div>".repeat(5);
+    el("chart").innerHTML = '<div class="sk sk-chart"></div>';
+    var widths = [70, 130, 84, 50, 30, 62, 96];
+    var cells = widths.map(function (w, i) {
+      var cls = (i === 2 || i === 4) ? ' class="num"' : "";
+      var ml = (i === 2 || i === 4) ? "margin-left:auto;" : "";
+      return "<td" + cls + '><span class="sk sk-line" style="' + ml + "width:" + w + 'px"></span></td>';
+    }).join("");
+    el("quotesBody").innerHTML = ('<tr class="qc-skrow">' + cells + "</tr>").repeat(6);
+    el("emptyState").hidden = true;
+    hideTableError();
+    el("rowCount").textContent = "Loading…";
+  }
+  function emptyPanel(icon, title, body) {
+    return '<div class="ico">' + icon + "</div><h4>" + esc(title) + "</h4><p>" + esc(body) + "</p>";
+  }
+  var ICON_INBOX = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h5l2 3h4l2-3h5"/><path d="M5 5.5h14a1.5 1.5 0 0 1 1.45 1.1L22 12v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5l1.55-5.4A1.5 1.5 0 0 1 5 5.5z"/></svg>';
+  var ICON_FILTER = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"/></svg>';
+  var ICON_WARN = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>';
+  function showTableError(msg) {
+    var t = el("tableError");
+    t.innerHTML = '<div class="ico">' + ICON_WARN + "</div><h4>Couldn’t load quotes</h4>" +
+      "<p>" + esc(msg || "Something went wrong reaching the quote store.") + "</p>" +
+      '<button type="button" id="retryBtn" class="btn btn-primary btn-sm">Try again</button>';
+    t.hidden = false;
+    el("quotesTable").style.display = "none";
+    el("emptyState").hidden = true;
+    el("rowCount").textContent = "";
+    if (!hasLoaded) { el("tiles").innerHTML = ""; el("chart").innerHTML = ""; }  // clear shimmer
+    var rb = el("retryBtn");
+    if (rb) rb.addEventListener("click", loadQuotes);
+  }
+  function hideTableError() {
+    var t = el("tableError");
+    if (t) t.hidden = true;
+    var tbl = el("quotesTable");
+    if (tbl) tbl.style.display = "";
+  }
+  function setRefreshing(on) {
+    loading = on;
+    var b = el("refreshBtn");
+    if (!b) return;
+    b.classList.toggle("is-loading", on);
+    b.textContent = on ? "Refreshing…" : "Refresh";
+  }
+
   // ── table ─────────────────────────────────────────────────────────────────
   function renderTable() {
     var q = (el("search").value || "").trim().toLowerCase();
@@ -192,7 +242,19 @@
       return true;
     });
     el("rowCount").textContent = rows.length + " of " + quotes.length;
-    el("emptyState").hidden = rows.length !== 0;
+    var empty = el("emptyState");
+    if (rows.length === 0) {
+      empty.hidden = false;
+      if (quotes.length === 0) {
+        empty.innerHTML = emptyPanel(ICON_INBOX, "No quotes yet",
+          "Quotes drafted by the RFQ pipeline land here automatically. Send a real request to the connected mailbox and the first draft will appear.");
+      } else {
+        empty.innerHTML = emptyPanel(ICON_FILTER, "No matches",
+          "No quotes fit these filters. Clear the search or switch the send state and outcome to widen it.");
+      }
+    } else {
+      empty.hidden = true;
+    }
     el("quotesBody").innerHTML = rows.map(function (r) {
       var b = bucket(r);
       var oc = outcomeOf(r);
@@ -255,13 +317,21 @@
 
   // ── load ────────────────────────────────────────────────────────────────────
   function loadQuotes() {
-    el("rowCount").textContent = "Loading...";
+    if (loading) return;
+    hideTableError();
+    if (!hasLoaded) renderSkeleton(); else el("rowCount").textContent = "Loading…";
+    setRefreshing(true);
     var query = sb.from("quotes").select("*").order("created_at", { ascending: false }).limit(1000);
     if (cfg.OWNER) query = query.eq("owner", cfg.OWNER);
     query.then(function (res) {
-      if (res.error) { el("rowCount").textContent = "Error: " + res.error.message; return; }
+      setRefreshing(false);
+      if (res.error) { showTableError(res.error.message); return; }
       quotes = res.data || [];
+      hasLoaded = true;
       render();
+    }, function (err) {
+      setRefreshing(false);
+      showTableError((err && err.message) || "Network error — check your connection and try again.");
     });
   }
 })();
