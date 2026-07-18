@@ -133,7 +133,7 @@ h1.in .woven::after{transform:scaleX(1)}
 .center h2,.center .sub{margin-left:auto;margin-right:auto}
 
 /* reveal — critically-damped settle (out-expo), transform+opacity+blur only (GPU-friendly) */
-.rv{opacity:0;transform:translateY(30px) scale(.985);filter:blur(6px);will-change:transform,opacity,filter;
+.rv{opacity:0;transform:translateY(30px) scale(.985);filter:blur(0px);will-change:transform,opacity,filter;
   transition:opacity .82s var(--expo),transform .82s var(--expo),filter .82s var(--expo)}
 .rv.in{opacity:1;transform:none;filter:none;will-change:auto}
 .rv-d1{transition-delay:.08s}.rv-d2{transition-delay:.16s}.rv-d3{transition-delay:.24s}
