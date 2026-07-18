@@ -5,6 +5,8 @@
    ============================================================ */
 (function(){
   'use strict';
+  try { var __rv = function(){ var n = document.querySelectorAll('.rv:not(.in),.reveal:not(.in),.stagger:not(.in)'); for (var i=0;i<n.length;i++) n[i].classList.add('in'); }; setTimeout(__rv, 1400); window.addEventListener('load', function(){ setTimeout(__rv, 250); }); } catch(e){}
+
   var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- nav ---------- */
@@ -115,6 +117,31 @@
       }, {threshold:.08, rootMargin:'0px 0px 0px 0px'});
       lio.observe(loom);
     } else { runLoom(); }
+
+    /* signature: pointer-reactive tilt + sheen (fine pointer only, GPU transform) */
+    var finePointer = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+    if(finePointer && !prefersReduced){
+      var loomRaf = null, loomRect = null, MAXT = 4.2, lastE = null;
+      loom.addEventListener('pointerenter', function(){ loomRect = loom.getBoundingClientRect(); loom.classList.add('tilting'); });
+      loom.addEventListener('pointermove', function(e){
+        lastE = e;
+        if(!loomRect) loomRect = loom.getBoundingClientRect();
+        if(loomRaf) return;
+        loomRaf = requestAnimationFrame(function(){
+          loomRaf = null;
+          var px = Math.max(0, Math.min(1, (lastE.clientX - loomRect.left) / loomRect.width));
+          var py = Math.max(0, Math.min(1, (lastE.clientY - loomRect.top) / loomRect.height));
+          loom.style.setProperty('--ry', ((px - .5) * 2 * MAXT).toFixed(2) + 'deg');
+          loom.style.setProperty('--rx', ((.5 - py) * 2 * MAXT).toFixed(2) + 'deg');
+          loom.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+          loom.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+        });
+      });
+      loom.addEventListener('pointerleave', function(){
+        loom.classList.remove('tilting');
+        loom.style.setProperty('--rx', '0deg'); loom.style.setProperty('--ry', '0deg');
+      });
+    }
   }
 
   /* ---------- pricing toggle ---------- */
