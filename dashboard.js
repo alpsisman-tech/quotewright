@@ -331,6 +331,7 @@
   function startDash(user) {
     if (dashStarted) return;
     dashStarted = true;
+    renderGreeting(user);
     loadQuotes();
     if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
       window.QWOnboarding.check(sb, resolvedOwner, user);
@@ -373,6 +374,49 @@
     el("logoutBtn").hidden = false; el("whoami").textContent = email || "";
     var nav = el("subnav"); if (nav) nav.hidden = false;
     var an = el("adminNav"); if (an) an.hidden = !(profile && profile.isAdmin);
+  }
+
+  // ── greeting hero ───────────────────────────────────────────────────────────
+  // New sign-ups (user_metadata.welcomed unset) get "Welcome, {name}" once, then
+  // welcomed is stamped so every later visit shows a time-of-day greeting. Hour is
+  // read at runtime from the browser. Demo/tour mode keeps a sensible name and never
+  // writes to the real account.
+  function greetingWord(h) {
+    if (h >= 5 && h <= 11) return "Good morning";
+    if (h >= 12 && h <= 16) return "Good afternoon";
+    if (h >= 17 && h <= 21) return "Good evening";
+    return "Good night";
+  }
+  function personName(user) {
+    var md = (user && user.user_metadata) || {};
+    var dn = (md.display_name == null ? "" : String(md.display_name)).trim();
+    if (dn) return dn;
+    var email = (user && user.email) || currentEmail || "";
+    var local = (email.split("@")[0] || "").trim();
+    return local || "there";
+  }
+  var welcomedMarked = false;
+  function markWelcomed() {
+    if (welcomedMarked) return; welcomedMarked = true;
+    if (sb && sb.auth && typeof sb.auth.updateUser === "function") {
+      try { sb.auth.updateUser({ data: { welcomed: true } }); } catch (e) {}
+    }
+  }
+  function renderGreeting(user) {
+    var titleEl = el("greetTitle"), subEl = el("greetSub"), banner = el("greetBanner");
+    if (!titleEl || !banner) return;
+    var demo = !!(window.QWDemo && QWDemo.isOn());
+    var md = (user && user.user_metadata) || {};
+    var name = personName(user);
+    if (md.welcomed !== true && !demo) {
+      titleEl.textContent = "Welcome, " + name;
+      if (subEl) subEl.textContent = "You're all set — here's your quote pipeline at a glance.";
+      markWelcomed();
+    } else {
+      titleEl.textContent = greetingWord(new Date().getHours()) + ", " + name;
+      if (subEl) subEl.textContent = "Here's what's moving through your pipeline today.";
+    }
+    banner.hidden = false;
   }
 
   // ── helpers ───────────────────────────────────────────────────────────────
@@ -766,7 +810,9 @@
     var b = el("refreshBtn");
     if (!b) return;
     b.classList.toggle("is-loading", on);
-    b.textContent = on ? "Refreshing…" : "Refresh";
+    // The button holds an icon + label span; only swap the label so the icon stays.
+    var lbl = b.querySelector("span") || b;
+    lbl.textContent = on ? "Refreshing…" : "Refresh";
   }
 
   // ── table ─────────────────────────────────────────────────────────────────

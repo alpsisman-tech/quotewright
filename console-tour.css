@@ -3,7 +3,21 @@
    Layering: spotlight 400, tooltip 410 — above the workspace drawer (50) so drawer
    steps highlight correctly, below the toast (9999) so confirmations stay visible. */
 
-/* ── "Take the tour" header button ─────────────────────────────────────────── */
+/* ── Settings: "Guided tour & help" row ──────────────────────────────────────
+   Sits inside the settings hub grid — span both columns so it's a full-width
+   footer row beneath the tabs + panel, not squeezed into the tab column. */
+.qc-help {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  margin-top: 6px; padding: 20px 22px;
+  background: #fff; border: 1px solid var(--hair, #E7E7E7); border-radius: 16px;
+}
+.qc-help-txt { flex: 1 1 260px; min-width: 0; }
+.qc-help-txt h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
+.qc-help-txt p  { margin: 0; font-size: 13px; line-height: 1.5; color: var(--soft, #6B6B6B); max-width: 62ch; }
+.qc-help .qw-tourbtn { flex: 0 0 auto; }
+
+/* ── "Take the tour" button ────────────────────────────────────────────────── */
 .qw-tourbtn {
   display: inline-flex; align-items: center; gap: 7px;
   font: inherit; font-size: 13px; font-weight: 600; color: var(--ink);
@@ -102,10 +116,13 @@
 @media (max-width: 640px) {
   .qw-tour-tip { width: calc(100vw - 24px); }
 }
-/* icon-only tour button on cramped mobile headers */
+/* icon-only tour button on cramped mobile headers — but the Settings help row
+   keeps its full label (it's a primary control there, not a header affordance). */
 @media (max-width: 480px) {
   .qw-tourbtn span { display: none; }
   .qw-tourbtn { padding: 7px; }
+  .qc-help .qw-tourbtn span { display: inline; }
+  .qc-help .qw-tourbtn { padding: 7px 13px; }
 }
 
 /* ── reduced motion ────────────────────────────────────────────────────────── */

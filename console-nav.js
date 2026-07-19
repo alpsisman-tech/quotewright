@@ -29,6 +29,14 @@
     try { new MutationObserver(sync).observe(who, { childList: true, characterData: true, subtree: true }); } catch (e) {}
   }
 
+  // Force the desktop rail open / let it re-collapse. Used by the guided tour so
+  // labels are visible while it highlights nav items. On mobile the class is inert
+  // (the collapse behaviour is desktop-only); the drawer is opened separately.
+  window.QWNav = {
+    expand: function () { var r = el("subnav"); if (r) r.classList.add("qc-rail-open"); },
+    collapse: function () { var r = el("subnav"); if (r) r.classList.remove("qc-rail-open"); }
+  };
+
   ready(function () {
     wireAvatar();
     var rail = el("subnav");
