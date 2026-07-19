@@ -163,9 +163,15 @@
   // Normalize one raw line into the fields the detail table shows.
   function normLine(l) {
     var status = (l.status || "").toLowerCase();
+    // A pending_info line that still carries a concrete price is provisionally
+    // priced (awaiting a spec confirmation) — surface it distinctly from
+    // truly-unpriced lines. Mirrors the Build HTML Email renderer.
+    var hasPrice = (Number(l.total_cash) > 0) || (l.unit_cash != null && String(l.unit_cash).trim() !== "");
+    if (status === "pending_info" && hasPrice) status = "provisional";
     var reason = l.match_reason || l.why || l.reason || l.match_note || l.note || "";
     if (!reason) {
       reason = status === "priced" ? "Matched to a catalogue SKU."
+        : status === "provisional" ? "Provisionally priced; awaiting spec confirmation."
         : status === "pending_info" ? "Awaiting a detail from the customer."
         : status === "pending_hassan" ? "Product exists; price pending from Hassan."
         : "";
@@ -360,6 +366,7 @@
       var rows = lines.map(function (raw) {
         var l = normLine(raw);
         var st = l.status === "priced" ? '<span class="pill sent">Priced</span>'
+          : l.status === "provisional" ? '<span class="pill provisional">Priced · confirm spec</span>'
           : l.status === "pending_info" ? '<span class="pill pending">Needs info</span>'
           : l.status === "pending_hassan" ? '<span class="pill info">Pending price</span>'
           : "—";
