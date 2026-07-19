@@ -29,6 +29,7 @@
   // from account_profiles — never trusted from client input. Falls back to the
   // legacy config OWNER before the tenancy SQL is applied (graceful degradation).
   var resolvedOwner = cfg.OWNER || null;
+  var isAdminUser = false;   // admin sees ALL tenants (RLS allows it) → skip owner filter
   var authMode = "signin";   // "signin" | "signup"
   var dashStarted = false;   // load the dashboard exactly once per session
 
@@ -86,19 +87,41 @@
   var pendingLogout = el("pendingLogout");
   if (pendingLogout) pendingLogout.addEventListener("click", signOut);
 
+  // View + sort + pagination state.
+  var view = "needsyou";     // "needsyou" | "all" — operator starts on what needs a human
+  var sortMode = "attention";
+  var PAGE = 25, renderLimit = PAGE;
+
   el("refreshBtn").addEventListener("click", loadQuotes);
-  el("search").addEventListener("input", renderTable);
-  el("statusFilter").addEventListener("change", renderTable);
-  el("tierFilter").addEventListener("change", renderTable);
-  el("outcomeFilter").addEventListener("change", renderTable);
+  el("search").addEventListener("input", function () { renderLimit = PAGE; renderTable(); });
+  el("sortBy").addEventListener("change", function () { sortMode = this.value; renderLimit = PAGE; renderTable(); });
+  el("statusFilter").addEventListener("change", function () { renderLimit = PAGE; renderTable(); });
+  el("tierFilter").addEventListener("change", function () { renderLimit = PAGE; renderTable(); });
+  el("outcomeFilter").addEventListener("change", function () { renderLimit = PAGE; renderTable(); });
   el("approvalFilter").addEventListener("click", function () {
     approvalOnly = !approvalOnly;
     this.setAttribute("aria-pressed", approvalOnly ? "true" : "false");
     this.classList.toggle("on", approvalOnly);
+    renderLimit = PAGE;
     renderTable();
   });
   el("selectAll").addEventListener("change", onSelectAll);
   var approvalOnly = false;
+
+  // View tabs.
+  el("tabNeedsYou").addEventListener("click", function () { setView("needsyou"); });
+  el("tabAll").addEventListener("click", function () { setView("all"); });
+
+  function setView(v) {
+    view = v === "all" ? "all" : "needsyou";
+    var needs = view === "needsyou";
+    el("tabNeedsYou").setAttribute("aria-selected", needs ? "true" : "false");
+    el("tabAll").setAttribute("aria-selected", needs ? "false" : "true");
+    el("needsYouView").hidden = !needs;
+    el("allView").hidden = needs;
+    var ind = el("viewInd"); if (ind) ind.classList.toggle("right", !needs);
+    if (needs) renderNeedsYou(); else renderTable();
+  }
 
   // Table interactions (event delegation — CSP-safe, no inline handlers).
   el("quotesBody").addEventListener("click", function (e) {
@@ -120,6 +143,45 @@
       syncSelectAll();
     }
   });
+
+  // Needs-you queue interactions (same actions as the table, card-shaped).
+  el("needsYouBody").addEventListener("click", function (e) {
+    var t = e.target;
+    var jump = t.closest ? t.closest("button[data-jump]") : null;
+    if (jump) { e.stopPropagation(); jumpToAll(jump.getAttribute("data-jump")); return; }
+    var actBtn = t.closest ? t.closest("button[data-act]") : null;
+    if (actBtn) { e.stopPropagation(); setOutcome(actBtn.getAttribute("data-id"), actBtn.getAttribute("data-act"), actBtn); return; }
+    var appBtn = t.closest ? t.closest("button[data-approve]") : null;
+    if (appBtn) { e.stopPropagation(); approve(appBtn.getAttribute("data-approve"), appBtn); return; }
+    var sendBtn = t.closest ? t.closest("button[data-send]") : null;
+    if (sendBtn) { e.stopPropagation(); doSend(sendBtn.getAttribute("data-send"), sendBtn); return; }
+    var card = t.closest ? t.closest("[data-row]") : null;
+    if (card) openDrawer(card.getAttribute("data-row"));
+  });
+
+  // Load-more (pagination) for the full ledger.
+  el("moreBar").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("#loadMore") : null;
+    if (b) { renderLimit += PAGE; renderTable(); }
+  });
+
+  // Jump from a needs-you group into the filtered full ledger.
+  function jumpToAll(kind) {
+    el("search").value = "";
+    el("statusFilter").value = "all";
+    el("tierFilter").value = "all";
+    el("outcomeFilter").value = "all";
+    approvalOnly = false; digestFocus = null;
+    el("approvalFilter").setAttribute("aria-pressed", "false");
+    el("approvalFilter").classList.remove("on");
+    if (kind === "ready") { el("tierFilter").value = "green"; el("statusFilter").value = "draft"; }
+    else if (kind === "approve") { approvalOnly = true; el("approvalFilter").setAttribute("aria-pressed", "true"); el("approvalFilter").classList.add("on"); }
+    else if (kind === "info") { el("statusFilter").value = "draft"; digestFocus = "info"; }
+    else if (kind === "reply") { digestFocus = "reply"; }
+    renderLimit = PAGE;
+    setView("all");
+    var tbl = el("quotesTable"); if (tbl) tbl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   // Drawer close affordances.
   el("drawerScrim").addEventListener("click", closeDrawer);
@@ -259,6 +321,7 @@
       if (p.anon) { showLogin(); return; }
       if (!p.active) { showPending(p.email || currentEmail); return; }
       resolvedOwner = p.owner || cfg.OWNER || null;
+      isAdminUser = !!p.isAdmin;
       showDash(currentEmail, p);
       startDash(p.user);
     }, function () { showPending(currentEmail); });
@@ -582,43 +645,54 @@
       if (outcomeOf(q) === "won") months[key].won += 1;
     });
     var keys = Object.keys(months).sort();
-    if (!keys.length) { host.innerHTML = '<div class="empty">No dated quotes yet.</div>'; return; }
+    if (!keys.length) {
+      host.innerHTML = '<div class="empty">' + emptyPanel(ICON_INBOX, "No dated quotes yet",
+        "Once quotes start landing, this chart tracks your monthly volume and how many were won.") + "</div>";
+      return;
+    }
     keys = keys.slice(-12);
     var data = keys.map(function (k) { return months[k]; });
     var maxN = data.reduce(function (m, x) { return Math.max(m, x.total); }, 1);
 
-    var VBW = 1000, VBH = 250, padT = 30, padB = 42, padX = 20;
+    // Nice, integer y-axis so a single month reads as a real chart (not a slab).
+    var yMax, tickN;
+    if (maxN <= 4) { yMax = maxN; tickN = maxN; }
+    else { var step = Math.ceil(maxN / 4); yMax = step * 4; tickN = 4; }
+    if (yMax < 1) yMax = 1;
+
+    var VBW = 1000, VBH = 250, padT = 20, padB = 40, padL = 46, padR = 18;
+    var innerW = VBW - padL - padR;
     var innerH = VBH - padT - padB;
     var baseY = padT + innerH;
     var n = data.length;
-    // Cap the column pitch so a sparse chart clusters left (with room to grow)
-    // rather than floating one fat bar in the middle.
-    var slot = Math.min((VBW - padX * 2) / n, 132);
-    var plotW = slot * n;
-    var barW = Math.max(12, Math.min(64, slot * 0.46));
+    // Fixed column pitch so bars keep a sensible width and cluster left with room
+    // to grow — one month is a single tidy bar, not a full-width block.
+    var slot = Math.min(innerW / n, 88);
+    var barW = Math.max(16, Math.min(44, slot * 0.5));
     var parts = [];
-    // horizontal gridlines + baseline — makes even one bar read as a chart
-    var ticks = Math.min(maxN, 4);
-    for (var g = 1; g <= ticks; g++) {
-      var gy = (padT + innerH - (g / ticks) * innerH).toFixed(1);
-      parts.push('<line class="grid" x1="' + padX + '" y1="' + gy + '" x2="' + (padX + plotW).toFixed(1) + '" y2="' + gy + '"/>');
+
+    // gridlines (full plot width) + integer y-axis ticks
+    for (var t = 0; t <= tickN; t++) {
+      var val = Math.round(yMax * t / tickN);
+      var gy = (baseY - (t / tickN) * innerH);
+      var cls = t === 0 ? "axis-base" : "grid";
+      parts.push('<line class="' + cls + '" x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (padL + innerW).toFixed(1) + '" y2="' + gy.toFixed(1) + '"/>');
+      parts.push('<text class="axis-lbl y" x="' + (padL - 12) + '" y="' + (gy + 4).toFixed(1) + '" text-anchor="end" font-size="15">' + val + "</text>");
     }
-    parts.push('<line class="axis-base" x1="' + padX + '" y1="' + baseY + '" x2="' + (padX + plotW).toFixed(1) + '" y2="' + baseY + '"/>');
+
     data.forEach(function (x, i) {
-      var cx = padX + slot * i + slot / 2;
+      var cx = padL + slot * i + slot / 2;
       var bx = cx - barW / 2;
-      var totH = x.total > 0 ? Math.max(5, Math.round(x.total / maxN * innerH)) : 0;
-      var wonH = Math.round(x.won / maxN * innerH);
-      var restH = totH - wonH;
-      var yTop = padT + (innerH - totH);
-      // single rounded column, won portion overlaid at the base
-      if (totH > 0) parts.push('<rect class="bar-rest" x="' + bx.toFixed(1) + '" y="' + yTop + '" width="' + barW.toFixed(1) + '" height="' + totH + '" rx="7"/>');
-      if (wonH > 0) parts.push('<rect class="bar-won" x="' + bx.toFixed(1) + '" y="' + (baseY - wonH) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(wonH, 7) + '" rx="7"/>');
-      parts.push('<text class="axis-lbl cnt" x="' + cx.toFixed(1) + '" y="' + (yTop - 11) + '" text-anchor="middle" font-size="20" font-weight="600">' + x.total + '</text>');
+      var totH = x.total > 0 ? Math.max(4, x.total / yMax * innerH) : 0;
+      var wonH = x.won > 0 ? Math.max(4, x.won / yMax * innerH) : 0;
+      var yTop = baseY - totH;
+      if (totH > 0) parts.push('<rect class="bar-rest" x="' + bx.toFixed(1) + '" y="' + yTop.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + totH.toFixed(1) + '" rx="6"/>');
+      if (wonH > 0) parts.push('<rect class="bar-won" x="' + bx.toFixed(1) + '" y="' + (baseY - wonH).toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + wonH.toFixed(1) + '" rx="6"/>');
+      if (x.total > 0) parts.push('<text class="axis-lbl cnt" x="' + cx.toFixed(1) + '" y="' + (yTop - 9).toFixed(1) + '" text-anchor="middle" font-size="19" font-weight="600">' + x.total + "</text>");
       var lbl = x.d.toLocaleDateString("en-GB", { month: "short" });
-      parts.push('<text class="axis-lbl" x="' + cx.toFixed(1) + '" y="' + (VBH - 12) + '" text-anchor="middle" font-size="16">' + lbl + '</text>');
+      parts.push('<text class="axis-lbl" x="' + cx.toFixed(1) + '" y="' + (VBH - 12) + '" text-anchor="middle" font-size="15">' + lbl + "</text>");
     });
-    host.innerHTML = '<svg viewBox="0 0 ' + VBW + ' ' + VBH + '" preserveAspectRatio="xMinYMid meet" role="img" aria-label="Quotes per month">' + parts.join("") + '</svg>';
+    host.innerHTML = '<svg viewBox="0 0 ' + VBW + ' ' + VBH + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Quotes per month, won portion highlighted">' + parts.join("") + "</svg>";
   }
 
   // ── loading / empty / error states ──────────────────────────────────────────
@@ -704,6 +778,12 @@
   }
   var CHEVRON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
 
+  // Combined search haystack — customer + EVERY line's product name and SKU.
+  function searchHay(q) {
+    var bits = [q.customer || ""];
+    linesOf(q).map(normLine).forEach(function (l) { bits.push(l.name, l.sku, l.spec, l.colors); });
+    return bits.join(" ").toLowerCase();
+  }
   function filteredRows() {
     var q = (el("search").value || "").trim().toLowerCase();
     var sf = el("statusFilter").value;
@@ -711,8 +791,7 @@
     var of = el("outcomeFilter").value;
     return quotes.filter(function (r) {
       if (q) {
-        var hay = ((r.customer || "") + " " + productSummary(r)).toLowerCase();
-        if (hay.indexOf(q) === -1) return false;
+        if (searchHay(r).indexOf(q) === -1) return false;
       }
       if (sf !== "all" && bucket(r) !== sf) return false;
       if (tf !== "all" && tierOf(r) !== tf) return false;
@@ -725,10 +804,11 @@
   }
 
   function renderTable() {
-    var rows = filteredRows();
-    el("rowCount").textContent = rows.length + " of " + quotes.length;
+    var rows = sortRows(filteredRows());
+    var total = rows.length;
     var empty = el("emptyState");
-    if (rows.length === 0) {
+    if (total === 0) {
+      el("rowCount").textContent = "0 of " + quotes.length;
       empty.hidden = false;
       if (quotes.length === 0) {
         empty.innerHTML = emptyPanel(ICON_INBOX, "No quotes yet",
@@ -737,10 +817,27 @@
         empty.innerHTML = emptyPanel(ICON_FILTER, "No matches",
           "No quotes fit these filters. Clear the search, drop the approval filter, or widen the tier / send state and outcome.");
       }
-    } else {
-      empty.hidden = true;
+      el("quotesBody").innerHTML = "";
+      var mb0 = el("moreBar"); if (mb0) mb0.hidden = true;
+      syncSelectAll();
+      return;
     }
-    el("quotesBody").innerHTML = rows.map(function (r) {
+    empty.hidden = true;
+    if (renderLimit > total) renderLimit = Math.max(PAGE, Math.ceil(total / PAGE) * PAGE);
+    var shown = Math.min(renderLimit, total);
+    var pageRows = rows.slice(0, shown);
+    el("rowCount").textContent = shown < total ? ("Showing " + shown + " of " + total) : (total + " of " + quotes.length);
+    // Load-more control (pagination for 50+ rows).
+    var mb = el("moreBar");
+    if (mb) {
+      if (shown < total) {
+        mb.hidden = false;
+        mb.innerHTML = '<button type="button" id="loadMore" class="btn btn-ghost btn-sm">Load ' +
+          Math.min(PAGE, total - shown) + ' more</button>' +
+          '<span class="qc-more-count">' + shown + " of " + total + " shown</span>";
+      } else { mb.hidden = true; mb.innerHTML = ""; }
+    }
+    el("quotesBody").innerHTML = pageRows.map(function (r) {
       var b = bucket(r);
       var oc = outcomeOf(r);
       var id = r.id != null ? String(r.id) : "";
@@ -771,7 +868,120 @@
     syncSelectAll();
   }
 
-  function render() { renderDigest(); renderTiles(); renderChart(); renderTable(); renderBulk(); }
+  // ── "Needs you" queue ───────────────────────────────────────────────────────
+  var ICON_REPLY = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+  var ICON_INFO = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>';
+  var ICON_SEND = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>';
+  var ICON_CHECK = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+
+  function hasWeakLines(q) {
+    return linesOf(q).map(normLine).some(function (l) {
+      return l.status === "pending_info" || l.status === "pending_hassan";
+    });
+  }
+  function needsYouSets() {
+    var reply = [], approve = [], info = [], ready = [];
+    quotes.forEach(function (q) {
+      if (q.last_reply_text) reply.push(q);
+      if (needsApproval(q)) approve.push(q);
+      if (isDraft(q) && hasWeakLines(q)) info.push(q);
+      if (tierOf(q) === "green" && isDraft(q) && !needsApproval(q) && !hasWeakLines(q)) ready.push(q);
+    });
+    return { reply: reply, approve: approve, info: info, ready: ready };
+  }
+  function needsYouCount() {
+    var s = needsYouSets(), seen = {};
+    [s.reply, s.approve, s.info, s.ready].forEach(function (a) { a.forEach(function (q) { seen[String(q.id)] = true; }); });
+    return Object.keys(seen).length;
+  }
+  function renderViewTabs() {
+    var n = needsYouCount(), badge = el("needsYouN");
+    if (badge) { badge.hidden = !hasLoaded || n === 0; badge.textContent = n; }
+    var allB = el("allN");
+    if (allB) { allB.hidden = !hasLoaded; allB.textContent = quotes.length; }
+  }
+  function nyCard(q, action) {
+    var id = String(q.id);
+    var tier = tierOf(q);
+    var tierBadge = tier ? '<span class="qc-tier ' + tier + '"><i></i>' +
+      { green: "Ready", amber: "Review", red: "Needs work" }[tier] + "</span>" : "";
+    var summary = productSummary(q);
+    var meta = [money(q.total, q.currency), fmtDate(q.created_at)]
+      .filter(function (x) { return x && x !== "—"; }).join("  ·  ");
+    var actHtml;
+    if (action === "approve") actHtml = '<button class="btn btn-primary btn-sm" data-approve="' + esc(id) + '">Approve</button>';
+    else if (action === "send") actHtml = '<button class="btn btn-primary btn-sm qc-send" data-send="' + esc(id) + '">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>Send</button>';
+    else actHtml = '<span class="qc-ny-open" aria-hidden="true">Open' + CHEVRON + "</span>";
+    return '<div class="qc-ny-card" data-row="' + esc(id) + '" tabindex="0" role="button" aria-label="Open ' + esc(q.customer || "quote") + '">' +
+      '<div class="qc-ny-main">' +
+        '<div class="qc-ny-top"><span class="qc-ny-cust">' + esc(q.customer || "—") + "</span>" + tierBadge + "</div>" +
+        (summary ? '<div class="qc-ny-prod">' + esc(summary) + "</div>" : "") +
+        (meta ? '<div class="qc-ny-meta">' + esc(meta) + "</div>" : "") +
+      "</div>" +
+      '<div class="qc-ny-act">' + actHtml + "</div>" +
+    "</div>";
+  }
+  function renderNeedsYou() {
+    var host = el("needsYouBody");
+    if (!host) return;
+    if (!hasLoaded) { host.innerHTML = ""; return; }
+    var s = needsYouSets();
+    var groups = [
+      { key: "reply", items: s.reply, title: "Customer replied", sub: "They’re waiting on a response", icon: ICON_REPLY, action: "open", jump: "reply" },
+      { key: "approve", items: s.approve, title: "Needs your approval", sub: "Margin or discount flagged — decide before it sends", icon: ICON_WARN, action: "approve", jump: "approve" },
+      { key: "info", items: s.info, title: "Lines to resolve", sub: "A line is missing a spec or price", icon: ICON_INFO, action: "open", jump: "info" },
+      { key: "ready", items: s.ready, title: "Ready to send", sub: "Priced, high-confidence drafts", icon: ICON_SEND, action: "send", jump: "ready" }
+    ].filter(function (g) { return g.items.length; });
+    if (!groups.length) {
+      host.innerHTML = '<div class="qc-empty qc-ny-empty">' + emptyPanel(ICON_CHECK,
+        quotes.length ? "You’re all caught up" : "Nothing needs you yet",
+        quotes.length
+          ? "No quotes are waiting on a human right now. New drafts, approvals and customer replies surface here the moment they need you."
+          : "When the RFQ pipeline drafts a quote or a customer replies, anything needing your attention lands here first.") + "</div>";
+      return;
+    }
+    var CAP = 6;
+    host.innerHTML = groups.map(function (g) {
+      var shown = g.items.slice(0, CAP), more = g.items.length - shown.length;
+      return '<section class="qc-ny-group">' +
+        '<div class="qc-ny-ghead">' +
+          '<span class="qc-ny-gico ' + g.key + '">' + g.icon + "</span>" +
+          '<h3>' + esc(g.title) + '<span class="qc-ny-gn">' + g.items.length + "</span></h3>" +
+          '<span class="qc-ny-gsub">' + esc(g.sub) + "</span>" +
+          '<button type="button" class="qc-ny-all" data-jump="' + g.jump + '">View in ledger' + CHEVRON + "</button>" +
+        "</div>" +
+        '<div class="qc-ny-cards">' + shown.map(function (q) { return nyCard(q, g.action); }).join("") + "</div>" +
+        (more > 0 ? '<button type="button" class="qc-ny-morelink" data-jump="' + g.jump + '">+' + more + " more in the full ledger →</button>" : "") +
+      "</section>";
+    }).join("");
+  }
+
+  // ── sorting (attention-first by default) ─────────────────────────────────────
+  function dtOf(q) { var d = new Date(q.created_at); return isNaN(d) ? 0 : d.getTime(); }
+  function attnScore(q) {
+    var s = 0;
+    if (needsApproval(q)) s += 1000;
+    if (q.last_reply_text) s += 800;
+    if (isDraft(q) && hasWeakLines(q)) s += 600;
+    if (tierOf(q) === "green" && isDraft(q)) s += 400;
+    if (isDraft(q)) s += 200;
+    if (outcomeOf(q) !== "pending") s -= 300;
+    return s;
+  }
+  function sortRows(rows) {
+    var m = sortMode;
+    return rows.slice().sort(function (a, b) {
+      if (m === "newest") return dtOf(b) - dtOf(a);
+      if (m === "oldest") return dtOf(a) - dtOf(b);
+      if (m === "value") { var av = numOrNull(a.total), bv = numOrNull(b.total); return (bv == null ? -1 : bv) - (av == null ? -1 : av); }
+      if (m === "margin") { var am = numOrNull(a.margin_pct), bm = numOrNull(b.margin_pct); return (am == null ? 1e9 : am) - (bm == null ? 1e9 : bm); }
+      var d = attnScore(b) - attnScore(a);
+      return d !== 0 ? d : dtOf(b) - dtOf(a);
+    });
+  }
+
+  function render() { renderDigest(); renderTiles(); renderChart(); renderViewTabs(); if (view === "needsyou") renderNeedsYou(); else renderTable(); renderBulk(); }
 
   // ── selection / bulk ────────────────────────────────────────────────────────
   function onSelectAll() {
@@ -1372,7 +1582,8 @@
     if (!hasLoaded) renderSkeleton(); else el("rowCount").textContent = "Loading…";
     setRefreshing(true);
     var query = sb.from("quotes").select("*").order("created_at", { ascending: false }).limit(1000);
-    if (resolvedOwner) query = query.eq("owner", resolvedOwner);
+    // Members scope to their own tenant; admins see every tenant (RLS permits it).
+    if (resolvedOwner && !isAdminUser) query = query.eq("owner", resolvedOwner);
     query.then(function (res) {
       setRefreshing(false);
       if (res.error) { showTableError(res.error.message); return; }
@@ -1389,7 +1600,7 @@
   // digest table is optional — degrade to client-side metrics if it's absent.
   function loadDigest() {
     var q = sb.from("digest").select("*").order("generated_at", { ascending: false }).limit(1);
-    if (resolvedOwner) q = q.eq("owner", resolvedOwner);
+    if (resolvedOwner && !isAdminUser) q = q.eq("owner", resolvedOwner);
     return q.then(function (res) {
       digest = (!res.error && res.data && res.data.length) ? res.data[0] : null;
     }, function () { digest = null; });

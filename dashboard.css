@@ -707,3 +707,115 @@ body.qc-has-bulk .qc-toast.show { bottom: 86px; }
   .qc-subnav a { flex: 0 0 auto; }
   .qc-nav-admin { margin-left: 0; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Console-final — view tabs, "Needs you" queue, pagination, chart y-axis
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* chart y-axis tick labels */
+.qc-chart .axis-lbl.y { fill: var(--grey); font-size: 11px; }
+
+/* ── view tabs (Needs you / All quotes) ─────────────────────────────────────── */
+.qc-viewtabs {
+  position: relative; display: inline-flex; gap: 4px; padding: 4px;
+  background: var(--row); border: 1px solid var(--hair); border-radius: 13px;
+  margin-bottom: 18px;
+}
+.qc-viewtab {
+  position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px;
+  border: 0; background: none; cursor: pointer; padding: 9px 16px; border-radius: 10px;
+  font: inherit; font-family: var(--font); font-weight: 600; font-size: 13.5px;
+  color: var(--soft); letter-spacing: -.01em; transition: color .2s var(--ease), transform .25s var(--spring);
+}
+.qc-viewtab svg { opacity: .7; transition: opacity .2s; }
+.qc-viewtab:hover { color: var(--ink); }
+.qc-viewtab[aria-selected="true"] { color: var(--ink); }
+.qc-viewtab[aria-selected="true"] svg { opacity: 1; }
+.qc-viewtab:active { transform: scale(.97); }
+.qc-viewtab-n {
+  display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 5px;
+  border-radius: 100px; background: var(--ink); color: #fff; font-family: var(--mono);
+  font-size: 11px; font-weight: 600; line-height: 1;
+}
+.qc-viewtab[aria-selected="true"] .qc-viewtab-n:not(.muted) { background: var(--lime); color: #111; }
+.qc-viewtab-n.muted { background: var(--line-strong); color: var(--soft); }
+.qc-viewtab-ind {
+  position: absolute; z-index: 0; top: 4px; left: 4px; bottom: 4px;
+  width: calc(50% - 4px); border-radius: 10px; background: #fff;
+  box-shadow: 0 1px 3px rgba(17,17,17,.10), 0 0 0 1px var(--hair);
+  transition: transform .34s var(--expo);
+}
+.qc-viewtab-ind.right { transform: translateX(100%); }
+@media (prefers-reduced-motion: reduce) { .qc-viewtab-ind { transition: none; } .qc-viewtab { transition: none; } }
+
+/* ── "Needs you" queue ──────────────────────────────────────────────────────── */
+/* styles.css has a global `section{padding:104px 0}` for the marketing pages —
+   neutralise it for the console's <section> panels. */
+#needsYouView, #allView { padding: 0; }
+.qc-needsyou { margin-bottom: 26px; }
+.qc-ny-group {
+  background: #fff; border: 1px solid var(--hair); border-radius: var(--r-md);
+  box-shadow: var(--lift-1); padding: 4px 4px 8px; margin-bottom: 16px;
+}
+.qc-ny-ghead {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 14px 16px 12px;
+}
+.qc-ny-gico {
+  flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+  background: var(--row); color: var(--soft);
+}
+.qc-ny-gico.reply   { background: rgba(210,255,55,.20); color: #5f7a12; }
+.qc-ny-gico.approve { background: #fff2d6; color: #9a6a10; }
+.qc-ny-gico.info    { background: #e7edfb; color: #3d6edb; }
+.qc-ny-gico.ready   { background: var(--lime); color: #111; }
+.qc-ny-ghead h3 {
+  display: inline-flex; align-items: center; gap: 9px; margin: 0;
+  font-family: var(--font); font-weight: 600; font-size: 16px; letter-spacing: -.025em; color: var(--ink);
+}
+.qc-ny-gn {
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px;
+  border-radius: 100px; background: var(--row); border: 1px solid var(--hair);
+  font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--soft); line-height: 1;
+}
+.qc-ny-gsub { font-size: 13px; color: var(--soft); }
+.qc-ny-all {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 3px; border: 0; background: none;
+  cursor: pointer; font: inherit; font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+  letter-spacing: .02em; color: var(--soft); padding: 6px 8px; border-radius: 8px; transition: color .16s, background .16s;
+}
+.qc-ny-all svg { width: 13px; height: 13px; }
+.qc-ny-all:hover { color: var(--ink); background: var(--row); }
+.qc-ny-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; padding: 0 12px 4px; }
+.qc-ny-card {
+  display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer;
+  background: var(--row); border: 1px solid transparent; border-radius: 13px; padding: 13px 14px;
+  transition: transform .26s var(--expo), box-shadow .26s var(--expo), border-color .2s, background .2s;
+}
+.qc-ny-card:hover { background: #fff; border-color: var(--line-strong); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.qc-ny-card:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.qc-ny-main { min-width: 0; flex: 1; }
+.qc-ny-top { display: flex; align-items: center; gap: 8px; }
+.qc-ny-cust {
+  font-family: var(--font); font-weight: 600; font-size: 14px; color: var(--ink); letter-spacing: -.015em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.qc-ny-prod { font-size: 12.5px; color: var(--soft); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qc-ny-meta { font-size: 11.5px; color: var(--grey); font-family: var(--mono); margin-top: 4px; }
+.qc-ny-act { flex: none; }
+.qc-ny-open { display: inline-flex; align-items: center; gap: 2px; font-family: var(--mono); font-size: 11.5px; font-weight: 600; color: var(--soft); }
+.qc-ny-open svg { width: 14px; height: 14px; }
+.qc-ny-card:hover .qc-ny-open { color: var(--ink); }
+.qc-ny-morelink {
+  display: inline-block; margin: 6px 12px 6px; border: 0; background: none; cursor: pointer;
+  font: inherit; font-family: var(--mono); font-size: 11.5px; font-weight: 600; color: var(--soft);
+  padding: 6px 8px; border-radius: 8px; transition: color .16s, background .16s;
+}
+.qc-ny-morelink:hover { color: var(--ink); background: var(--row); }
+.qc-ny-empty { border: 1px dashed var(--line-strong); border-radius: var(--r-md); background: #fff; }
+.qc-ny-empty .ico { background: var(--lime-dim); border-color: transparent; }
+.qc-ny-empty .ico svg { stroke: #5f7a12; }
+
+/* ── pagination / load-more ─────────────────────────────────────────────────── */
+.qc-more { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 16px; }
+.qc-more-count { font-family: var(--mono); font-size: 11.5px; color: var(--grey); }

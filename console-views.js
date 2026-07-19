@@ -78,6 +78,9 @@
     fmtDate: fmtDate, fmtDateTime: fmtDateTime, relTime: relTime,
     parseJson: parseJson, isMissingTable: isMissingTable, toast: toast,
     cfg: cfg, sb: null, email: "",
+    // Tenancy (Wave A). owner = the CALLER's resolved tenant; isAdmin sees all.
+    // Falls back to cfg.OWNER before the tenancy SQL is applied (legacy mode).
+    owner: cfg.OWNER || null, isAdmin: false,
     boot: boot
   };
   window.QWConsole = API;
@@ -144,11 +147,27 @@
       if (lv) lv.hidden = true; if (av) av.hidden = false;
       if (logoutBtn) logoutBtn.hidden = false;
       var who = el("whoami"); if (who) who.textContent = email || "";
-      if (typeof opts.onAuth === "function") opts.onAuth(sb, email);
-      // First-run onboarding (self-contained, fail-safe). No-op if already onboarded.
-      if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
-        window.QWOnboarding.check(sb, cfg.OWNER);
-      }
+
+      // Resolve the CALLER's tenant BEFORE the page queries, so every auxiliary
+      // view scopes to the signed-in user's owner (not the hardcoded Hassan one).
+      // Purely additive + fail-safe: if the tenancy SQL isn't applied yet (or the
+      // resolver isn't loaded), API.owner stays cfg.OWNER and nothing changes.
+      var proceed = function () {
+        if (typeof opts.onAuth === "function") opts.onAuth(sb, email);
+        if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
+          window.QWOnboarding.check(sb, API.owner || cfg.OWNER);
+        }
+      };
+      if (window.QWTenancy && typeof window.QWTenancy.resolve === "function") {
+        window.QWTenancy.resolve(sb).then(function (p) {
+          // Only an ACTIVE member with an assigned tenant narrows the scope. A
+          // pending/admin/degraded result keeps the legacy owner; RLS is the real
+          // gate (pending users get zero rows either way — fail-closed).
+          if (p && p.active && p.owner) { API.owner = p.owner; cfg.OWNER = p.owner; }
+          API.isAdmin = !!(p && p.isAdmin);
+          proceed();
+        }, proceed);
+      } else { proceed(); }
     }
   }
 })();
