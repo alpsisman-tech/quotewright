@@ -52,6 +52,20 @@
   var currentEmail = "";
 
   el("logoutBtn").addEventListener("click", function () { sb.auth.signOut().then(showLogin); });
+  var googleBtn = el("googleBtn");
+  if (googleBtn) googleBtn.addEventListener("click", function () {
+    var err = el("loginError"); if (err) err.textContent = "";
+    googleBtn.disabled = true;
+    // Full-page redirect to Google via Supabase; on return, getSession() (below)
+    // picks up the session from the URL. redirectTo must be in Supabase's
+    // Auth -> URL Configuration allow-list.
+    sb.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin + window.location.pathname }
+    }).then(function (res) {
+      if (res && res.error) { googleBtn.disabled = false; if (err) err.textContent = res.error.message; }
+    }).catch(function () { googleBtn.disabled = false; if (err) err.textContent = "Network error."; });
+  });
   el("refreshBtn").addEventListener("click", loadQuotes);
   el("search").addEventListener("input", renderTable);
   el("statusFilter").addEventListener("change", renderTable);

@@ -44,6 +44,12 @@ body.qc { background: var(--bg); min-height: 100vh; color: var(--ink); }
 .qc-login input { width: 100%; padding: 12px 13px; border: 1px solid var(--hair); border-radius: 12px; font: inherit; font-family: var(--font); background: var(--row); color: var(--ink); }
 .qc-login input:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(19,19,19,.08); }
 .qc-login .btn-primary { width: 100%; margin-top: 6px; justify-content: center; }
+.qc-or { display: flex; align-items: center; gap: 12px; margin: 16px 0 4px; color: var(--muted, #8a8a8a); font-size: 12px; }
+.qc-or::before, .qc-or::after { content: ""; flex: 1; height: 1px; background: var(--hair); }
+.qc-google { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: #fff; color: var(--ink); border: 1px solid var(--hair); font-weight: 600; }
+.qc-google:hover { border-color: var(--ink); background: var(--row); }
+.qc-google:disabled { opacity: .6; cursor: default; }
+.qc-google-g { flex: 0 0 auto; }
 .qc-error { color: #b42318; font-size: 13px; margin-top: 12px; min-height: 1em; }
 
 /* dashboard */
