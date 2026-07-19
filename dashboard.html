@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="dashboard.css">
 <link rel="stylesheet" href="console-onboarding.css">
+<link rel="stylesheet" href="console-tour.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
 </head>
 <body class="qc">
@@ -33,8 +34,10 @@
 
 <nav class="qc-subnav" id="subnav" aria-label="Console sections" hidden>
   <a href="dashboard.html" aria-current="page">Quotes</a>
+  <a href="insights.html">Insights</a>
   <a href="customers.html">Customers</a>
   <a href="gaps.html">Catalogue gaps</a>
+  <a href="activity.html">Activity</a>
   <a href="settings.html">Settings</a>
   <a href="admin.html" id="adminNav" class="qc-nav-admin" hidden>Admin</a>
 </nav>
@@ -137,48 +140,76 @@
       <div id="chart"></div>
     </div>
 
-    <div class="qc-controls">
-      <input id="search" type="search" placeholder="Search customer or product&hellip;" class="qc-search">
-      <select id="statusFilter" class="qc-select" aria-label="Send state">
-        <option value="all">All send states</option>
-        <option value="draft">Draft (pending send)</option>
-        <option value="sent">Sent</option>
-      </select>
-      <select id="tierFilter" class="qc-select" aria-label="Autonomy tier">
-        <option value="all">All tiers</option>
-        <option value="green">Green — ready</option>
-        <option value="amber">Amber — review</option>
-        <option value="red">Red — needs work</option>
-      </select>
-      <select id="outcomeFilter" class="qc-select" aria-label="Outcome">
-        <option value="all">All outcomes</option>
-        <option value="pending">Pending decision</option>
-        <option value="won">Won</option>
-        <option value="lost">Lost</option>
-      </select>
-      <button id="approvalFilter" class="qc-chip" type="button" aria-pressed="false">
-        Needs approval <span id="approvalChipN" class="qc-chip-n" hidden></span>
+    <!-- View tabs: start on what needs a human, switch to the full ledger -->
+    <div class="qc-viewtabs" role="tablist" aria-label="Quote views">
+      <button type="button" class="qc-viewtab" id="tabNeedsYou" role="tab" aria-selected="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 3-1.5 4.5-2 5.5h18c-.5-1-2-2.5-2-5.5a7 7 0 0 0-7-7z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg>
+        Needs you <span class="qc-viewtab-n" id="needsYouN" hidden></span>
       </button>
-      <span id="rowCount" class="qc-count"></span>
+      <button type="button" class="qc-viewtab" id="tabAll" role="tab" aria-selected="false">
+        All quotes <span class="qc-viewtab-n muted" id="allN" hidden></span>
+      </button>
+      <span class="qc-viewtab-ind" id="viewInd" aria-hidden="true"></span>
     </div>
 
-    <div class="qc-tablewrap">
-      <table class="qc-table" id="quotesTable">
-        <thead>
-          <tr>
-            <th class="qc-col-sel"><input type="checkbox" id="selectAll" aria-label="Select all"></th>
-            <th class="qc-col-tier" aria-label="Tier"></th>
-            <th>Date</th><th>Customer &amp; products</th><th class="num">Total</th>
-            <th class="num">Margin</th><th>Confidence</th>
-            <th>Send</th><th>Approval</th><th>Outcome</th>
-            <th class="qc-col-open" aria-label="Open"></th>
-          </tr>
-        </thead>
-        <tbody id="quotesBody"></tbody>
-      </table>
-      <div id="emptyState" class="qc-empty" hidden></div>
-      <div id="tableError" class="qc-tableerror" hidden></div>
-    </div>
+    <!-- Needs-you queue — the operator's starting point -->
+    <section id="needsYouView" class="qc-needsyou" role="tabpanel" aria-label="Needs you">
+      <div id="needsYouBody"></div>
+    </section>
+
+    <!-- Full ledger -->
+    <section id="allView" role="tabpanel" aria-label="All quotes" hidden>
+      <div class="qc-controls">
+        <input id="search" type="search" placeholder="Search customer, product or SKU&hellip;" class="qc-search">
+        <select id="sortBy" class="qc-select" aria-label="Sort">
+          <option value="attention">Sort: Needs attention first</option>
+          <option value="newest">Sort: Newest first</option>
+          <option value="oldest">Sort: Oldest first</option>
+          <option value="value">Sort: Highest value</option>
+          <option value="margin">Sort: Lowest margin</option>
+        </select>
+        <select id="statusFilter" class="qc-select" aria-label="Send state">
+          <option value="all">All send states</option>
+          <option value="draft">Draft (pending send)</option>
+          <option value="sent">Sent</option>
+        </select>
+        <select id="tierFilter" class="qc-select" aria-label="Autonomy tier">
+          <option value="all">All tiers</option>
+          <option value="green">Green — ready</option>
+          <option value="amber">Amber — review</option>
+          <option value="red">Red — needs work</option>
+        </select>
+        <select id="outcomeFilter" class="qc-select" aria-label="Outcome">
+          <option value="all">All outcomes</option>
+          <option value="pending">Pending decision</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
+        </select>
+        <button id="approvalFilter" class="qc-chip" type="button" aria-pressed="false">
+          Needs approval <span id="approvalChipN" class="qc-chip-n" hidden></span>
+        </button>
+        <span id="rowCount" class="qc-count"></span>
+      </div>
+
+      <div class="qc-tablewrap">
+        <table class="qc-table" id="quotesTable">
+          <thead>
+            <tr>
+              <th class="qc-col-sel"><input type="checkbox" id="selectAll" aria-label="Select all"></th>
+              <th class="qc-col-tier" aria-label="Tier"></th>
+              <th>Date</th><th>Customer &amp; products</th><th class="num">Total</th>
+              <th class="num">Margin</th><th>Confidence</th>
+              <th>Send</th><th>Approval</th><th>Outcome</th>
+              <th class="qc-col-open" aria-label="Open"></th>
+            </tr>
+          </thead>
+          <tbody id="quotesBody"></tbody>
+        </table>
+        <div id="emptyState" class="qc-empty" hidden></div>
+        <div id="tableError" class="qc-tableerror" hidden></div>
+      </div>
+      <div id="moreBar" class="qc-more" hidden></div>
+    </section>
   </section>
 
   <div id="bootError" class="qc-boot-error" hidden></div>
@@ -212,6 +243,8 @@
 <script src="vendor/supabase.js"></script>
 <script src="dashboard-config.js"></script>
 <script src="console-tenancy.js"></script>
+<script src="console-demo.js"></script>
+<script src="console-tour.js"></script>
 <script src="console-onboarding.js"></script>
 <script src="dashboard.js"></script>
 </body>

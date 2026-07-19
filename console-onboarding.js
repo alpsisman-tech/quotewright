@@ -315,6 +315,11 @@
       document.body.classList.remove("ob-lock");
       setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 260);
       if (saved && window.QWConsole && window.QWConsole.toast) window.QWConsole.toast("You’re all set. Welcome to Quotewright.");
+      // The questionnaire is done → the user is now onboarded. Offer the guided tour
+      // (gated on user_metadata.tour_done inside QWTour.maybeAutoStart).
+      if (window.QWTour && typeof window.QWTour.maybeAutoStart === "function") {
+        setTimeout(function () { window.QWTour.maybeAutoStart(sb); }, 300);
+      }
     }
 
     show(0);

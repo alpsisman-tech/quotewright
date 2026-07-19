@@ -181,6 +181,7 @@
   // ── save one section ────────────────────────────────────────────────────
   function save(section, btn) {
     var keys = SECTIONS[section]; if (!keys) return;
+    if (window.QWDemo && QWDemo.isOn()) { snapSection(section); setDirtyNote(section, false, "Demo — not saved"); toast("Demo mode — settings aren't saved."); return; }
     var label = btn.textContent;
     btn.disabled = true; btn.textContent = "Saving…";
     var patch = { updated_at: new Date().toISOString() };
@@ -239,6 +240,15 @@
 
   function load() {
     el("tableError").hidden = true;
+    // DEMO MODE (tour): show the hub with sample settings, never touch Supabase.
+    if (window.QWDemo && QWDemo.isOn()) {
+      state.display_name = "Mehmed Yalçın"; state.company = "Hassan Tekstil A.Ş."; state.role = "Export Sales Manager";
+      state.auto_resolve_enabled = true; state.auto_send_enabled = false; state.followup_enabled = true;
+      state.green_min_confidence = 90; state.green_min_margin = 20; state.amber_min_confidence = 60;
+      state.margin_floor = 15; state.followup_days = 5; state.max_followups = 2;
+      el("loadingCard").hidden = true; el("settingsHub").hidden = false; paint();
+      return;
+    }
     sb.from("autonomy_settings").select("*").eq("owner", owner).maybeSingle().then(function (res) {
       el("loadingCard").hidden = true;
       if (res.error) {

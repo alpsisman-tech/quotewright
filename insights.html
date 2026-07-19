@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Catalogue gaps — Quotewright console</title>
-<meta name="description" content="Internal Quotewright console — catalogue gaps.">
+<title>Insights — Quotewright console</title>
+<meta name="description" content="Internal Quotewright console — reporting &amp; insights.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="console-views.css">
+<link rel="stylesheet" href="insights.css">
 <link rel="stylesheet" href="console-tour.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
 </head>
@@ -23,7 +24,7 @@
       <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
     </svg>
-    Quotewright <span class="qc-tag">Console</span>
+    Quotewright <span class="qc-tag">Insights</span>
   </a>
   <div class="qc-top-right">
     <span id="whoami" class="qc-who"></span>
@@ -32,10 +33,12 @@
 </header>
 
 <nav class="qc-subnav" id="subnav" aria-label="Console sections" hidden>
+  <a href="dashboard.html" class="in-back">&larr; Console</a>
   <a href="dashboard.html">Quotes</a>
   <a href="customers.html">Customers</a>
-  <a href="gaps.html" aria-current="page">Catalogue gaps</a>
-  <a href="settings.html">Autonomy</a>
+  <a href="gaps.html">Catalogue gaps</a>
+  <a href="insights.html" aria-current="page">Insights</a>
+  <a href="settings.html">Settings</a>
 </nav>
 
 <main class="qc-main">
@@ -44,8 +47,8 @@
   <section id="loginView" class="qc-login" hidden>
     <div class="qc-login-card">
       <div class="kicker">Internal access</div>
-      <h1>Catalogue gaps</h1>
-      <p class="sub">Sign in to see what customers keep asking for that isn’t catalogued.</p>
+      <h1>Insights</h1>
+      <p class="sub">Sign in to see win-rate, pipeline value, margins and turnaround across your quotes.</p>
       <form id="loginForm" novalidate>
         <div class="field">
           <label for="email">Email</label>
@@ -65,29 +68,27 @@
   <section id="appView" class="wrap qc-view" hidden>
     <div class="qc-head">
       <div>
-        <div class="kicker">Catalogue gaps</div>
-        <h1 class="qc-h1">What customers keep asking for</h1>
-        <p class="qc-lede">Requests the catalogue can’t price yet, ranked by how often they come up. The top of this list is the prioritised brief to feed back to the factory — the products worth adding first.</p>
+        <div class="kicker">Insights</div>
+        <h1 class="qc-h1">Reporting</h1>
+        <p class="qc-lede">How the pipeline is performing — win-rate, pipeline value, margins and turnaround, drawn live from your quotes. Everything here reflects only the quotes your account can see.</p>
       </div>
-      <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
+      <div class="in-head-actions">
+        <select id="rangeSel" class="qc-select" aria-label="Time range">
+          <option value="90">Last 90 days</option>
+          <option value="180">Last 180 days</option>
+          <option value="365">Last 12 months</option>
+          <option value="all" selected>All time</option>
+        </select>
+        <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
+      </div>
     </div>
 
+    <!-- Stat tiles -->
     <div class="qc-tiles" id="tiles"></div>
 
-    <div class="qc-controls">
-      <input id="search" type="search" placeholder="Search gaps&hellip;" class="qc-search" aria-label="Search gaps">
-      <select id="statusSel" class="qc-select" aria-label="Filter by status">
-        <option value="open">Open</option>
-        <option value="all">All statuses</option>
-        <option value="resolved">Added</option>
-        <option value="ignored">Ignored</option>
-      </select>
-      <span id="rowCount" class="qc-count"></span>
-    </div>
+    <!-- Charts -->
+    <div class="in-grid" id="grid"></div>
 
-    <div id="writeNote" class="qc-note" hidden></div>
-
-    <div id="gaps" class="qc-gaps"></div>
     <div id="emptyState" class="qc-empty qc-card" hidden></div>
     <div id="tableError" class="qc-tableerror qc-card" hidden></div>
   </section>
@@ -96,12 +97,14 @@
   <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
 </main>
 
+<div id="inTip" class="in-tip" role="status" aria-live="off" hidden></div>
+
 <script src="vendor/supabase.js"></script>
 <script src="dashboard-config.js"></script>
 <script src="console-tenancy.js"></script>
 <script src="console-demo.js"></script>
 <script src="console-tour.js"></script>
 <script src="console-views.js"></script>
-<script src="gaps.js"></script>
+<script src="insights.js"></script>
 </body>
 </html>
