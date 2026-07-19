@@ -215,6 +215,69 @@ dialog.qc-drawer[open]::backdrop { animation: qc-fade-in .34s var(--ease) both; 
 .qc-tier-desc { font-size: 12.5px; line-height: 1.55; color: var(--soft); margin: 0; }
 .qc-tier-desc b { color: var(--ink); font-weight: 600; }
 
+/* ── settings hub (tabbed) ───────────────────────────────────────────────── */
+.qc-hub { display: grid; grid-template-columns: 210px 1fr; gap: 24px; align-items: start; }
+.qc-hubnav { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 118px; }
+.qc-hubtab { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; cursor: pointer;
+  font-family: var(--font); font-size: 14px; font-weight: 500; color: var(--soft);
+  background: none; border: 1px solid transparent; border-radius: 12px; padding: 10px 13px;
+  transition: color .16s, background .16s, border-color .16s, transform .3s var(--spring); }
+.qc-hubtab svg { flex: none; stroke: currentColor; opacity: .85; }
+.qc-hubtab:hover { color: var(--ink); background: var(--row); }
+.qc-hubtab:active { transform: scale(.98); transition-duration: .08s; }
+.qc-hubtab[aria-selected="true"] { color: var(--ink); font-weight: 600; background: #fff; border-color: var(--hair); box-shadow: var(--lift-1); }
+.qc-hubtab[aria-selected="true"] svg { color: var(--ink); opacity: 1; }
+.qc-hubtab:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.qc-hubbody { min-width: 0; }
+.qc-sec { animation: qc-sec-in .32s var(--expo) both; }
+@keyframes qc-sec-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* forms inside a section */
+.qc-form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; margin-bottom: 6px; }
+.qc-field { display: flex; flex-direction: column; min-width: 0; }
+.qc-field-wide { grid-column: 1 / -1; }
+.qc-field label { font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.qc-field input, .qc-field textarea, .qc-field select {
+  width: 100%; padding: 11px 13px; border: 1px solid var(--hair); border-radius: 11px;
+  font: inherit; font-family: var(--font); font-size: 14px; background: var(--row); color: var(--ink);
+  transition: border-color .16s, box-shadow .16s; box-sizing: border-box; }
+.qc-field textarea { resize: vertical; line-height: 1.5; }
+.qc-field select { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 34px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; }
+.qc-field input:focus, .qc-field textarea:focus, .qc-field select:focus {
+  outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(19, 19, 19, .07); background: #fff; }
+.qc-hint { font-size: 12px; line-height: 1.5; color: var(--soft); margin: 7px 0 0; }
+.qc-field-sm { max-width: 200px; }
+.qc-inputwrap { position: relative; }
+.qc-inputwrap input { padding-right: 54px; }
+.qc-unit { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); font-family: var(--mono); font-size: 11px; color: var(--grey); pointer-events: none; }
+.qc-inline { display: flex; gap: 16px; margin: 12px 0 4px; }
+.qc-inline.off { opacity: .45; pointer-events: none; }
+
+/* section sub-heading (divides a long panel) */
+.qc-subhead { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--grey); font-weight: 600; margin: 28px 0 12px; padding-top: 22px; border-top: 1px solid var(--hair); }
+.qc-sec .qc-switchrow + .qc-sendhint { margin-bottom: 4px; }
+
+/* segmented control */
+.qc-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; max-width: 460px; }
+.qc-seg-btn { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; cursor: pointer;
+  padding: 12px 14px; border: 1px solid var(--hair); border-radius: 12px; background: #fff; font-family: var(--font);
+  transition: border-color .16s, background .16s, box-shadow .16s, transform .3s var(--spring); }
+.qc-seg-btn:active { transform: scale(.98); transition-duration: .08s; }
+.qc-seg-t { font-weight: 600; font-size: 13.5px; color: var(--ink); }
+.qc-seg-d { font-size: 11.5px; color: var(--soft); }
+.qc-seg-btn.on { border-color: var(--ink); background: var(--lime-dim); box-shadow: inset 0 0 0 1px var(--ink); }
+.qc-seg-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.qc-saved.ok { color: #1f6d3a; }
+
+@media (max-width: 820px) {
+  .qc-hub { grid-template-columns: 1fr; gap: 16px; }
+  .qc-hubnav { flex-direction: row; position: static; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+  .qc-hubtab { width: auto; flex: none; white-space: nowrap; }
+  .qc-form { grid-template-columns: 1fr; }
+}
+
 /* ── empty / error / loading ─────────────────────────────────────────────── */
 .qc-empty, .qc-tableerror { padding: 54px 32px; text-align: center; }
 .qc-empty .ico, .qc-tableerror .ico { width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center; margin: 0 auto 16px; }

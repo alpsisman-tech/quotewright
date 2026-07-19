@@ -10,6 +10,24 @@ body.qc { background: var(--bg); min-height: 100vh; color: var(--ink); }
   position: sticky; top: 0; z-index: 10;
 }
 .qc-top .logo { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font); font-weight: 600; color: var(--ink); text-decoration: none; }
+
+/* ── section sub-nav (surfaces Customers / Catalogue gaps / Settings) ──────── */
+.qc-subnav {
+  display: flex; gap: 4px; padding: 10px 24px; border-bottom: 1px solid var(--hair);
+  background: rgba(255,255,255,.85); position: sticky; top: 57px; z-index: 9;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); overflow-x: auto;
+}
+.qc-subnav a {
+  flex: none; font-family: var(--font); font-size: 13.5px; font-weight: 500;
+  color: var(--soft); text-decoration: none; padding: 7px 14px; border-radius: 100px;
+  border: 1px solid transparent; white-space: nowrap;
+  transition: color .18s, background .18s, border-color .18s, transform .3s var(--spring);
+}
+.qc-subnav a:hover { color: var(--ink); background: var(--row); }
+.qc-subnav a:active { transform: scale(.96); transition-duration: .08s; }
+.qc-subnav a[aria-current="page"] { color: var(--ink); font-weight: 600; background: var(--lime); border-color: var(--lime); }
+@media (prefers-reduced-motion: reduce) { .qc-subnav a { transition: none; } }
+@media (max-width: 560px) { .qc-subnav { top: 55px; padding: 9px 16px; } }
 .qc-tag { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); border: 1px solid var(--hair); border-radius: 100px; padding: 3px 9px; }
 .qc-top-right { display: flex; align-items: center; gap: 14px; }
 .qc-who { font-size: 13px; color: var(--soft); font-family: var(--mono); }
