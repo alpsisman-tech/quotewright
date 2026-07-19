@@ -13,30 +13,48 @@
 <link rel="stylesheet" href="console-views.css">
 <link rel="stylesheet" href="console-tour.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
+<link rel="stylesheet" href="console-nav.css">
 </head>
 <body class="qc">
 
-<header class="qc-top">
-  <a class="logo" href="dashboard.html" aria-label="Quotewright quote console">
-    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <rect width="32" height="32" rx="7" fill="#111"/>
-      <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
-    </svg>
-    Quotewright <span class="qc-tag">Console</span>
+<!-- Mobile top bar — shown only on narrow widths, once signed in -->
+<div class="qc-mobar">
+  <button class="qc-burger" id="navBurger" type="button" aria-label="Open navigation" aria-controls="subnav" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <a class="qc-mobar-brand" href="dashboard.html" aria-label="Quotewright quote console">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#111"/><path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/></svg>
+    Quotewright <span class="qc-tag">Copilot</span>
   </a>
-  <div class="qc-top-right">
-    <span id="whoami" class="qc-who"></span>
+</div>
+
+<div class="qc-nav-scrim" id="navScrim" aria-hidden="true"></div>
+
+<!-- Liquid-glass left navigation. #subnav is revealed on auth (replaces the old top bars). -->
+<aside class="qc-sidebar" id="subnav" aria-label="Console navigation" hidden>
+  <a class="qc-side-brand" href="dashboard.html" aria-label="Quotewright quote console">
+    <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#111"/><path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <span>Quotewright</span> <span class="qc-tag">Copilot</span>
+  </a>
+
+  <nav class="qc-side-nav" id="sideNav" aria-label="Console sections">
+    <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span>Quotes</span></a>
+    <a href="insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg><span>Insights</span></a>
+    <a href="customers.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg><span>Customers</span></a>
+    <a href="gaps.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><span>Catalogue gaps</span></a>
+    <a href="activity.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Activity</span></a>
+    <a href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M18 6h2M4 12h2M11 12h9M4 18h9M18 18h2"/><circle cx="15.5" cy="6" r="2"/><circle cx="8.5" cy="12" r="2"/><circle cx="15.5" cy="18" r="2"/></svg><span>Settings</span></a>
+    <a href="admin.html" id="adminNav" class="qc-nav-admin" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Admin</span></a>
+  </nav>
+
+  <div class="qc-side-foot">
+    <div class="qc-side-user">
+      <span class="qc-side-avatar" id="userAvatar" aria-hidden="true"></span>
+      <span id="whoami" class="qc-who"></span>
+    </div>
     <button id="logoutBtn" class="btn btn-ghost btn-sm" hidden>Sign out</button>
   </div>
-</header>
-
-<nav class="qc-subnav" id="subnav" aria-label="Console sections" hidden>
-  <a href="dashboard.html">Quotes</a>
-  <a href="customers.html" aria-current="page">Customers</a>
-  <a href="gaps.html">Catalogue gaps</a>
-  <a href="settings.html">Autonomy</a>
-</nav>
+</aside>
 
 <main class="qc-main">
 
@@ -111,6 +129,7 @@
 <script src="console-tenancy.js"></script>
 <script src="console-demo.js"></script>
 <script src="console-tour.js"></script>
+<script src="console-nav.js"></script>
 <script src="console-views.js"></script>
 <script src="customers.js"></script>
 </body>

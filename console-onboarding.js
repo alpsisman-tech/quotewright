@@ -151,6 +151,9 @@
 
     document.body.appendChild(wrap);
     document.body.classList.add("ob-lock");
+    // Onboarding is now ON SCREEN — hard-gate the guided tour so it can never
+    // auto-start over the wizard (console-tour.js checks this flag). Cleared in close().
+    window.QWOnboardingActive = true;
 
     // dots
     var dots = wrap.querySelector("#obDots");
@@ -313,10 +316,13 @@
     function close(saved) {
       wrap.classList.add("ob-out");
       document.body.classList.remove("ob-lock");
+      // Wizard is gone → release the tour gate BEFORE handing off, so the tour
+      // that we launch next is allowed to run.
+      window.QWOnboardingActive = false;
       setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 260);
       if (saved && window.QWConsole && window.QWConsole.toast) window.QWConsole.toast("You’re all set. Welcome to Quotewright.");
-      // The questionnaire is done → the user is now onboarded. Offer the guided tour
-      // (gated on user_metadata.tour_done inside QWTour.maybeAutoStart).
+      // The questionnaire is done → the user is now onboarded. NOW (and only now) offer
+      // the guided tour (gated on user_metadata.tour_done inside QWTour.maybeAutoStart).
       if (window.QWTour && typeof window.QWTour.maybeAutoStart === "function") {
         setTimeout(function () { window.QWTour.maybeAutoStart(sb); }, 300);
       }
