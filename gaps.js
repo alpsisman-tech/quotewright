@@ -113,6 +113,11 @@
     var rec = null;
     for (var i = 0; i < all.length; i++) if (String(all[i].id) === String(id)) { rec = all[i]; break; }
     if (!rec) return;
+    if (window.QWDemo && QWDemo.isOn()) {
+      rec.status = status; render();
+      toast(status === "resolved" ? "Marked as added · demo — not saved." : status === "ignored" ? "Gap ignored · demo." : "Gap reopened · demo.");
+      return;
+    }
     var prev = rec.status || "open";
     var siblings = btn.parentNode ? btn.parentNode.querySelectorAll("button") : [];
     for (var s = 0; s < siblings.length; s++) siblings[s].disabled = true;
@@ -168,6 +173,11 @@
 
   function load() {
     if (loading) return;
+    // DEMO MODE (tour): sample catalogue gaps, never touch Supabase.
+    if (window.QWDemo && QWDemo.isOn()) {
+      all = QWDemo.gaps(); loaded = true; loading = false;
+      el("tableError").hidden = true; render(); return;
+    }
     loading = true;
     el("tableError").hidden = true;
     if (!loaded) skeleton(); else el("rowCount").textContent = "Loading…";

@@ -335,7 +335,19 @@
     if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
       window.QWOnboarding.check(sb, resolvedOwner, user);
     }
+    // Guided tour: mount the "Take the tour" button, resume an in-progress tour, or
+    // auto-launch it for a first-time (onboarded, not-yet-toured) user.
+    if (window.QWTour && typeof window.QWTour.onConsoleReady === "function") {
+      window.QWTour.onConsoleReady(sb, user);
+    }
   }
+
+  // Hooks the guided tour uses to drive the dashboard (open a quote, switch tabs).
+  window.QWDash = {
+    setView: function (v) { try { setView(v); } catch (e) {} },
+    openDrawer: function (id) { try { if (findQuote(id)) openDrawer(id); } catch (e) {} },
+    closeDrawer: function () { try { if (openId != null) closeDrawer(); } catch (e) {} }
+  };
 
   function showLogin() {
     el("loginView").hidden = false;
@@ -1027,6 +1039,23 @@
 
   // ── secured webhook client ──────────────────────────────────────────────────
   function api(path, body) {
+    // DEMO MODE: simulate a successful pipeline call — never hit the network / DB.
+    if (window.QWDemo && QWDemo.isOn()) {
+      var out = { ok: true, status: "sent", demo: true };
+      var q = body && body.quote_id ? findQuote(body.quote_id) : null;
+      if (/resolve-line/.test(path) && q) {
+        // reflect the resolution locally so the drawer visibly updates during the tour
+        var ls = linesOf(q);
+        for (var i = 0; i < ls.length; i++) {
+          if (String(ls[i].ref) === String(body.line_ref)) {
+            ls[i].status = "priced"; ls[i].sku = body.chosen_sku || ls[i].sku;
+            if (ls[i].candidates) ls[i].candidates = [];
+            ls[i].match_reason = "Resolved from the console (demo).";
+          }
+        }
+      }
+      return Promise.resolve(out);
+    }
     return sb.auth.getSession().then(function (res) {
       var s = res.data && res.data.session;
       var token = s && s.access_token;
@@ -1081,6 +1110,12 @@
   // ── outcome write ───────────────────────────────────────────────────────────
   function setOutcome(id, outcome, btn) {
     if (!id) return;
+    if (window.QWDemo && QWDemo.isOn()) {
+      patchLocal(id, { outcome: outcome, outcome_at: new Date().toISOString() });
+      render(); if (openId === String(id)) renderDrawer();
+      toast("Marked " + outcome + " · demo — not saved.");
+      return;
+    }
     var acts = btn && btn.parentNode ? btn.parentNode.querySelectorAll("button") : [];
     for (var i = 0; i < acts.length; i++) acts[i].disabled = true;
     var patch = { outcome: outcome, outcome_at: new Date().toISOString() };
@@ -1111,6 +1146,7 @@
     rec.needs_approval = false; rec.approved_by = by; rec.approved_at = now;
     render();
     if (openId === String(id)) renderDrawer();
+    if (window.QWDemo && QWDemo.isOn()) { toast("Approved · demo — not saved."); return; }
     var patch = { needs_approval: false, approved_by: by, approved_at: now };
     sb.from("quotes").update(patch).eq("id", id).then(function (res) {
       if (res.error) {
@@ -1579,6 +1615,15 @@
   function loadQuotes() {
     if (loading) return;
     hideTableError();
+    // DEMO MODE (tour / demo): render sample data, never touch Supabase.
+    if (window.QWDemo && QWDemo.isOn()) {
+      quotes = QWDemo.quotes();
+      hasLoaded = true; digest = null;
+      setRefreshing(false);
+      Object.keys(selected).forEach(function (id) { if (!findQuote(id)) delete selected[id]; });
+      render(); if (openId != null) renderDrawer();
+      return;
+    }
     if (!hasLoaded) renderSkeleton(); else el("rowCount").textContent = "Loading…";
     setRefreshing(true);
     var query = sb.from("quotes").select("*").order("created_at", { ascending: false }).limit(1000);
@@ -1599,6 +1644,7 @@
   }
   // digest table is optional — degrade to client-side metrics if it's absent.
   function loadDigest() {
+    if (window.QWDemo && QWDemo.isOn()) { digest = null; return Promise.resolve(); }
     var q = sb.from("digest").select("*").order("generated_at", { ascending: false }).limit(1);
     if (resolvedOwner && !isAdminUser) q = q.eq("owner", resolvedOwner);
     return q.then(function (res) {

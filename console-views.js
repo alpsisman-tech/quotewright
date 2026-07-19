@@ -157,6 +157,10 @@
         if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
           window.QWOnboarding.check(sb, API.owner || cfg.OWNER);
         }
+        // Guided tour: mount the re-launch button + resume/auto-start (see console-tour.js).
+        if (window.QWTour && typeof window.QWTour.onConsoleReady === "function") {
+          window.QWTour.onConsoleReady(sb, null);
+        }
       };
       if (window.QWTenancy && typeof window.QWTenancy.resolve === "function") {
         window.QWTenancy.resolve(sb).then(function (p) {

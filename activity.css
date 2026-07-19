@@ -1,0 +1,115 @@
+/* Quotewright console — Activity feed.
+   Self-contained: inherits Seam Studio tokens (white / ink / Inter / lime #D2FF37)
+   and the shared chrome (top bar, subnav, login, tiles, controls, empty/error,
+   toast, skeleton) from styles.css + console-views.css. This file only adds the
+   timeline itself. Motion is fail-safe: entrance is a CSS keyframe that always
+   settles visible — never gated on a JS/observer class. */
+
+/* ── back link ───────────────────────────────────────────────────────────────── */
+.qc-back {
+  display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px;
+  font-family: var(--font); font-size: 13px; font-weight: 500; color: var(--soft);
+  text-decoration: none; padding: 5px 11px 5px 8px; border-radius: 100px;
+  border: 1px solid transparent; transition: color .16s, background .16s, border-color .16s, transform .3s var(--spring);
+}
+.qc-back svg { transition: transform .28s var(--expo); }
+.qc-back:hover { color: var(--ink); background: var(--row); border-color: var(--hair); }
+.qc-back:hover svg { transform: translateX(-2px); }
+.qc-back:active { transform: scale(.97); transition-duration: .08s; }
+
+/* ── timeline shell ──────────────────────────────────────────────────────────── */
+.qc-tl { display: flex; flex-direction: column; gap: 6px; }
+.qc-tl-day { margin-top: 10px; }
+.qc-tl-day:first-child { margin-top: 0; }
+.qc-tl-dayhead {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 6px 2px;
+  position: sticky; top: 104px; z-index: 4;
+}
+.qc-tl-dayhead::after { content: ""; flex: 1; height: 1px; background: var(--hair); }
+.qc-tl-dayhead h3 {
+  font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--grey); margin: 0;
+  background: var(--bg); padding: 4px 10px 4px 0; letter-spacing: .07em;
+}
+.qc-tl-daycount {
+  font-family: var(--mono); font-size: 10.5px; color: var(--grey);
+  background: var(--row); border: 1px solid var(--hair); border-radius: 100px;
+  min-width: 20px; text-align: center; padding: 1px 7px; font-variant-numeric: tabular-nums;
+}
+
+/* ── the spine + rows ────────────────────────────────────────────────────────── */
+.qc-tl-list { list-style: none; margin: 0; padding: 0; position: relative; }
+.qc-tl-list::before {
+  content: ""; position: absolute; left: 16px; top: 20px; bottom: 20px; width: 2px;
+  background: linear-gradient(180deg, var(--hair), var(--hair) 92%, transparent);
+  border-radius: 2px;
+}
+.qc-ev {
+  position: relative; display: grid; grid-template-columns: 34px 1fr; gap: 14px;
+  padding: 6px 0 16px; align-items: start;
+  animation: qc-ev-in .44s var(--expo) both;
+  animation-delay: calc(var(--i, 0) * 34ms);
+}
+.qc-ev:last-child { padding-bottom: 4px; }
+@keyframes qc-ev-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+
+/* icon node */
+.qc-ev-dot {
+  position: relative; z-index: 1; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; flex: none; box-shadow: 0 0 0 4px var(--bg);
+  border: 1px solid var(--hair); background: var(--row); color: var(--soft);
+  transition: transform .3s var(--spring), box-shadow .2s;
+}
+.qc-ev:hover .qc-ev-dot { transform: scale(1.08); }
+
+.qc-ev-dot.tone-neutral { background: var(--row);      border-color: var(--hair);            color: var(--soft); }
+.qc-ev-dot.tone-ink     { background: var(--ink);      border-color: var(--ink);             color: var(--lime); }
+.qc-ev-dot.tone-lime    { background: var(--lime);     border-color: var(--lime-border);     color: #16210a; }
+.qc-ev-dot.tone-green   { background: var(--ok-bg);    border-color: rgba(47,143,78,.34);    color: #1f6d3a; }
+.qc-ev-dot.tone-amber   { background: var(--amber-bg); border-color: #e6d2a3;                color: #8a6d1f; }
+.qc-ev-dot.tone-red     { background: #fdeeeb;         border-color: #f1b4ac;                color: #c0392b; }
+.qc-ev-dot.tone-blue    { background: #eaf0fd;         border-color: #c3d4f6;                color: #3054b0; }
+
+/* body */
+.qc-ev-body { min-width: 0; padding-top: 1px; }
+.qc-ev-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.qc-ev-title { font-family: var(--font); font-weight: 600; font-size: 14.5px; letter-spacing: -.01em; color: var(--ink); }
+.qc-ev-time { flex: none; font-family: var(--mono); font-size: 11.5px; color: var(--grey); white-space: nowrap; font-variant-numeric: tabular-nums; cursor: default; }
+
+.qc-ev-meta {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 7px;
+  margin-top: 3px; font-size: 13px; line-height: 1.5; color: var(--soft);
+}
+.qc-ev-meta b { color: var(--ink); font-weight: 600; }
+.qc-ev-note, .qc-ev-sku, .qc-ev-meta b { min-width: 0; overflow-wrap: anywhere; }
+.qc-ev-sep { color: var(--line-strong); font-size: 11px; }
+.qc-ev-amt { font-family: var(--mono); font-weight: 600; font-size: 12.5px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.qc-ev-sku { font-family: var(--mono); font-weight: 600; font-size: 12.5px; color: var(--ink); word-break: break-all; }
+.qc-ev-note { color: var(--soft); }
+.qc-mut { color: var(--grey); }
+
+/* tier chip on a draft */
+.qc-ev-tier {
+  display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: 1px 8px 1px 6px;
+  border-radius: 100px; border: 1px solid var(--hair); background: #fff; color: var(--soft);
+}
+.qc-ev-tier::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--grey); }
+.qc-ev-tier.green::before { background: #2f8f4e; }
+.qc-ev-tier.amber::before { background: #d8a41a; }
+.qc-ev-tier.red::before   { background: #d1443a; }
+
+/* ── responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .qc-tl-dayhead { top: 100px; }
+  .qc-ev { grid-template-columns: 30px 1fr; gap: 12px; }
+  .qc-ev-dot { width: 30px; height: 30px; }
+  .qc-tl-list::before { left: 14px; }
+  .qc-ev-line { flex-direction: column; gap: 1px; }
+  .qc-ev-time { order: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qc-ev { animation: none; }
+  .qc-ev-dot, .qc-back, .qc-back svg { transition: none; }
+}
