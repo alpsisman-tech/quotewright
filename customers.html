@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Customer memory — Quotewright console</title>
+<meta name="description" content="Internal Quotewright console — customer memory.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="console-views.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
+</head>
+<body class="qc">
+
+<header class="qc-top">
+  <a class="logo" href="dashboard.html" aria-label="Quotewright quote console">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="7" fill="#111"/>
+      <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
+    </svg>
+    Quotewright <span class="qc-tag">Console</span>
+  </a>
+  <div class="qc-top-right">
+    <span id="whoami" class="qc-who"></span>
+    <button id="logoutBtn" class="btn btn-ghost btn-sm" hidden>Sign out</button>
+  </div>
+</header>
+
+<nav class="qc-subnav" id="subnav" aria-label="Console sections" hidden>
+  <a href="dashboard.html">Quotes</a>
+  <a href="customers.html" aria-current="page">Customers</a>
+  <a href="gaps.html">Catalogue gaps</a>
+  <a href="settings.html">Autonomy</a>
+</nav>
+
+<main class="qc-main">
+
+  <!-- Login -->
+  <section id="loginView" class="qc-login" hidden>
+    <div class="qc-login-card">
+      <div class="kicker">Internal access</div>
+      <h1>Customer memory</h1>
+      <p class="sub">Sign in to review the customers the pipeline remembers.</p>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" required placeholder="you@company.com">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+        </div>
+        <button type="submit" class="btn btn-primary" id="loginBtn">Sign in</button>
+        <div id="loginError" class="qc-error" role="alert"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- App -->
+  <section id="appView" class="wrap qc-view" hidden>
+    <div class="qc-head">
+      <div>
+        <div class="kicker">Customer memory</div>
+        <h1 class="qc-h1">Customers we remember</h1>
+        <p class="qc-lede">Every customer the RFQ pipeline has quoted, with their history and learned preferences. Recurring buyers are recognised on sight — currency, colours and past products carry over.</p>
+      </div>
+      <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
+    </div>
+
+    <div class="qc-tiles" id="tiles"></div>
+
+    <div class="qc-controls">
+      <input id="search" type="search" placeholder="Search name, email or domain&hellip;" class="qc-search" aria-label="Search customers">
+      <select id="sortSel" class="qc-select" aria-label="Sort customers">
+        <option value="recent">Recently seen</option>
+        <option value="quotes">Most quotes</option>
+        <option value="orders">Most orders</option>
+        <option value="name">Name A–Z</option>
+      </select>
+      <span id="rowCount" class="qc-count"></span>
+    </div>
+
+    <div class="qc-tablewrap qc-card" id="tableCard">
+      <table class="qc-table" id="custTable">
+        <thead>
+          <tr>
+            <th>Customer</th><th>Email</th>
+            <th class="num">Quotes</th><th class="num">Orders</th>
+            <th>Currency</th><th>Last seen</th><th aria-label="Open"></th>
+          </tr>
+        </thead>
+        <tbody id="custBody"></tbody>
+      </table>
+      <div id="emptyState" class="qc-empty" hidden></div>
+      <div id="tableError" class="qc-tableerror" hidden></div>
+    </div>
+  </section>
+
+  <dialog id="drawer" class="qc-drawer" aria-label="Customer detail"></dialog>
+  <div id="bootError" class="qc-boot-error" hidden></div>
+  <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
+</main>
+
+<script src="vendor/supabase.js"></script>
+<script src="dashboard-config.js"></script>
+<script src="console-views.js"></script>
+<script src="customers.js"></script>
+</body>
+</html>

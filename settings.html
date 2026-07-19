@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Autonomy — Quotewright console</title>
+<meta name="description" content="Internal Quotewright console — autonomy settings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="console-views.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
+</head>
+<body class="qc">
+
+<header class="qc-top">
+  <a class="logo" href="dashboard.html" aria-label="Quotewright quote console">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="7" fill="#111"/>
+      <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
+    </svg>
+    Quotewright <span class="qc-tag">Console</span>
+  </a>
+  <div class="qc-top-right">
+    <span id="whoami" class="qc-who"></span>
+    <button id="logoutBtn" class="btn btn-ghost btn-sm" hidden>Sign out</button>
+  </div>
+</header>
+
+<nav class="qc-subnav" id="subnav" aria-label="Console sections" hidden>
+  <a href="dashboard.html">Quotes</a>
+  <a href="customers.html">Customers</a>
+  <a href="gaps.html">Catalogue gaps</a>
+  <a href="settings.html" aria-current="page">Autonomy</a>
+</nav>
+
+<main class="qc-main">
+
+  <!-- Login -->
+  <section id="loginView" class="qc-login" hidden>
+    <div class="qc-login-card">
+      <div class="kicker">Internal access</div>
+      <h1>Autonomy</h1>
+      <p class="sub">Sign in to set how much the pipeline does on its own.</p>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" required placeholder="you@company.com">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+        </div>
+        <button type="submit" class="btn btn-primary" id="loginBtn">Sign in</button>
+        <div id="loginError" class="qc-error" role="alert"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- App -->
+  <section id="appView" class="wrap qc-view" hidden>
+    <div class="qc-head">
+      <div>
+        <div class="kicker">Autonomy</div>
+        <h1 class="qc-h1">How much runs on its own</h1>
+        <p class="qc-lede">The pipeline scores every quote for confidence and margin, then sorts it into a tier. These gates decide where the line sits — and whether the safest quotes can go out without a human tap. The send gate stays off until you turn it on.</p>
+      </div>
+    </div>
+
+    <div id="settingsGrid" class="qc-settings" hidden>
+      <div class="qc-panel">
+        <h3>Auto-send</h3>
+        <p class="ph-sub">The one money-facing switch. Everything else here only sorts quotes into tiers.</p>
+
+        <div class="qc-switchrow" id="switchRow">
+          <div>
+            <div class="sw-label">Send green-tier quotes automatically</div>
+            <div class="sw-state" id="swState">Off — every quote waits for you</div>
+          </div>
+          <button type="button" class="qc-switch" id="autoSend" role="switch" aria-checked="false" aria-label="Auto-send green-tier quotes"></button>
+        </div>
+        <div class="qc-sendhint">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v6c0 5 3.8 8.3 9 9 5.2-.7 9-4 9-9V7z"/></svg>
+          <span>When on, only quotes that clear <b>both</b> green gates below send on their own. Amber and red always wait in the console. When off, nothing sends automatically — the pipeline just drafts.</span>
+        </div>
+
+        <div class="qc-thr">
+          <div class="qc-thr-item">
+            <div class="qc-thr-top">
+              <span class="qc-thr-name">Green · minimum confidence</span>
+              <span class="qc-thr-val"><span id="gcVal">90</span><span class="u">/100</span></span>
+            </div>
+            <p class="qc-thr-desc">How sure the match has to be before a quote counts as green. Higher = the system only trusts itself on near-certain matches.</p>
+            <input type="range" min="0" max="100" step="1" value="90" class="qc-range" id="greenConf" aria-label="Green minimum confidence">
+          </div>
+          <div class="qc-thr-item">
+            <div class="qc-thr-top">
+              <span class="qc-thr-name">Green · minimum margin</span>
+              <span class="qc-thr-val"><span id="gmVal">20</span><span class="u">%</span></span>
+            </div>
+            <p class="qc-thr-desc">The deal also has to be healthy. Below this margin a quote can never be green, however confident the match — it drops to amber for a look.</p>
+            <input type="range" min="0" max="60" step="1" value="20" class="qc-range" id="greenMargin" aria-label="Green minimum margin">
+          </div>
+          <div class="qc-thr-item">
+            <div class="qc-thr-top">
+              <span class="qc-thr-name">Amber · minimum confidence</span>
+              <span class="qc-thr-val"><span id="acVal">60</span><span class="u">/100</span></span>
+            </div>
+            <p class="qc-thr-desc">The floor for “worth reviewing.” Above this (but short of green) a quote is amber. Below it, the quote is red — flagged for a careful look.</p>
+            <input type="range" min="0" max="100" step="1" value="60" class="qc-range" id="amberConf" aria-label="Amber minimum confidence">
+          </div>
+        </div>
+
+        <div class="qc-save">
+          <button type="button" class="btn btn-primary" id="saveBtn">Save settings</button>
+          <span class="qc-saved" id="savedNote"></span>
+        </div>
+      </div>
+
+      <div class="qc-panel">
+        <h3>What each tier means</h3>
+        <p class="ph-sub">Live preview of your current gates. This is exactly how the pipeline sorts each quote.</p>
+        <div class="qc-tiers" id="tiers"></div>
+      </div>
+    </div>
+
+    <div id="emptyState" class="qc-empty qc-card" hidden></div>
+    <div id="tableError" class="qc-tableerror qc-card" hidden></div>
+    <div id="loadingCard" class="qc-panel"><div class="sk sk-row" style="height:120px"></div></div>
+  </section>
+
+  <div id="bootError" class="qc-boot-error" hidden></div>
+  <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
+</main>
+
+<script src="vendor/supabase.js"></script>
+<script src="dashboard-config.js"></script>
+<script src="console-views.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>
