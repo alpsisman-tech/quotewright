@@ -430,7 +430,7 @@
         "<td>" + confCell(overallConf(r)) + "</td>" +
         "<td><span class='pill " + b + "'>" + (b === "draft" ? "Draft" : "Sent") + "</span></td>" +
         "<td>" + approvalCell(r, id) + "</td>" +
-        "<td><span class='pill " + oc + "'>" + oc.charAt(0).toUpperCase() + oc.slice(1) + "</span>" + acts + "</td>" +
+        "<td><div class='qc-outcome'><span class='pill " + oc + "'>" + oc.charAt(0).toUpperCase() + oc.slice(1) + "</span>" + acts + "</div></td>" +
       "</tr>";
       return main + (open ? detailRow(r, id) : "");
     }).join("");
