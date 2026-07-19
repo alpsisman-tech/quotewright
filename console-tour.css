@@ -1,0 +1,117 @@
+/* Quotewright console — guided walkthrough (coach-marks).
+   Self-hosted; no external tour library. Seam Studio theme (white / ink / lime).
+   Layering: spotlight 400, tooltip 410 — above the workspace drawer (50) so drawer
+   steps highlight correctly, below the toast (9999) so confirmations stay visible. */
+
+/* ── "Take the tour" header button ─────────────────────────────────────────── */
+.qw-tourbtn {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--ink);
+  background: #fff; border: 1px solid var(--line-strong, #D6D6D6);
+  border-radius: 999px; padding: 7px 13px; cursor: pointer;
+  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.qw-tourbtn:hover { border-color: var(--ink); transform: translateY(-1px); box-shadow: 0 8px 20px -14px rgba(0,0,0,.35); }
+.qw-tourbtn svg { width: 15px; height: 15px; stroke: var(--ink); }
+.qw-tourbtn:hover svg { stroke: #6b7c00; }
+.qw-tourbtn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* ── spotlight ─────────────────────────────────────────────────────────────── */
+.qw-tour-spot {
+  position: fixed; z-index: 400; pointer-events: none;
+  border-radius: 12px; top: 0; left: 0; width: 0; height: 0;
+  box-shadow: 0 0 0 3px var(--lime), 0 0 0 100vmax rgba(19,19,19,.55);
+  transition: top .34s cubic-bezier(.2,.8,.2,1), left .34s cubic-bezier(.2,.8,.2,1),
+              width .34s cubic-bezier(.2,.8,.2,1), height .34s cubic-bezier(.2,.8,.2,1),
+              opacity .2s ease;
+}
+.qw-tour-spot.no-target {
+  /* Fail-safe: no element to highlight → just dim the page, no ring. */
+  box-shadow: 0 0 0 100vmax rgba(19,19,19,.55);
+}
+.qw-tour-spot.hidden { opacity: 0; }
+
+/* ── tooltip card ──────────────────────────────────────────────────────────── */
+.qw-tour-tip {
+  position: fixed; z-index: 410; width: min(340px, calc(100vw - 28px));
+  background: #fff; color: var(--ink);
+  border: 1px solid var(--line-strong, #D6D6D6); border-radius: 16px;
+  box-shadow: 0 28px 70px -30px rgba(0,0,0,.45), 0 8px 24px -18px rgba(0,0,0,.3);
+  padding: 18px 18px 15px; opacity: 0; transform: translateY(6px);
+  transition: opacity .24s ease, transform .24s cubic-bezier(.2,.8,.2,1);
+}
+.qw-tour-tip.in { opacity: 1; transform: translateY(0); }
+
+/* arrow */
+.qw-tour-tip::before {
+  content: ""; position: absolute; width: 12px; height: 12px; background: #fff;
+  border: 1px solid var(--line-strong, #D6D6D6); transform: rotate(45deg);
+  border-radius: 2px;
+}
+.qw-tour-tip[data-arrow="top"]::before    { top: -7px;  left: var(--ax, 28px); border-right: none; border-bottom: none; }
+.qw-tour-tip[data-arrow="bottom"]::before { bottom: -7px; left: var(--ax, 28px); border-left: none; border-top: none; }
+.qw-tour-tip[data-arrow="left"]::before   { left: -7px;  top: var(--ay, 24px); border-top: none; border-right: none; }
+.qw-tour-tip[data-arrow="right"]::before  { right: -7px; top: var(--ay, 24px); border-bottom: none; border-left: none; }
+.qw-tour-tip[data-arrow="none"]::before   { display: none; }
+
+.qw-tour-kick {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: #6b7c00; margin-bottom: 8px;
+}
+.qw-tour-kick::before { content: ""; width: 16px; height: 2px; border-radius: 2px; background: var(--lime); }
+.qw-tour-tip h3 { font-size: 17px; line-height: 1.2; letter-spacing: -.02em; margin: 0 0 6px; }
+.qw-tour-tip p  { font-size: 13.5px; line-height: 1.5; color: var(--soft, #555); margin: 0; }
+.qw-tour-tip p b, .qw-tour-tip p strong { color: var(--ink); font-weight: 600; }
+
+.qw-tour-foot {
+  display: flex; align-items: center; gap: 10px; margin-top: 15px;
+}
+.qw-tour-dots { display: flex; align-items: center; gap: 5px; margin-right: auto; }
+.qw-tour-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--line-strong, #D6D6D6); transition: background .2s ease, width .2s ease; }
+.qw-tour-dot.on   { background: var(--ink); width: 16px; border-radius: 3px; }
+.qw-tour-dot.done { background: #b9c96a; }
+
+.qw-tour-btn {
+  font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  border-radius: 9px; padding: 7px 13px; border: 1px solid transparent;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.qw-tour-btn.next  { background: var(--ink); color: #fff; }
+.qw-tour-btn.next:hover  { transform: translateY(-1px); box-shadow: 0 10px 22px -14px rgba(0,0,0,.5); }
+.qw-tour-btn.back  { background: transparent; color: var(--ink); border-color: var(--line-strong, #D6D6D6); }
+.qw-tour-btn.back:hover  { border-color: var(--ink); }
+.qw-tour-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.qw-tour-skip {
+  position: absolute; top: 14px; right: 15px;
+  font: inherit; font-size: 12px; font-weight: 600; color: var(--soft, #666);
+  background: none; border: none; cursor: pointer; padding: 3px 5px; border-radius: 6px;
+}
+.qw-tour-skip:hover { color: var(--ink); }
+.qw-tour-skip:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* final "you're all set" centred card gets a bigger tick */
+.qw-tour-tip.finale { text-align: left; }
+.qw-tour-finale-ico {
+  width: 40px; height: 40px; border-radius: 11px; background: var(--lime);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+}
+.qw-tour-finale-ico svg { width: 22px; height: 22px; stroke: var(--ink); }
+
+@media (max-width: 640px) {
+  .qw-tour-tip { width: calc(100vw - 24px); }
+}
+/* icon-only tour button on cramped mobile headers */
+@media (max-width: 480px) {
+  .qw-tourbtn span { display: none; }
+  .qw-tourbtn { padding: 7px; }
+}
+
+/* ── reduced motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .qw-tour-spot { transition: opacity .01s linear; }
+  .qw-tour-tip  { transition: opacity .12s linear; transform: none; }
+  .qw-tour-tip.in { transform: none; }
+  .qw-tourbtn:hover, .qw-tour-btn.next:hover { transform: none; }
+}

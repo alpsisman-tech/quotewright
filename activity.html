@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Catalogue gaps — Quotewright console</title>
-<meta name="description" content="Internal Quotewright console — catalogue gaps.">
+<title>Activity — Quotewright console</title>
+<meta name="description" content="Internal Quotewright console — recent activity feed.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="console-views.css">
+<link rel="stylesheet" href="activity.css">
 <link rel="stylesheet" href="console-tour.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
 </head>
@@ -34,8 +35,9 @@
 <nav class="qc-subnav" id="subnav" aria-label="Console sections" hidden>
   <a href="dashboard.html">Quotes</a>
   <a href="customers.html">Customers</a>
-  <a href="gaps.html" aria-current="page">Catalogue gaps</a>
-  <a href="settings.html">Autonomy</a>
+  <a href="gaps.html">Catalogue gaps</a>
+  <a href="settings.html">Settings</a>
+  <a href="activity.html" aria-current="page">Activity</a>
 </nav>
 
 <main class="qc-main">
@@ -44,8 +46,8 @@
   <section id="loginView" class="qc-login" hidden>
     <div class="qc-login-card">
       <div class="kicker">Internal access</div>
-      <h1>Catalogue gaps</h1>
-      <p class="sub">Sign in to see what customers keep asking for that isn’t catalogued.</p>
+      <h1>Activity feed</h1>
+      <p class="sub">Sign in to see a live timeline of everything the RFQ pipeline and your team have done.</p>
       <form id="loginForm" novalidate>
         <div class="field">
           <label for="email">Email</label>
@@ -63,11 +65,16 @@
 
   <!-- App -->
   <section id="appView" class="wrap qc-view" hidden>
+    <a class="qc-back" href="dashboard.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      Console
+    </a>
+
     <div class="qc-head">
       <div>
-        <div class="kicker">Catalogue gaps</div>
-        <h1 class="qc-h1">What customers keep asking for</h1>
-        <p class="qc-lede">Requests the catalogue can’t price yet, ranked by how often they come up. The top of this list is the prioritised brief to feed back to the factory — the products worth adding first.</p>
+        <div class="kicker">Activity</div>
+        <h1 class="qc-h1">Recent activity</h1>
+        <p class="qc-lede">Everything that happened, newest first — drafts written by the pipeline, quotes sent, deals won and lost, approvals, follow-ups, catalogue resolutions and gaps. One honest timeline, built from real timestamps.</p>
       </div>
       <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
     </div>
@@ -75,19 +82,27 @@
     <div class="qc-tiles" id="tiles"></div>
 
     <div class="qc-controls">
-      <input id="search" type="search" placeholder="Search gaps&hellip;" class="qc-search" aria-label="Search gaps">
-      <select id="statusSel" class="qc-select" aria-label="Filter by status">
-        <option value="open">Open</option>
-        <option value="all">All statuses</option>
-        <option value="resolved">Added</option>
-        <option value="ignored">Ignored</option>
+      <input id="search" type="search" placeholder="Search customer, product or SKU&hellip;" class="qc-search" aria-label="Search activity">
+      <select id="typeSel" class="qc-select" aria-label="Filter by event type">
+        <option value="all">All activity</option>
+        <option value="draft">Quotes drafted</option>
+        <option value="sent">Quotes sent</option>
+        <option value="outcome">Outcomes (won / lost)</option>
+        <option value="approval">Approvals</option>
+        <option value="followup">Follow-ups</option>
+        <option value="resolution">Catalogue resolutions</option>
+        <option value="gap">Catalogue gaps</option>
+      </select>
+      <select id="rangeSel" class="qc-select" aria-label="Filter by date range">
+        <option value="all">All time</option>
+        <option value="today">Today</option>
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
       </select>
       <span id="rowCount" class="qc-count"></span>
     </div>
 
-    <div id="writeNote" class="qc-note" hidden></div>
-
-    <div id="gaps" class="qc-gaps"></div>
+    <div id="feed" class="qc-tl"></div>
     <div id="emptyState" class="qc-empty qc-card" hidden></div>
     <div id="tableError" class="qc-tableerror qc-card" hidden></div>
   </section>
@@ -102,6 +117,6 @@
 <script src="console-demo.js"></script>
 <script src="console-tour.js"></script>
 <script src="console-views.js"></script>
-<script src="gaps.js"></script>
+<script src="activity.js"></script>
 </body>
 </html>

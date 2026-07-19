@@ -198,6 +198,12 @@
 
   function load() {
     if (loading) return;
+    // DEMO MODE (tour): sample customers, never touch Supabase.
+    if (window.QWDemo && QWDemo.isOn()) {
+      rows = QWDemo.customers(); loaded = true; loading = false;
+      el("tableError").hidden = true; el("custTable").style.display = "";
+      render(); return;
+    }
     loading = true;
     el("tableError").hidden = true;
     el("custTable").style.display = "";
