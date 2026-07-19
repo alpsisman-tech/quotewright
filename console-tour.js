@@ -26,9 +26,9 @@
 
   // ── the walkthrough ─────────────────────────────────────────────────────────
   var STEPS = [
-    { page: "dashboard.html", sel: "#sideNav", place: "right", tab: "needsyou",
+    { page: "dashboard.html", sel: "#sideNav", place: "right", tab: "needsyou", rail: true,
       kick: "Welcome", title: "Your whole console, one rail",
-      body: "Everything lives on this glass rail — <b>Quotes</b> is home base, with Insights, Customers, Catalogue gaps, Activity and Settings a click away. Let's walk through what each one does." },
+      body: "Everything lives on this glass rail — it sits as a slim icon strip and opens on hover. <b>Quotes</b> is home base, with Insights, Customers, Catalogue gaps, Activity and Settings a click away. Let's walk through what each one does." },
 
     { page: "dashboard.html", sel: "#digestBar", place: "bottom", tab: "needsyou",
       kick: "Daily brief", title: "What's waiting on you today",
@@ -159,6 +159,9 @@
       if (s.drawer) { QWDash.setView("all"); QWDash.openDrawer(s.drawer); }
       else { QWDash.closeDrawer(); if (s.tab) QWDash.setView(s.tab); }
     }
+    // The rail is collapsed by default — expand it while a step highlights it so the
+    // labels are visible, and let it re-collapse for every other step.
+    if (window.QWNav) { if (s.rail) QWNav.expand(); else QWNav.collapse(); }
     if (s.click) { var n = document.querySelector(s.click); if (n) { try { n.click(); } catch (e) {} } }
   }
 
@@ -303,6 +306,7 @@
   function end(markDone) {
     if (markDone) setTourDone();
     if (window.QWDemo) QWDemo.disable();
+    if (window.QWNav) QWNav.collapse();
     clearState();
     if (window.QWDash) { try { QWDash.closeDrawer(); } catch (e) {} }
     teardown();
@@ -359,19 +363,15 @@
     }, function () {});
   }
 
-  // ── "Take the tour" header button ────────────────────────────────────────────
+  // ── "Take the tour" control — lives on the Settings page ─────────────────────
+  // The button is static markup in settings.html (#qwTourBtn); here we just wire it
+  // to launch the tour. On every other console page there's no such node, so this is
+  // a no-op — the tour is re-launched from Settings, not the nav.
   function mountButton() {
-    if (document.getElementById("qwTourBtn")) return;
-    var host = document.querySelector(".qc-side-foot");
-    if (!host) return;
-    var b = document.createElement("button");
-    b.type = "button"; b.id = "qwTourBtn"; b.className = "qw-tourbtn";
-    b.innerHTML =
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2z"/></svg>' +
-      "<span>Take the tour</span>";
+    var b = document.getElementById("qwTourBtn");
+    if (!b || b.getAttribute("data-tour-wired") === "1") return;
+    b.setAttribute("data-tour-wired", "1");
     b.addEventListener("click", function () { start(); });
-    var logout = document.getElementById("logoutBtn");
-    if (logout) host.insertBefore(b, logout); else host.appendChild(b);
   }
 
   // ── entry point (called from each console page once the user is active) ──────

@@ -33,11 +33,6 @@
 
 <!-- Liquid-glass left navigation. #subnav is revealed on auth (replaces the old top bars). -->
 <aside class="qc-sidebar" id="subnav" aria-label="Console navigation" hidden>
-  <a class="qc-side-brand" href="dashboard.html" aria-label="Quotewright quote console">
-    <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#111"/><path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/></svg>
-    <span>Quotewright</span> <span class="qc-tag">Copilot</span>
-  </a>
-
   <nav class="qc-side-nav" id="sideNav" aria-label="Console sections">
     <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span>Quotes</span></a>
     <a href="insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg><span>Insights</span></a>
@@ -52,8 +47,8 @@
     <div class="qc-side-user">
       <span class="qc-side-avatar" id="userAvatar" aria-hidden="true"></span>
       <span id="whoami" class="qc-who"></span>
+      <button id="logoutBtn" class="qc-signout" hidden>Sign out</button>
     </div>
-    <button id="logoutBtn" class="btn btn-ghost btn-sm" hidden>Sign out</button>
   </div>
 </aside>
 

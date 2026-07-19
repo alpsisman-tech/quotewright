@@ -819,3 +819,87 @@ body.qc-has-bulk .qc-toast.show { bottom: 86px; }
 /* ── pagination / load-more ─────────────────────────────────────────────────── */
 .qc-more { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 16px; }
 .qc-more-count { font-family: var(--mono); font-size: 11.5px; color: var(--grey); }
+
+/* ── greeting hero — liquid glass over an ink→lime woven-loom motif ──────────── */
+.qc-greet {
+  position: relative; overflow: hidden; isolation: isolate;
+  border-radius: 20px; margin-bottom: 20px; min-height: 122px;
+}
+/* the themed background: ink base + a lime bloom and a cool thread-blue bloom,
+   with a faint woven warp/weft grid masked to the top-right for a loom feel */
+.qc-greet-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(120% 150% at 86% -20%, rgba(210,255,55,.46), transparent 52%),
+    radial-gradient(95% 130% at 6% 128%, rgba(61,110,219,.32), transparent 58%),
+    linear-gradient(118deg, #171a20 0%, #101115 58%, #191d12 100%);
+}
+.qc-greet-bg::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 23px),
+    repeating-linear-gradient(0deg,  rgba(255,255,255,.045) 0 1px, transparent 1px 23px);
+  -webkit-mask: radial-gradient(120% 130% at 82% 0%, #000 26%, transparent 74%);
+          mask: radial-gradient(120% 130% at 82% 0%, #000 26%, transparent 74%);
+  opacity: .8;
+}
+/* the glass panel floating over the motif */
+.qc-greet-glass {
+  position: relative; z-index: 1; min-height: inherit;
+  display: flex; align-items: center; gap: 18px;
+  padding: 22px 24px;
+  border-radius: 20px;
+  background: linear-gradient(158deg, rgba(255,255,255,.17), rgba(255,255,255,.055) 60%);
+  -webkit-backdrop-filter: blur(13px) saturate(150%);
+          backdrop-filter: blur(13px) saturate(150%);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.4),          /* specular top edge */
+    inset 0 0 0 1px rgba(255,255,255,.05);
+}
+.qc-greet-text { flex: 1 1 auto; min-width: 0; }
+.qc-greet-kicker {
+  display: inline-block; font-family: var(--mono);
+  font-size: 10.5px; font-weight: 600; letter-spacing: .13em; text-transform: uppercase;
+  color: rgba(210,255,55,.9); margin-bottom: 9px;
+}
+.qc-greet-title {
+  margin: 0; color: #fff;
+  font-size: clamp(21px, 3vw, 28px); font-weight: 600; letter-spacing: -.025em; line-height: 1.08;
+  text-wrap: balance;
+}
+.qc-greet-sub {
+  margin: 6px 0 0; color: rgba(255,255,255,.74);
+  font-size: 13.5px; line-height: 1.45; font-weight: 450;
+}
+/* refresh, restyled to sit on the dark glass */
+.qc-greet-refresh {
+  flex: 0 0 auto; align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 7px;
+  font: inherit; font-size: 13px; font-weight: 600; color: #fff;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px; padding: 8px 15px; cursor: pointer;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  transition: background .18s ease, border-color .18s ease, transform .16s var(--expo);
+}
+.qc-greet-refresh svg { width: 15px; height: 15px; }
+.qc-greet-refresh:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.4); transform: translateY(-1px); }
+.qc-greet-refresh:active { transform: translateY(0) scale(.98); }
+.qc-greet-refresh:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+
+@media (max-width: 560px) {
+  .qc-greet-glass { padding: 18px 18px; gap: 12px; }
+  .qc-greet-refresh span { display: none; }
+  .qc-greet-refresh { padding: 8px; border-radius: 12px; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .qc-greet-glass {
+    background: linear-gradient(158deg, rgba(30,33,40,.92), rgba(20,22,27,.92));
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  .qc-greet-refresh { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255,255,255,.14); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qc-greet-refresh { transition: none; }
+}

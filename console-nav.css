@@ -11,7 +11,8 @@
    in console-nav.js. */
 
 :root {
-  --sb-w: 246px;          /* rail width           */
+  --sb-w: 246px;          /* rail width — hover / focus expanded  */
+  --sb-w-collapsed: 72px; /* rail width — default icon-only rail   */
   --sb-gap: 14px;         /* inset from window     */
   --z-mobar: 44;
   --z-navscrim: 55;
@@ -35,7 +36,8 @@ body.qc > main, body.qc > .qc-mobar { position: relative; z-index: 1; }
   position: fixed; top: var(--sb-gap); left: var(--sb-gap); bottom: var(--sb-gap);
   width: var(--sb-w); z-index: var(--z-sidebar);
   display: flex; flex-direction: column; gap: 14px;
-  padding: 16px 14px 14px;
+  padding: 14px 14px 14px;
+  transition: width .34s var(--expo), box-shadow .34s var(--expo);
   border-radius: 22px;
   border: 1px solid rgba(255,255,255,.65);
   background:
@@ -56,21 +58,6 @@ body.qc > main, body.qc > .qc-mobar { position: relative; z-index: 1; }
   opacity: .7;
 }
 .qc-sidebar > * { position: relative; }
-
-/* ── brand ───────────────────────────────────────────────────────────────── */
-.qc-side-brand {
-  display: flex; align-items: center; gap: 10px;
-  padding: 4px 8px 2px; text-decoration: none;
-  font-family: var(--font); font-weight: 600; font-size: 17px; letter-spacing: -.03em;
-  color: var(--ink);
-}
-.qc-side-brand svg { flex: 0 0 auto; }
-.qc-side-brand .qc-tag {
-  font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--soft);
-  border: 1px solid rgba(19,19,19,.14); border-radius: 100px; padding: 2px 8px;
-  background: rgba(255,255,255,.5);
-}
 
 /* ── nav links ───────────────────────────────────────────────────────────── */
 .qc-side-nav { display: flex; flex-direction: column; gap: 3px; overflow-y: auto; margin: 2px -4px; padding: 0 4px; }
@@ -99,29 +86,37 @@ body.qc > main, body.qc > .qc-mobar { position: relative; z-index: 1; }
 .qc-side-nav .qc-nav-admin { margin-left: 0; margin-top: 2px; }
 .qc-nav-sep { height: 1px; margin: 6px 8px; background: rgba(19,19,19,.07); }
 
-/* ── footer: user · take the tour · sign out ─────────────────────────────── */
+/* ── footer: avatar · email · sign out — one compact row ─────────────────────
+   Collapsed the rail shows only the avatar; expanded it reveals the email and a
+   compact Sign-out button beside it (email · [Sign out]). */
 .qc-side-foot {
-  margin-top: auto; display: flex; flex-direction: column; gap: 8px;
-  padding-top: 12px; border-top: 1px solid rgba(19,19,19,.08);
+  margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(19,19,19,.08);
 }
-.qc-side-user { display: flex; align-items: center; gap: 10px; padding: 2px 6px 4px; min-width: 0; }
+.qc-side-user { display: flex; align-items: center; gap: 9px; padding: 2px 4px; min-width: 0; }
 .qc-side-avatar {
-  flex: 0 0 auto; width: 30px; height: 30px; border-radius: 9px;
+  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 10px;
   display: grid; place-items: center; background: var(--ink); color: #fff;
   font-family: var(--font); font-weight: 600; font-size: 13px; text-transform: uppercase;
 }
 .qc-side-user .qc-who {
-  font-family: var(--mono); font-size: 12px; color: var(--soft);
+  flex: 1 1 auto; display: block;
+  font-family: var(--mono); font-size: 11.5px; color: var(--soft);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
 }
-.qc-side-foot .qw-tourbtn,
-.qc-side-foot #logoutBtn { width: 100%; justify-content: center; }
-.qc-side-foot .qw-tourbtn { background: rgba(255,255,255,.55); }
-.qc-side-foot #logoutBtn { background: transparent; }
-/* the rail always has room for these — defeat legacy ≤560px top-bar rules that
-   hid the email (dashboard.css) and the tour-button label (console-tour.css). */
-.qc-side-user .qc-who { display: block; }
-.qc-side-foot .qw-tourbtn span { display: inline; }
+/* compact sign-out — a subtle text button that sits inline after the email */
+.qc-signout {
+  flex: 0 0 auto; display: inline-flex; align-items: center;
+  font: inherit; font-size: 12px; font-weight: 600; letter-spacing: -.01em;
+  color: var(--soft); background: transparent; border: 0; cursor: pointer;
+  padding: 4px 8px; border-radius: 8px; white-space: nowrap;
+  transition: color .16s ease, background .16s ease;
+}
+.qc-signout::before {
+  content: ""; width: 1px; height: 13px; margin-right: 8px;
+  background: rgba(19,19,19,.16); border-radius: 1px;
+}
+.qc-signout:hover { color: var(--ink); background: rgba(19,19,19,.05); }
+.qc-signout:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 /* ── mobile top bar (glass) — shown only on narrow + authed ──────────────── */
 .qc-mobar {
@@ -161,10 +156,47 @@ body.qc > main, body.qc > .qc-mobar { position: relative; z-index: 1; }
 }
 .qc-nav-scrim.show { opacity: 1; visibility: visible; }
 
-/* ── layout: push content right of the rail ──────────────────────────────── */
-.qc-main { margin-left: calc(var(--sb-w) + var(--sb-gap) * 2); transition: margin-left .32s var(--expo); }
+/* ── layout: content clears the COLLAPSED rail; hover-expansion overlays ─────
+   The page reserves room for the narrow icon rail only. When the rail widens on
+   hover / focus it floats OVER the content (no reflow, no horizontal shift). */
+.qc-main { margin-left: calc(var(--sb-w-collapsed) + var(--sb-gap) * 2); transition: margin-left .32s var(--expo); }
 /* logged-out (rail hidden) → full-width, centred login card */
 body.qc:has(#subnav[hidden]) .qc-main { margin-left: 0; }
+
+/* ── desktop: collapsed icon rail that expands on hover / focus / tour ───────── */
+@media (min-width: 861px) {
+  .qc-sidebar { width: var(--sb-w-collapsed); }
+  /* labels + email + sign-out are laid out but faded while collapsed; kept in the
+     DOM (opacity, not display) so screen readers still announce them. */
+  .qc-side-nav a span,
+  .qc-side-user .qc-who,
+  .qc-side-user .qc-signout {
+    opacity: 0; transition: opacity .16s ease;
+  }
+  .qc-side-nav a span { transition: opacity .2s ease .02s; }
+
+  .qc-sidebar:hover,
+  .qc-sidebar:focus-within,
+  .qc-sidebar.qc-rail-open {
+    width: var(--sb-w);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.92),
+      inset 0 0 0 1px rgba(255,255,255,.14),
+      0 0 0 1px rgba(19,19,19,.05),
+      0 34px 64px -32px rgba(19,19,19,.42);
+  }
+  .qc-sidebar:hover .qc-side-nav a span,
+  .qc-sidebar:focus-within .qc-side-nav a span,
+  .qc-sidebar.qc-rail-open .qc-side-nav a span,
+  .qc-sidebar:hover .qc-side-user .qc-who,
+  .qc-sidebar:focus-within .qc-side-user .qc-who,
+  .qc-sidebar.qc-rail-open .qc-side-user .qc-who,
+  .qc-sidebar:hover .qc-side-user .qc-signout,
+  .qc-sidebar:focus-within .qc-side-user .qc-signout,
+  .qc-sidebar.qc-rail-open .qc-side-user .qc-signout {
+    opacity: 1;
+  }
+}
 
 /* ── responsive: collapse to a top bar + slide-in glass drawer ───────────── */
 @media (max-width: 860px) {
@@ -200,9 +232,9 @@ body.qc:has(#subnav[hidden]) .qc-main { margin-left: 0; }
     box-shadow: 0 0 0 1px rgba(19,19,19,.05), 0 20px 44px -30px rgba(19,19,19,.3);
   }
   .qc-sidebar::before { display: none; }
-  .qc-side-brand .qc-tag, .qc-mobar-brand .qc-tag { background: var(--row); }
+  .qc-mobar-brand .qc-tag { background: var(--row); }
   .qc-mobar { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .qc-burger, .qc-side-foot .qw-tourbtn { background: var(--row); }
+  .qc-burger { background: var(--row); }
 }
 @media (prefers-contrast: more) {
   .qc-sidebar { background: #fff; border-color: var(--ink); }
