@@ -89,6 +89,9 @@
         <option value="won">Won</option>
         <option value="lost">Lost</option>
       </select>
+      <button id="approvalFilter" class="qc-chip" type="button" aria-pressed="false">
+        Needs approval <span id="approvalChipN" class="qc-chip-n" hidden></span>
+      </button>
       <span id="rowCount" class="qc-count"></span>
     </div>
 
@@ -96,8 +99,10 @@
       <table class="qc-table" id="quotesTable">
         <thead>
           <tr>
+            <th class="qc-col-x" aria-label="Expand"></th>
             <th>Date</th><th>Customer</th><th class="num">Total</th>
-            <th>Send</th><th class="num">Needs info</th><th>Outcome</th><th>Set outcome</th>
+            <th class="num">Margin</th><th>Confidence</th>
+            <th>Send</th><th>Approval</th><th>Outcome</th>
           </tr>
         </thead>
         <tbody id="quotesBody"></tbody>
