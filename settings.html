@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Autonomy — Quotewright console</title>
-<meta name="description" content="Internal Quotewright console — autonomy settings.">
+<title>Settings — Quotewright console</title>
+<meta name="description" content="Internal Quotewright console — settings.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="console-views.css">
+<link rel="stylesheet" href="console-onboarding.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
 </head>
 <body class="qc">
@@ -34,7 +35,7 @@
   <a href="dashboard.html">Quotes</a>
   <a href="customers.html">Customers</a>
   <a href="gaps.html">Catalogue gaps</a>
-  <a href="settings.html" aria-current="page">Autonomy</a>
+  <a href="settings.html" aria-current="page">Settings</a>
 </nav>
 
 <main class="qc-main">
@@ -43,8 +44,8 @@
   <section id="loginView" class="qc-login" hidden>
     <div class="qc-login-card">
       <div class="kicker">Internal access</div>
-      <h1>Autonomy</h1>
-      <p class="sub">Sign in to set how much the pipeline does on its own.</p>
+      <h1>Settings</h1>
+      <p class="sub">Sign in to set your profile, quoting voice and how much the pipeline runs on its own.</p>
       <form id="loginForm" novalidate>
         <div class="field">
           <label for="email">Email</label>
@@ -64,72 +65,267 @@
   <section id="appView" class="wrap qc-view" hidden>
     <div class="qc-head">
       <div>
-        <div class="kicker">Autonomy</div>
-        <h1 class="qc-h1">How much runs on its own</h1>
-        <p class="qc-lede">The pipeline scores every quote for confidence and margin, then sorts it into a tier. These gates decide where the line sits — and whether the safest quotes can go out without a human tap. The send gate stays off until you turn it on.</p>
+        <div class="kicker">Settings</div>
+        <h1 class="qc-h1">How Quotewright works for you</h1>
+        <p class="qc-lede">Your details, the voice quotes go out in, and exactly how much the pipeline does on its own. Every switch here changes real behaviour — nothing is decorative.</p>
       </div>
     </div>
 
-    <div id="settingsGrid" class="qc-settings" hidden>
-      <div class="qc-panel">
-        <h3>Auto-send</h3>
-        <p class="ph-sub">The one money-facing switch. Everything else here only sorts quotes into tiers.</p>
-
-        <div class="qc-switchrow" id="switchRow">
-          <div>
-            <div class="sw-label">Send green-tier quotes automatically</div>
-            <div class="sw-state" id="swState">Off — every quote waits for you</div>
-          </div>
-          <button type="button" class="qc-switch" id="autoSend" role="switch" aria-checked="false" aria-label="Auto-send green-tier quotes"></button>
-        </div>
-        <div class="qc-sendhint">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v6c0 5 3.8 8.3 9 9 5.2-.7 9-4 9-9V7z"/></svg>
-          <span>When on, only quotes that clear <b>both</b> green gates below send on their own. Amber and red always wait in the console. When off, nothing sends automatically — the pipeline just drafts.</span>
-        </div>
-
-        <div class="qc-thr">
-          <div class="qc-thr-item">
-            <div class="qc-thr-top">
-              <span class="qc-thr-name">Green · minimum confidence</span>
-              <span class="qc-thr-val"><span id="gcVal">90</span><span class="u">/100</span></span>
-            </div>
-            <p class="qc-thr-desc">How sure the match has to be before a quote counts as green. Higher = the system only trusts itself on near-certain matches.</p>
-            <input type="range" min="0" max="100" step="1" value="90" class="qc-range" id="greenConf" aria-label="Green minimum confidence">
-          </div>
-          <div class="qc-thr-item">
-            <div class="qc-thr-top">
-              <span class="qc-thr-name">Green · minimum margin</span>
-              <span class="qc-thr-val"><span id="gmVal">20</span><span class="u">%</span></span>
-            </div>
-            <p class="qc-thr-desc">The deal also has to be healthy. Below this margin a quote can never be green, however confident the match — it drops to amber for a look.</p>
-            <input type="range" min="0" max="60" step="1" value="20" class="qc-range" id="greenMargin" aria-label="Green minimum margin">
-          </div>
-          <div class="qc-thr-item">
-            <div class="qc-thr-top">
-              <span class="qc-thr-name">Amber · minimum confidence</span>
-              <span class="qc-thr-val"><span id="acVal">60</span><span class="u">/100</span></span>
-            </div>
-            <p class="qc-thr-desc">The floor for “worth reviewing.” Above this (but short of green) a quote is amber. Below it, the quote is red — flagged for a careful look.</p>
-            <input type="range" min="0" max="100" step="1" value="60" class="qc-range" id="amberConf" aria-label="Amber minimum confidence">
-          </div>
-        </div>
-
-        <div class="qc-save">
-          <button type="button" class="btn btn-primary" id="saveBtn">Save settings</button>
-          <span class="qc-saved" id="savedNote"></span>
-        </div>
+    <div id="settingsHub" class="qc-hub" hidden>
+      <!-- Section nav -->
+      <div class="qc-hubnav" role="tablist" aria-label="Settings sections">
+        <button class="qc-hubtab" role="tab" id="tab-profile" aria-controls="sec-profile" aria-selected="true" data-sec="profile">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </button>
+        <button class="qc-hubtab" role="tab" id="tab-voice" aria-controls="sec-voice" aria-selected="false" data-sec="voice" tabindex="-1">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>
+          <span>Quoting voice</span>
+        </button>
+        <button class="qc-hubtab" role="tab" id="tab-automation" aria-controls="sec-automation" aria-selected="false" data-sec="automation" tabindex="-1">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.4.98 2 2 0 0 1-3.86 0 1.65 1.65 0 0 0-2.4-.98l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a2 2 0 0 1 0-3.86 1.65 1.65 0 0 0 .98-2.4l-.06-.06A2 2 0 1 1 8.35 5.85l.06.06a1.65 1.65 0 0 0 2.4-.98 2 2 0 0 1 3.86 0 1.65 1.65 0 0 0 2.4.98l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.98 2.4z"/></svg>
+          <span>Automation</span>
+        </button>
+        <button class="qc-hubtab" role="tab" id="tab-notif" aria-controls="sec-notif" aria-selected="false" data-sec="notif" tabindex="-1">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span>Notifications</span>
+        </button>
       </div>
 
-      <div class="qc-panel">
-        <h3>What each tier means</h3>
-        <p class="ph-sub">Live preview of your current gates. This is exactly how the pipeline sorts each quote.</p>
-        <div class="qc-tiers" id="tiers"></div>
+      <!-- Section panels -->
+      <div class="qc-hubbody">
+
+        <!-- ── Profile ─────────────────────────────────────────────── -->
+        <section class="qc-panel qc-sec" role="tabpanel" id="sec-profile" aria-labelledby="tab-profile">
+          <h3>Your profile</h3>
+          <p class="ph-sub">Who the quotes come from. Your name and company appear on the sign-off; the rest is kept for the record.</p>
+          <div class="qc-form">
+            <div class="qc-field">
+              <label for="f_display_name">Your name</label>
+              <input id="f_display_name" type="text" autocomplete="name" placeholder="e.g. Mehmed Yalçın">
+            </div>
+            <div class="qc-field">
+              <label for="f_company">Company</label>
+              <input id="f_company" type="text" autocomplete="organization" placeholder="Hassan Tekstil A.Ş.">
+            </div>
+            <div class="qc-field">
+              <label for="f_role">Role</label>
+              <input id="f_role" type="text" placeholder="Export Sales Manager">
+            </div>
+            <div class="qc-field">
+              <label for="f_phone">Phone</label>
+              <input id="f_phone" type="tel" autocomplete="tel" placeholder="+90 …">
+            </div>
+            <div class="qc-field">
+              <label for="f_country">Country</label>
+              <input id="f_country" type="text" autocomplete="country-name" placeholder="Türkiye">
+            </div>
+            <div class="qc-field qc-field-wide">
+              <label for="f_address">Business address</label>
+              <textarea id="f_address" rows="2" placeholder="Esenyurt, İstanbul, Türkiye"></textarea>
+            </div>
+          </div>
+          <div class="qc-save">
+            <button type="button" class="btn btn-primary" data-save="profile">Save profile</button>
+            <span class="qc-saved" data-dirty="profile"></span>
+          </div>
+        </section>
+
+        <!-- ── Quoting voice ───────────────────────────────────────── -->
+        <section class="qc-panel qc-sec" role="tabpanel" id="sec-voice" aria-labelledby="tab-voice" hidden>
+          <h3>Quoting voice</h3>
+          <p class="ph-sub">The language, sign-off and default terms every quote goes out with. The pipeline still replies in the customer's own language when you leave language on auto.</p>
+          <div class="qc-form">
+            <div class="qc-field">
+              <label for="f_reply_language">Reply language</label>
+              <select id="f_reply_language" class="qc-select">
+                <option value="auto">Auto — match the customer's language</option>
+                <option value="en">English</option>
+                <option value="tr">Türkçe</option>
+                <option value="de">Deutsch</option>
+                <option value="bg">Български</option>
+                <option value="fr">Français</option>
+              </select>
+              <p class="qc-hint">Auto is recommended — the customer hears back in the language they wrote in. Pick a fixed language only to force every quote into one.</p>
+            </div>
+            <div class="qc-field">
+              <label for="f_default_incoterm">Default incoterm</label>
+              <select id="f_default_incoterm" class="qc-select">
+                <option value="EXW">EXW — Ex Works</option>
+                <option value="FCA">FCA — Free Carrier</option>
+                <option value="FOB">FOB — Free On Board</option>
+                <option value="CFR">CFR — Cost & Freight</option>
+                <option value="CIF">CIF — Cost, Insurance & Freight</option>
+                <option value="CPT">CPT — Carriage Paid To</option>
+                <option value="CIP">CIP — Carriage & Insurance Paid</option>
+                <option value="DAP">DAP — Delivered At Place</option>
+                <option value="DPU">DPU — Delivered At Place Unloaded</option>
+                <option value="DDP">DDP — Delivered Duty Paid</option>
+              </select>
+              <p class="qc-hint">The shipping term quotes assume unless the customer names another.</p>
+            </div>
+            <div class="qc-field">
+              <label for="f_quote_validity_days">Quote validity (days)</label>
+              <input id="f_quote_validity_days" type="number" min="1" max="365" step="1" inputmode="numeric" placeholder="7">
+              <p class="qc-hint">How long the prices in a quote stand before the footer says they may change.</p>
+            </div>
+            <div class="qc-field qc-field-wide">
+              <label for="f_signature">Sign-off / signature</label>
+              <textarea id="f_signature" rows="3" placeholder="Best regards,&#10;Mehmed Yalçın · Export Sales&#10;Hassan Tekstil A.Ş."></textarea>
+              <p class="qc-hint">Closes every quote email. Leave blank to use the standard sign-off.</p>
+            </div>
+          </div>
+          <div class="qc-save">
+            <button type="button" class="btn btn-primary" data-save="voice">Save quoting voice</button>
+            <span class="qc-saved" data-dirty="voice"></span>
+          </div>
+        </section>
+
+        <!-- ── Automation & autonomy ───────────────────────────────── -->
+        <section class="qc-panel qc-sec" role="tabpanel" id="sec-automation" aria-labelledby="tab-automation" hidden>
+          <h3>Automation &amp; autonomy</h3>
+          <p class="ph-sub">How much the pipeline does on its own — from filling repeat prices to sending finished quotes. Start conservative; loosen once you trust it.</p>
+
+          <!-- Auto-resolve -->
+          <div class="qc-switchrow" id="autoResolveRow">
+            <div>
+              <div class="sw-label">Auto-fill repeat lines</div>
+              <div class="sw-state" id="arState">Off — the sales team picks each first-time match</div>
+            </div>
+            <button type="button" class="qc-switch" id="autoResolve" role="switch" aria-checked="false" aria-label="Auto-fill repeat lines"></button>
+          </div>
+          <div class="qc-sendhint">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <span>When a line is an <b>exact repeat</b> of one your team already resolved before, the pipeline reuses that decision automatically instead of flagging it again. When off, every unmatched line waits for a human — exactly as today.</span>
+          </div>
+
+          <div class="qc-subhead">The send gate</div>
+          <!-- Auto-send master switch -->
+          <div class="qc-switchrow" id="switchRow">
+            <div>
+              <div class="sw-label">Send green-tier quotes automatically</div>
+              <div class="sw-state" id="swState">Off — every quote waits for you</div>
+            </div>
+            <button type="button" class="qc-switch" id="autoSend" role="switch" aria-checked="false" aria-label="Auto-send green-tier quotes"></button>
+          </div>
+          <div class="qc-sendhint">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v6c0 5 3.8 8.3 9 9 5.2-.7 9-4 9-9V7z"/></svg>
+            <span>The one money-facing switch. When on, only quotes that clear <b>both</b> green gates below send on their own. Amber and red always wait. When off, nothing sends — the pipeline just drafts.</span>
+          </div>
+
+          <div class="qc-thr">
+            <div class="qc-thr-item">
+              <div class="qc-thr-top">
+                <span class="qc-thr-name">Green · minimum confidence</span>
+                <span class="qc-thr-val"><span id="gcVal">90</span><span class="u">/100</span></span>
+              </div>
+              <p class="qc-thr-desc">How sure the match has to be before a quote counts as green. Higher = the system only trusts itself on near-certain matches.</p>
+              <input type="range" min="0" max="100" step="1" value="90" class="qc-range" id="greenConf" aria-label="Green minimum confidence">
+            </div>
+            <div class="qc-thr-item">
+              <div class="qc-thr-top">
+                <span class="qc-thr-name">Green · minimum margin</span>
+                <span class="qc-thr-val"><span id="gmVal">20</span><span class="u">%</span></span>
+              </div>
+              <p class="qc-thr-desc">The deal also has to be healthy. Below this margin a quote can never be green — it drops to amber for a look.</p>
+              <input type="range" min="0" max="60" step="1" value="20" class="qc-range" id="greenMargin" aria-label="Green minimum margin">
+            </div>
+            <div class="qc-thr-item">
+              <div class="qc-thr-top">
+                <span class="qc-thr-name">Amber · minimum confidence</span>
+                <span class="qc-thr-val"><span id="acVal">60</span><span class="u">/100</span></span>
+              </div>
+              <p class="qc-thr-desc">The floor for "worth reviewing." Above this (but short of green) a quote is amber. Below it, the quote is red — flagged for a careful look.</p>
+              <input type="range" min="0" max="100" step="1" value="60" class="qc-range" id="amberConf" aria-label="Amber minimum confidence">
+            </div>
+            <div class="qc-thr-item">
+              <div class="qc-thr-top">
+                <span class="qc-thr-name">Thin-margin floor</span>
+                <span class="qc-thr-val"><span id="mfVal">15</span><span class="u">%</span></span>
+              </div>
+              <p class="qc-thr-desc">Any quote landing under this margin is tagged <b>needs approval</b> — held for a human even when confidence is high. Your safety net against underpricing.</p>
+              <input type="range" min="0" max="50" step="1" value="15" class="qc-range" id="marginFloor" aria-label="Thin-margin floor">
+            </div>
+          </div>
+
+          <div class="qc-subhead">Follow-ups</div>
+          <div class="qc-switchrow" id="followupRow">
+            <div>
+              <div class="sw-label">Chase quotes that go quiet</div>
+              <div class="sw-state" id="fuState">On — a gentle nudge if the customer goes silent</div>
+            </div>
+            <button type="button" class="qc-switch" id="followupEnabled" role="switch" aria-checked="true" aria-label="Follow up on quiet quotes"></button>
+          </div>
+          <div class="qc-inline" id="followupOpts">
+            <div class="qc-field qc-field-sm">
+              <label for="f_followup_days">Wait before nudging</label>
+              <div class="qc-inputwrap"><input id="f_followup_days" type="number" min="1" max="60" step="1" inputmode="numeric" placeholder="5"><span class="qc-unit">days</span></div>
+            </div>
+            <div class="qc-field qc-field-sm">
+              <label for="f_max_followups">Maximum nudges</label>
+              <div class="qc-inputwrap"><input id="f_max_followups" type="number" min="0" max="10" step="1" inputmode="numeric" placeholder="2"><span class="qc-unit">total</span></div>
+            </div>
+          </div>
+
+          <div class="qc-subhead">Clarifications</div>
+          <p class="qc-hint" style="margin-top:-4px">When a line is missing a spec the pipeline needs a question answered. Choose whether that question goes straight to the customer, or waits as a draft for you.</p>
+          <div class="qc-seg" id="clarifySeg" role="radiogroup" aria-label="Clarification handling">
+            <button type="button" class="qc-seg-btn" role="radio" data-clarify="draft" aria-checked="true">
+              <span class="qc-seg-t">Draft it for me</span>
+              <span class="qc-seg-d">Waits in the console for your OK</span>
+            </button>
+            <button type="button" class="qc-seg-btn" role="radio" data-clarify="send" aria-checked="false">
+              <span class="qc-seg-t">Send straight away</span>
+              <span class="qc-seg-d">The question goes to the customer at once</span>
+            </button>
+          </div>
+
+          <div class="qc-save">
+            <button type="button" class="btn btn-primary" data-save="automation">Save automation</button>
+            <span class="qc-saved" data-dirty="automation"></span>
+          </div>
+        </section>
+
+        <!-- ── Notifications ───────────────────────────────────────── -->
+        <section class="qc-panel qc-sec" role="tabpanel" id="sec-notif" aria-labelledby="tab-notif" hidden>
+          <h3>Notifications</h3>
+          <p class="ph-sub">What lands in your inbox. Everything is a summary — the pipeline never emails a customer without your sign-off unless you turned that on above.</p>
+
+          <div class="qc-switchrow" id="digestRow">
+            <div>
+              <div class="sw-label">Daily digest</div>
+              <div class="sw-state" id="dgState">On — a morning rollup of activity</div>
+            </div>
+            <button type="button" class="qc-switch" id="digestEnabled" role="switch" aria-checked="true" aria-label="Daily digest"></button>
+          </div>
+          <div class="qc-sendhint">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 8 9 6 9-6"/></svg>
+            <span>One email each morning: quotes drafted, replies in, anything waiting on you, and the day's catalogue gaps.</span>
+          </div>
+
+          <div class="qc-switchrow" id="thinRow">
+            <div>
+              <div class="sw-label">Thin-margin alerts</div>
+              <div class="sw-state" id="tmState">On — flag me the moment a quote dips low</div>
+            </div>
+            <button type="button" class="qc-switch" id="alertThinMargin" role="switch" aria-checked="true" aria-label="Thin-margin alerts"></button>
+          </div>
+          <div class="qc-sendhint">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            <span>An immediate heads-up whenever a fresh quote lands under your thin-margin floor — so nothing underpriced slips past.</span>
+          </div>
+
+          <div class="qc-save">
+            <button type="button" class="btn btn-primary" data-save="notif">Save notifications</button>
+            <span class="qc-saved" data-dirty="notif"></span>
+          </div>
+        </section>
+
       </div>
     </div>
 
-    <div id="emptyState" class="qc-empty qc-card" hidden></div>
     <div id="tableError" class="qc-tableerror qc-card" hidden></div>
-    <div id="loadingCard" class="qc-panel"><div class="sk sk-row" style="height:120px"></div></div>
+    <div id="loadingCard" class="qc-panel"><div class="sk sk-row" style="height:220px"></div></div>
   </section>
 
   <div id="bootError" class="qc-boot-error" hidden></div>
@@ -139,6 +335,7 @@
 <script src="vendor/supabase.js"></script>
 <script src="dashboard-config.js"></script>
 <script src="console-views.js"></script>
+<script src="console-onboarding.js"></script>
 <script src="settings.js"></script>
 </body>
 </html>

@@ -145,6 +145,10 @@
       if (logoutBtn) logoutBtn.hidden = false;
       var who = el("whoami"); if (who) who.textContent = email || "";
       if (typeof opts.onAuth === "function") opts.onAuth(sb, email);
+      // First-run onboarding (self-contained, fail-safe). No-op if already onboarded.
+      if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
+        window.QWOnboarding.check(sb, cfg.OWNER);
+      }
     }
   }
 })();

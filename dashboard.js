@@ -126,6 +126,11 @@
   function showDash(email) {
     el("loginView").hidden = true; el("dashView").hidden = false;
     el("logoutBtn").hidden = false; el("whoami").textContent = email || "";
+    var nav = el("subnav"); if (nav) nav.hidden = false;
+    // First-run onboarding (self-contained, fail-safe). No-op if already onboarded.
+    if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
+      window.QWOnboarding.check(sb, cfg.OWNER);
+    }
   }
 
   // ── helpers ───────────────────────────────────────────────────────────────
