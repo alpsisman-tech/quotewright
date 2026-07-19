@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding — Bring your catalogue — Quotewright</title>
+<meta name="description" content="Prepare your product master for Quotewright: upload your cost/price Excel or CSV, map it to the catalogue loader, review flagged rows, and export a clean, loader-ready CSV — parsed entirely in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="onboarding.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
+</head>
+<body>
+
+<div class="selvedge" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html" aria-label="Quotewright home">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="#111"/>
+        <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      Quotewright
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="product.html">Product</a></li>
+      <li><a href="onboarding.html" class="active">Onboarding</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="dashboard.html">Log in</a></li>
+    </ul>
+    <a href="contact.html" class="btn btn-primary btn-sm nav-cta">Book a pilot</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</nav>
+
+<main>
+<header class="page-hero ob-hero">
+  <div class="wrap">
+    <div class="kicker center rv">Self-serve onboarding</div>
+    <h1 class="rv rv-d1">Bring your <em>catalogue</em>, leave with a loader-ready file.</h1>
+    <p class="sub rv rv-d2">Drop in the cost and price spreadsheet you already keep — Excel or CSV, in whatever column order you use. Quotewright reads it <b>entirely in your browser</b>, maps it to the catalogue loader, flags anything incomplete, and hands back a clean CSV to upload. Nothing leaves this page.</p>
+  </div>
+</header>
+
+<section class="ob-flow">
+  <div class="wrap">
+
+    <ol class="ob-steps" id="obSteps" aria-label="Onboarding steps">
+      <li class="on" data-step="1"><span class="d">1</span> Upload</li>
+      <li data-step="2"><span class="d">2</span> Map columns</li>
+      <li data-step="3"><span class="d">3</span> Review</li>
+      <li data-step="4"><span class="d">4</span> Export</li>
+    </ol>
+
+    <!-- 1 · Upload -->
+    <div class="ob-card ob-drop" id="drop" tabindex="0" role="button" aria-label="Choose a spreadsheet or drag one here">
+      <input id="file" type="file" accept=".csv,.tsv,.xlsx,text/csv" hidden>
+      <div class="ob-drop-inner">
+        <div class="ob-drop-ic" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        </div>
+        <p class="ob-drop-lead"><b>Drop your spreadsheet here</b> or <span class="ob-link">browse</span></p>
+        <p class="ob-drop-sub">.xlsx · .csv · .tsv — up to a few thousand rows</p>
+      </div>
+      <div class="ob-file" id="fileTag" hidden></div>
+    </div>
+    <div id="parseError" class="ob-alert bad" role="alert" hidden></div>
+
+    <!-- 2 · Map columns -->
+    <div class="ob-card ob-map" id="mapCard" hidden>
+      <div class="ob-card-head">
+        <div>
+          <h3>Map your columns</h3>
+          <p class="ob-card-sub">We matched your headers to the catalogue loader. Correct anything that looks off — <b>SKU is required</b>, the rest fill in what they can.</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="resetBtn" type="button">Start over</button>
+      </div>
+      <div class="ob-maptable-wrap">
+        <table class="ob-maptable" id="mapTable">
+          <thead><tr><th>Loader column</th><th></th><th>Your column</th><th class="num">Sample</th></tr></thead>
+          <tbody id="mapBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3 · Review -->
+    <div class="ob-card ob-review" id="reviewCard" hidden>
+      <div class="ob-card-head">
+        <div>
+          <h3>Review the product master</h3>
+          <p class="ob-card-sub">Keyed by SKU. Rows missing a SKU can’t be loaded; rows with no price are marked <b>data&nbsp;incomplete</b> so the pipeline routes them to your sales team instead of inventing a number.</p>
+        </div>
+      </div>
+      <div class="ob-stats" id="obStats"></div>
+      <div class="ob-preview-wrap">
+        <table class="ob-preview" id="previewTable">
+          <thead><tr>
+            <th>SKU</th><th>Product</th><th>Line</th><th class="num">GSM</th><th>Colour</th>
+            <th class="num">Sale €</th><th class="num">Sale $</th><th>Complete</th><th>Status</th>
+          </tr></thead>
+          <tbody id="previewBody"></tbody>
+        </table>
+      </div>
+      <p class="ob-preview-note" id="previewNote"></p>
+    </div>
+
+    <!-- 4 · Export -->
+    <div class="ob-card ob-export" id="exportCard" hidden>
+      <div class="ob-export-inner">
+        <div>
+          <h3>Export a loader-ready CSV</h3>
+          <p class="ob-card-sub">All 44 catalogue columns, in the exact order the <b>Hassan Products Loader</b> expects. Upload the download at the loader form and your catalogue is live — additive, never wiping existing SKUs.</p>
+        </div>
+        <button class="btn btn-primary" id="exportBtn" type="button">
+          Download cleaned CSV
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        </button>
+      </div>
+      <p class="ob-export-order">Loader order: <code id="orderCode"></code></p>
+    </div>
+
+  </div>
+</section>
+
+<section class="ob-privacy">
+  <div class="wrap">
+    <div class="ob-privacy-inner">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      <p><b>Parsed on your device.</b> Your cost and price data is read and cleaned by JavaScript running in your own browser tab. It is never uploaded, logged, or sent anywhere — closing the tab discards it.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-inner">
+      <div>
+        <a class="logo" href="index.html" aria-label="Quotewright home">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect width="32" height="32" rx="7" fill="#D2FF37"/>
+            <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 25h20" stroke="#111" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+          Quotewright
+        </a>
+        <p class="foot-desc">RFQ emails in, finished quotes out. Built on the floor of a working textile factory, for every made-to-order manufacturer drowning in requests for quotation.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h6>Product</h6>
+          <ul>
+            <li><a href="product.html">How it works</a></li>
+            <li><a href="onboarding.html">Onboarding</a></li>
+            <li><a href="product.html#features">Features</a></li>
+          </ul>
+        </div>
+        <div>
+          <h6>Company</h6>
+          <ul>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="contact.html">Book a pilot</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+            <li><a href="terms.html">Terms</a></li>
+            <li><a href="cookies.html">Cookies</a></li>
+            <li><a href="#" class="cookie-prefs">Cookie preferences</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span id="yr">2026</span> Quotewright. All rights reserved.</span>
+      <span>Woven in İstanbul &amp; London</span>
+    </div>
+  </div>
+</footer>
+
+<script src="vendor/qw-sheet.js"></script>
+<script src="onboarding.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
