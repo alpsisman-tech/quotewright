@@ -382,12 +382,12 @@
       { n: awaiting, l: "Awaiting approval", warn: awaiting > 0, sub2: awaiting > 0 ? "margin / discount flagged" : "none flagged" },
       { n: winRate == null ? "—" : winRate + "%", l: "Win rate", accent: true, sub2: won.length + " won · " + lost.length + " lost" },
       { n: curJoin(sumByCur(quotes), true), l: "Quoted value", small: true },
-      { n: curJoin(sumByCur(won), true), l: "Won value", small: true, accent: true },
+      { n: curJoin(sumByCur(won), true), l: "Won value", small: true, dark: true },
     ];
     el("tiles").innerHTML = tiles.map(function (t) {
-      return '<div class="qc-tile' + (t.accent ? " accent" : "") + (t.warn ? " warn" : "") + '">' +
-        '<div class="n' + (t.small ? " small" : "") + '">' + esc(t.n) + "</div>" +
+      return '<div class="qc-tile' + (t.accent ? " accent" : "") + (t.dark ? " dark" : "") + (t.warn ? " warn" : "") + '">' +
         '<div class="l">' + esc(t.l) + "</div>" +
+        '<div class="n' + (t.small ? " small" : "") + '">' + esc(t.n) + "</div>" +
         (t.sub2 ? '<div class="sub2">' + esc(t.sub2) + "</div>" : "") +
       "</div>";
     }).join("");
@@ -415,26 +415,38 @@
     var data = keys.map(function (k) { return months[k]; });
     var maxN = data.reduce(function (m, x) { return Math.max(m, x.total); }, 1);
 
-    var VBW = 1000, VBH = 250, padT = 30, padB = 42, padX = 16;
+    var VBW = 1000, VBH = 250, padT = 30, padB = 42, padX = 20;
     var innerH = VBH - padT - padB;
+    var baseY = padT + innerH;
     var n = data.length;
-    var slot = (VBW - padX * 2) / n;
-    var barW = Math.max(12, Math.min(88, slot * 0.5));
+    // Cap the column pitch so a sparse chart clusters left (with room to grow)
+    // rather than floating one fat bar in the middle.
+    var slot = Math.min((VBW - padX * 2) / n, 132);
+    var plotW = slot * n;
+    var barW = Math.max(12, Math.min(64, slot * 0.46));
     var parts = [];
+    // horizontal gridlines + baseline — makes even one bar read as a chart
+    var ticks = Math.min(maxN, 4);
+    for (var g = 1; g <= ticks; g++) {
+      var gy = (padT + innerH - (g / ticks) * innerH).toFixed(1);
+      parts.push('<line class="grid" x1="' + padX + '" y1="' + gy + '" x2="' + (padX + plotW).toFixed(1) + '" y2="' + gy + '"/>');
+    }
+    parts.push('<line class="axis-base" x1="' + padX + '" y1="' + baseY + '" x2="' + (padX + plotW).toFixed(1) + '" y2="' + baseY + '"/>');
     data.forEach(function (x, i) {
       var cx = padX + slot * i + slot / 2;
       var bx = cx - barW / 2;
-      var totH = x.total > 0 ? Math.max(4, Math.round(x.total / maxN * innerH)) : 0;
+      var totH = x.total > 0 ? Math.max(5, Math.round(x.total / maxN * innerH)) : 0;
       var wonH = Math.round(x.won / maxN * innerH);
       var restH = totH - wonH;
       var yTop = padT + (innerH - totH);
-      if (restH > 0) parts.push('<rect class="bar-rest" x="' + bx.toFixed(1) + '" y="' + yTop + '" width="' + barW.toFixed(1) + '" height="' + restH + '" rx="6"/>');
-      if (wonH > 0) parts.push('<rect class="bar-won" x="' + bx.toFixed(1) + '" y="' + (padT + innerH - wonH) + '" width="' + barW.toFixed(1) + '" height="' + wonH + '" rx="6"/>');
-      parts.push('<text class="axis-lbl cnt" x="' + cx.toFixed(1) + '" y="' + (yTop - 9) + '" text-anchor="middle" font-size="20" fill="#131313" font-weight="600">' + x.total + '</text>');
+      // single rounded column, won portion overlaid at the base
+      if (totH > 0) parts.push('<rect class="bar-rest" x="' + bx.toFixed(1) + '" y="' + yTop + '" width="' + barW.toFixed(1) + '" height="' + totH + '" rx="7"/>');
+      if (wonH > 0) parts.push('<rect class="bar-won" x="' + bx.toFixed(1) + '" y="' + (baseY - wonH) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(wonH, 7) + '" rx="7"/>');
+      parts.push('<text class="axis-lbl cnt" x="' + cx.toFixed(1) + '" y="' + (yTop - 11) + '" text-anchor="middle" font-size="20" font-weight="600">' + x.total + '</text>');
       var lbl = x.d.toLocaleDateString("en-GB", { month: "short" });
       parts.push('<text class="axis-lbl" x="' + cx.toFixed(1) + '" y="' + (VBH - 12) + '" text-anchor="middle" font-size="16">' + lbl + '</text>');
     });
-    host.innerHTML = '<svg viewBox="0 0 ' + VBW + ' ' + VBH + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Quotes per month">' + parts.join("") + '</svg>';
+    host.innerHTML = '<svg viewBox="0 0 ' + VBW + ' ' + VBH + '" preserveAspectRatio="xMinYMid meet" role="img" aria-label="Quotes per month">' + parts.join("") + '</svg>';
   }
 
   // ── loading / empty / error states ──────────────────────────────────────────

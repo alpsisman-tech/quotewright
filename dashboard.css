@@ -524,3 +524,114 @@ body.qc-has-bulk .qc-toast.show { bottom: 86px; }
   .qc-dh { background: #fff; }
   .qc-scrim { backdrop-filter: none; background: rgba(17,17,17,.5); }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TASTE PASS — depth, material & hierarchy elevation (2026-07)
+   Seam Studio identity kept exactly: white / ink #131313 / Inter / lime #D2FF37.
+   Raises the craft bar within it: considered spacing rhythm, quiet labels over
+   confident numbers, dark inset panels with inner-light + grain, lime as a rare
+   accent rather than everywhere. Transform/opacity motion only; a11y intact.
+   ════════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* materials */
+  --sheen-light: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,0) 46%);
+  --panel-grad: linear-gradient(158deg, #1a1b1e 0%, #141416 55%, #0e0e10 100%);
+  --panel-innerlight: radial-gradient(130% 100% at 14% -12%, rgba(255,255,255,.12), transparent 52%);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* layered, believable elevation */
+  --lift-1: 0 1px 2px rgba(17,17,17,.04), 0 5px 14px -10px rgba(17,17,17,.15);
+  --lift-2: 0 2px 4px rgba(17,17,17,.05), 0 20px 44px -22px rgba(17,17,17,.30);
+  --lift-dark: 0 1px 2px rgba(0,0,0,.24), 0 20px 46px -22px rgba(0,0,0,.62);
+}
+
+/* ── stat tiles: quiet label over a confident number, real depth ───────────── */
+.qc-tiles { gap: 13px; }
+.qc-tile {
+  position: relative; overflow: hidden; display: flex; flex-direction: column;
+  padding: 15px 17px 16px; border-radius: 16px;
+  border: 1px solid var(--hair); background: #fff;
+  box-shadow: var(--lift-1);
+}
+.qc-tile::before { content: ""; position: absolute; inset: 0; background: var(--sheen-light); pointer-events: none; }
+.qc-tile > * { position: relative; z-index: 1; }
+.qc-tile .l {
+  order: -1; font-family: var(--mono); font-size: 10.5px; letter-spacing: .085em;
+  text-transform: uppercase; color: var(--grey); margin: 0;
+}
+.qc-tile .n { font-size: 33px; line-height: 1; letter-spacing: -.05em; margin-top: 11px; }
+.qc-tile .n.small { font-size: 21px; letter-spacing: -.03em; }
+.qc-tile .sub2 { margin-top: 7px; font-size: 11.5px; color: var(--soft); }
+.qc-tile:hover { transform: translateY(-3px); box-shadow: var(--lift-2); border-color: var(--line-strong); }
+
+/* the one lime hero — win rate */
+.qc-tile.accent { background: var(--lime); border-color: rgba(150,190,20,.55); box-shadow: 0 1px 2px rgba(110,140,10,.16), 0 16px 34px -20px var(--lime-glow); }
+.qc-tile.accent::before { background: linear-gradient(180deg, rgba(255,255,255,.55), transparent 48%); }
+.qc-tile.accent .l { color: rgba(24,34,0,.6); }
+.qc-tile.accent .n, .qc-tile.accent .n.small { color: #131313; }
+.qc-tile.accent .sub2 { color: rgba(24,34,0,.66); }
+.qc-tile.accent:hover { box-shadow: 0 2px 6px rgba(110,140,10,.2), 0 22px 46px -22px var(--lime-glow); border-color: rgba(150,190,20,.7); }
+
+/* the dark inset anchor — won value, with inner-light + grain, lime numeral */
+.qc-tile.dark { background: var(--panel-grad); border-color: #050506; color: #fff; box-shadow: var(--lift-dark); }
+.qc-tile.dark::before { background: var(--panel-innerlight); }
+.qc-tile.dark::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: 140px 140px; opacity: .5; mix-blend-mode: overlay; pointer-events: none; }
+.qc-tile.dark .l { color: rgba(255,255,255,.5); }
+.qc-tile.dark .n, .qc-tile.dark .n.small { color: var(--lime); }
+.qc-tile.dark .sub2 { color: rgba(255,255,255,.55); }
+.qc-tile.dark:hover { border-color: #000; box-shadow: 0 2px 6px rgba(0,0,0,.28), 0 30px 60px -24px rgba(0,0,0,.7); }
+
+/* awaiting-approval: warm depth, not a flat wash */
+.qc-tile.warn { background: linear-gradient(180deg, #fffaef, #fff 58%); border-color: #ecdcb0; }
+.qc-tile.warn::before { background: linear-gradient(180deg, rgba(255,255,255,.7), transparent 46%); }
+.qc-tile.warn .n { color: #8a6d1f; }
+.qc-tile.warn .l { color: #9a8340; }
+
+@media (prefers-reduced-transparency: reduce) { .qc-tile.dark::after { display: none; } }
+
+/* ── chart: axis furniture so a sparse chart still reads as a chart ─────────── */
+.qc-chart { box-shadow: var(--lift-1); position: relative; overflow: hidden; }
+.qc-chart::before { content: ""; position: absolute; inset: 0 0 auto; height: 60%; background: var(--sheen-light); pointer-events: none; }
+.qc-chart-head, .qc-chart #chart { position: relative; z-index: 1; }
+.qc-chart .grid { stroke: var(--hair); stroke-width: 1; }
+.qc-chart .axis-base { stroke: var(--line-strong); stroke-width: 1.4; }
+.qc-chart .bar-rest { fill: #E4E4E4; }
+.qc-chart svg rect.bar-won { filter: drop-shadow(0 6px 12px rgba(160,200,20,.28)); }
+.qc-chart .axis-lbl.cnt { fill: var(--ink); }
+
+/* ── controls + table: comfortable ops-console density with layered lift ────── */
+.qc-search, .qc-select { box-shadow: 0 1px 1px rgba(17,17,17,.02); transition: border-color .16s, box-shadow .16s; }
+.qc-search:focus, .qc-select:focus { box-shadow: 0 0 0 3px rgba(19,19,19,.06); }
+.qc-tablewrap { box-shadow: var(--lift-1); border-radius: var(--r-md); }
+.qc-table th { padding: 14px 18px; background: linear-gradient(180deg, #fbfbfa, #fff); }
+.qc-table td { padding: 15px 18px; }
+.qc-table .qc-cust-name { font-size: 14.5px; letter-spacing: -.012em; }
+.qc-table .qc-total { font-size: 14px; letter-spacing: -.01em; }
+.qc-table tbody tr { transition: background .16s var(--ease), box-shadow .16s var(--ease); }
+.qc-table tbody tr:hover:not(.is-open) { box-shadow: inset 3px 0 0 var(--line-strong); }
+
+/* margin / confidence: a touch more presence, tabular + tight */
+.qc-margin { padding: 4px 10px; font-size: 12px; }
+.qc-conf { font-size: 12.5px; }
+.qc-conf i { width: 8px; height: 8px; box-shadow: 0 0 0 3px rgba(0,0,0,.04); }
+
+/* ── digest brief: dark inset panel with inner-light + grain ────────────────── */
+.qc-digest { position: relative; overflow: hidden; background: var(--panel-grad); border: 1px solid #050506; box-shadow: var(--lift-dark); padding: 16px 22px; }
+.qc-digest::before { content: ""; position: absolute; inset: 0; background: var(--panel-innerlight); pointer-events: none; }
+.qc-digest::after { content: ""; position: absolute; inset: 0; background: var(--grain); background-size: 140px 140px; opacity: .5; mix-blend-mode: overlay; pointer-events: none; }
+.qc-digest > * { position: relative; z-index: 1; }
+.qc-digest.calm { background: #fff; box-shadow: var(--lift-1); }
+.qc-digest.calm::before, .qc-digest.calm::after { display: none; }
+.qc-digest-lead { font-size: 10.5px; letter-spacing: .13em; }
+.qc-digest-live { box-shadow: 0 0 0 3px rgba(210,255,55,.16); }
+.qc-seg { padding: 10px 16px 10px 13px; border-radius: 13px; }
+.qc-seg-n { font-size: 20px; }
+@media (prefers-reduced-transparency: reduce) { .qc-digest::after { display: none; } }
+
+/* ── login card: a considered gate, not a plain box ────────────────────────── */
+.qc-login-card { position: relative; overflow: hidden; box-shadow: var(--lift-2); border-radius: var(--r-lg); }
+.qc-login-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--lime); }
+.qc-login input { transition: border-color .16s, box-shadow .16s, background .16s; }
+
+/* ── drawer header: subtle inner-light on the translucent chrome ───────────── */
+.qc-dh { box-shadow: 0 1px 0 rgba(17,17,17,.02); }
+.qc-dh-cust { letter-spacing: -.035em; }

@@ -255,3 +255,55 @@ dialog.qc-drawer[open]::backdrop { animation: qc-fade-in .34s var(--ease) both; 
   .qc-gap-actions { grid-column: 1 / -1; flex-direction: row; min-width: 0; }
   .qc-gap-actions .qc-gap-btn { flex: 1; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TASTE PASS — depth & hierarchy elevation, matched to the main console (2026-07)
+   Same Seam Studio identity: white / ink #131313 / Inter / lime. Transform/opacity
+   motion only; a11y intact. Mirrors dashboard.css so the whole console reads as one.
+   ════════════════════════════════════════════════════════════════════════════ */
+:root {
+  --sheen-light: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,0) 46%);
+  --lift-1: 0 1px 2px rgba(17,17,17,.04), 0 5px 14px -10px rgba(17,17,17,.15);
+  --lift-2: 0 2px 4px rgba(17,17,17,.05), 0 20px 44px -22px rgba(17,17,17,.30);
+}
+
+/* ── stat tiles: quiet label over a confident number, with real depth ──────── */
+.qc-tile { position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 15px 17px 16px; border-radius: 16px; box-shadow: var(--lift-1); }
+.qc-tile::before { content: ""; position: absolute; inset: 0; background: var(--sheen-light); pointer-events: none; }
+.qc-tile > * { position: relative; z-index: 1; }
+.qc-tile .l { order: -1; font-size: 10.5px; letter-spacing: .085em; margin-top: 0; }
+.qc-tile .n { font-size: 33px; letter-spacing: -.05em; margin-top: 11px; }
+.qc-tile .n.small { font-size: 21px; letter-spacing: -.03em; }
+.qc-tile .sub2 { margin-top: 7px; }
+.qc-tile:hover { transform: translateY(-3px); box-shadow: var(--lift-2); border-color: var(--line-strong); }
+.qc-tile.accent { border-color: rgba(150,190,20,.55); box-shadow: 0 1px 2px rgba(110,140,10,.16), 0 16px 34px -20px var(--lime-glow); }
+.qc-tile.accent::before { background: linear-gradient(180deg, rgba(255,255,255,.55), transparent 48%); }
+.qc-tile.accent .l { color: rgba(24,34,0,.6); }
+.qc-tile.accent .sub2 { color: rgba(24,34,0,.66); }
+
+/* ── surfaces: layered lift instead of the flat hairline shadow ────────────── */
+.qc-tablewrap, .qc-card, .qc-panel { box-shadow: var(--lift-1); }
+.qc-panel { position: relative; overflow: hidden; }
+.qc-panel::before { content: ""; position: absolute; inset: 0 0 auto; height: 76px; background: var(--sheen-light); pointer-events: none; }
+.qc-panel > * { position: relative; z-index: 1; }
+.qc-search, .qc-select { box-shadow: 0 1px 1px rgba(17,17,17,.02); }
+.qc-table th { padding: 14px 18px; background: linear-gradient(180deg, #fbfbfa, #fff); }
+.qc-table td { padding: 15px 18px; }
+.qc-table .qc-cust-name { font-size: 14.5px; }
+.qc-table tbody tr { transition: background .16s var(--ease), box-shadow .16s var(--ease); }
+.qc-table tbody tr:hover { box-shadow: inset 3px 0 0 var(--line-strong); }
+
+/* ── gap cards: a touch more presence + a confident count column ───────────── */
+.qc-gap { box-shadow: var(--lift-1); border-radius: 16px; }
+.qc-gap-count .cn { font-size: 32px; letter-spacing: -.05em; }
+.qc-gap:hover { box-shadow: var(--lift-2); }
+
+/* ── tier explainer + facts: subtle inner-light, crisper edges ─────────────── */
+.qc-tier { box-shadow: var(--lift-1); }
+.qc-fact { box-shadow: inset 0 1px 0 rgba(255,255,255,.6); }
+
+/* ── login card: a considered gate, lime hairline accent ───────────────────── */
+.qc-login-card { position: relative; overflow: hidden; box-shadow: var(--lift-2); }
+.qc-login-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--lime); z-index: 2; }
+
+@media (prefers-reduced-motion: reduce) { .qc-tile, .qc-gap, .qc-table tbody tr { transition: none; } }
