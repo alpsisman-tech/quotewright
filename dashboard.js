@@ -510,19 +510,32 @@
     return first + (extra > 0 ? "  ·  +" + extra + " line" + (extra > 1 ? "s" : "") : "");
   }
 
+  function normCur(c) {
+    c = (c == null ? "" : String(c)).trim();
+    var up = c.toUpperCase();
+    if (up === "EUR" || up === "USD" || up === "GBP" || up === "TRY") return up;
+    var hasE = c.indexOf("\u20AC") >= 0, hasD = c.indexOf("$") >= 0, hasP = c.indexOf("\u00A3") >= 0, hasL = c.indexOf("\u20BA") >= 0;
+    var hits = (hasE?1:0) + (hasD?1:0) + (hasP?1:0) + (hasL?1:0);
+    if (hits === 1) return hasE ? "EUR" : hasD ? "USD" : hasP ? "GBP" : "TRY";
+    return null; // mixed / unknown currency -> not meaningfully summable
+  }
   function sumByCur(list) {
-    var by = {};
+    var by = {}, mixed = 0;
     list.forEach(function (q) {
       if (q.total == null || isNaN(q.total)) return;
-      var c = q.currency || "";
-      by[c] = (by[c] || 0) + Number(q.total);
+      var c = normCur(q.currency);
+      if (c) by[c] = (by[c] || 0) + Number(q.total);
+      else mixed++;
     });
+    if (mixed) by.__mixed = mixed;
     return by;
   }
   function curJoin(by, shortForm) {
-    var keys = Object.keys(by);
-    if (!keys.length) return "—";
-    return keys.map(function (c) { return (shortForm ? moneyShort : money)(by[c], c); }).join("  ·  ");
+    var order = ["EUR", "USD", "GBP", "TRY"], parts = [];
+    order.forEach(function (c) { if (by[c] != null) parts.push((shortForm ? moneyShort : money)(by[c], c)); });
+    Object.keys(by).forEach(function (c) { if (c !== "__mixed" && order.indexOf(c) < 0) parts.push((shortForm ? moneyShort : money)(by[c], c)); });
+    if (by.__mixed) parts.push("+" + by.__mixed + " mixed");
+    return parts.length ? parts.join("  ·  ") : "—";
   }
 
   // ── client-side digest metrics (fallback when the digest table is empty) ────
