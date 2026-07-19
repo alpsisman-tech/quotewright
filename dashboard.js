@@ -1,9 +1,15 @@
-/* Quote console — auth + quote analytics + margin governance + explainability.
-   No inline scripts (site CSP is script-src 'self'). Reads the `quotes` table.
-   - Win/loss outcome tracking needs quote-analytics.sql applied.
-   - Margin / approval / confidence columns need quotewright-expansion.sql applied;
-     every one of those features DEGRADES GRACEFULLY when the columns don't exist yet
-     (the column is simply absent on the row object → shown as "—" / hidden). */
+/* Quotewright quote console — the COPILOT.
+   The operator does everything here and never opens Gmail: review the pipeline's
+   draft, resolve weak lines with one tap, then approve & send — all in-page.
+
+   No inline scripts (site CSP is script-src 'self'). Reads `quotes` + `products`
+   from Supabase (anon key + RLS); writes money-facing actions through secured
+   n8n webhooks (Bearer = the Supabase access token).
+
+   EVERYTHING degrades gracefully when the intelligence columns/tables aren't
+   there yet (autonomy_tier, thread_snapshot, candidates[], digest, …) — a missing
+   field is shown as "—"/an empty state, never a crash. Once the owner runs
+   quotewright-intelligence.sql and publishes the staged pipeline, it all lights up. */
 (function () {
   "use strict";
 
@@ -12,18 +18,23 @@
   var boot = el("bootError");
   var sb = null;
   var quotes = [];
-  var hasLoaded = false;   // first successful load complete?
+  var digest = null;         // latest digest row, or null (then computed client-side)
+  var hasLoaded = false;
   var loading = false;
-  var expanded = {};       // id -> true when the explainability detail row is open
-  var approvalOnly = false;
+  var selected = {};         // id -> true (bulk selection)
+  var openId = null;         // quote currently in the workspace drawer
+  var lastFocus = null;      // element focused before the drawer opened
 
-  // Margin bands (percentage points). Below LOW = red/thin, below MID = amber, else green.
+  var WEBHOOK_BASE = "https://alpsisman.app.n8n.cloud/webhook/";
+
   var MARGIN_LOW = 15, MARGIN_MID = 30;
-  // Confidence bands (0–100). At/above HIGH = green, at/above MID = amber, else red.
   var CONF_HIGH = 85, CONF_MID = 60;
 
-  // SECURITY: attach the submit interceptor FIRST and unconditionally, so the
-  // login form can NEVER fall back to a native GET submit (email+password in URL).
+  // The firm's own mailbox — used to tell "us" from "the customer" in a thread.
+  var FIRM_HINTS = ["hassannonwovensrfq", "hassan.com.tr", "@hassan"];
+
+  // SECURITY: intercept the login submit FIRST so email+password can never land
+  // in the URL via a native GET submit.
   var loginForm = el("loginForm");
   if (loginForm) loginForm.addEventListener("submit", onLoginSubmit);
 
@@ -44,6 +55,7 @@
   el("refreshBtn").addEventListener("click", loadQuotes);
   el("search").addEventListener("input", renderTable);
   el("statusFilter").addEventListener("change", renderTable);
+  el("tierFilter").addEventListener("change", renderTable);
   el("outcomeFilter").addEventListener("change", renderTable);
   el("approvalFilter").addEventListener("click", function () {
     approvalOnly = !approvalOnly;
@@ -51,20 +63,38 @@
     this.classList.toggle("on", approvalOnly);
     renderTable();
   });
+  el("selectAll").addEventListener("change", onSelectAll);
+  var approvalOnly = false;
 
-  // Event delegation (CSP-safe: no inline handlers). One listener covers:
-  //  - Won / Lost / Reset outcome buttons  (data-act)
-  //  - Approve button                      (data-approve)
-  //  - expand caret / row click            (toggles the explainability detail)
+  // Table interactions (event delegation — CSP-safe, no inline handlers).
   el("quotesBody").addEventListener("click", function (e) {
     var t = e.target;
+    if (t.closest && t.closest(".qc-col-sel")) return; // checkbox handled on change
     var actBtn = t.closest ? t.closest("button[data-act]") : null;
-    if (actBtn) { setOutcome(actBtn.getAttribute("data-id"), actBtn.getAttribute("data-act"), actBtn); return; }
+    if (actBtn) { e.stopPropagation(); setOutcome(actBtn.getAttribute("data-id"), actBtn.getAttribute("data-act"), actBtn); return; }
     var appBtn = t.closest ? t.closest("button[data-approve]") : null;
-    if (appBtn) { approve(appBtn.getAttribute("data-approve"), appBtn); return; }
+    if (appBtn) { e.stopPropagation(); approve(appBtn.getAttribute("data-approve"), appBtn); return; }
     var row = t.closest ? t.closest("tr[data-row]") : null;
-    if (row) toggleExpand(row.getAttribute("data-row"));
+    if (row) openDrawer(row.getAttribute("data-row"));
   });
+  el("quotesBody").addEventListener("change", function (e) {
+    var cb = e.target;
+    if (cb && cb.classList && cb.classList.contains("qc-rowsel")) {
+      var id = cb.getAttribute("data-sel");
+      if (cb.checked) selected[id] = true; else delete selected[id];
+      renderBulk();
+      syncSelectAll();
+    }
+  });
+
+  // Drawer close affordances.
+  el("drawerScrim").addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && openId != null) closeDrawer();
+  });
+  // Drawer interactions (delegated).
+  el("drawerInner").addEventListener("click", onDrawerClick);
+  el("drawerInner").addEventListener("input", onDrawerInput);
 
   sb.auth.getSession().then(function (res) {
     var s = res.data && res.data.session;
@@ -99,14 +129,15 @@
   }
 
   // ── helpers ───────────────────────────────────────────────────────────────
+  var SYM = { EUR: "€", USD: "$", GBP: "£", TRY: "₺" };
   function money(n, cur) {
     if (n == null || isNaN(n)) return "—";
-    var sym = { EUR: "€", USD: "$", GBP: "£", TRY: "₺" }[cur] || (cur ? cur + " " : "");
+    var sym = SYM[cur] || (cur ? cur + " " : "");
     return sym + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   function moneyShort(n, cur) {
     if (n == null || isNaN(n)) return "—";
-    var sym = { EUR: "€", USD: "$", GBP: "£", TRY: "₺" }[cur] || (cur ? cur + " " : "");
+    var sym = SYM[cur] || (cur ? cur + " " : "");
     return sym + Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 });
   }
   function fmtDate(s) {
@@ -114,16 +145,27 @@
     var d = new Date(s);
     return isNaN(d) ? "—" : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   }
+  function fmtDateTime(s) {
+    if (!s) return "";
+    var d = new Date(s);
+    return isNaN(d) ? "" : d.toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  }
   function bucket(q) { return (q.status || "").toLowerCase() === "draft" ? "draft" : "sent"; }
+  function isDraft(q) { return bucket(q) === "draft"; }
   function outcomeOf(q) {
     var o = (q.outcome || "pending").toLowerCase();
     return (o === "won" || o === "lost") ? o : "pending";
+  }
+  function tierOf(q) {
+    var t = (q.autonomy_tier || "").toLowerCase();
+    return (t === "green" || t === "amber" || t === "red") ? t : null;
   }
   function esc(s) {
     return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
     });
   }
+  function nl2br(s) { return esc(s).replace(/\r?\n/g, "<br>"); }
   function numOrNull(v) { return (v == null || v === "" || isNaN(Number(v))) ? null : Number(v); }
   function needsApproval(q) { return q.needs_approval === true; }
 
@@ -140,8 +182,6 @@
     return "low";
   }
 
-  // The agent's structured object lives in the `output` column. Parse defensively —
-  // it may be an object OR a JSON string, and the lines[] may be nested.
   function parseOutput(q) {
     var o = q.output;
     if (!o) return null;
@@ -154,18 +194,27 @@
     var arr = o.lines || (o.output && o.output.lines) || (o.quote && o.quote.lines) || [];
     return Array.isArray(arr) ? arr : [];
   }
+  function threadOf(q) {
+    var arr = q.thread_snapshot;
+    if (typeof arr === "string") { try { arr = JSON.parse(arr); } catch (e) { arr = null; } }
+    if (Array.isArray(arr)) return arr;
+    if (arr && Array.isArray(arr.messages)) return arr.messages;
+    return [];
+  }
   function overallConf(q) {
     var c = numOrNull(q.match_confidence);
     if (c != null) return c;
     var o = parseOutput(q);
     return o ? numOrNull(o.match_confidence) : null;
   }
-  // Normalize one raw line into the fields the detail table shows.
+  function draftText(q) {
+    var o = parseOutput(q);
+    return (o && (o.quote_text || (o.output && o.output.quote_text))) || q.quote_text || "";
+  }
+
+  // Human product NAME first — SKU is a secondary tag (priority #1).
   function normLine(l) {
     var status = (l.status || "").toLowerCase();
-    // A pending_info line that still carries a concrete price is provisionally
-    // priced (awaiting a spec confirmation) — surface it distinctly from
-    // truly-unpriced lines. Mirrors the Build HTML Email renderer.
     var hasPrice = (Number(l.total_cash) > 0) || (l.unit_cash != null && String(l.unit_cash).trim() !== "");
     if (status === "pending_info" && hasPrice) status = "provisional";
     var reason = l.match_reason || l.why || l.reason || l.match_note || l.note || "";
@@ -178,15 +227,40 @@
     }
     var conf = numOrNull(l.confidence);
     if (conf == null) conf = numOrNull(l.match_confidence);
+    var name = l.product_name || l.urun_adi || l.product || l.name || l.description || "—";
+    var cands = Array.isArray(l.candidates) ? l.candidates : [];
     return {
       ref: l.ref != null ? String(l.ref) : "",
-      product: l.product || l.name || l.description || "—",
-      spec: l.spec || "",
+      name: name,
+      spec: l.spec || l.specs || "",
+      colors: l.colors || l.colour || l.color || "",
       sku: l.sku || l.matched_sku || "",
       status: status,
       reason: reason,
-      conf: conf
+      conf: conf,
+      qty: numOrNull(l.qty),
+      qty_unit: l.qty_unit || "",
+      unit_cash: l.unit_cash,
+      unit_term: l.unit_term,
+      total_cash: numOrNull(l.total_cash),
+      total_term: numOrNull(l.total_term),
+      candidates: cands,
+      raw: l
     };
+  }
+  function lineWeak(l) {
+    if (l.status === "pending_info" || l.status === "pending_hassan") return true;
+    if (l.status === "provisional") return true;
+    if (l.conf != null && l.conf < CONF_MID) return true;
+    return false;
+  }
+  // A short "customer & products" secondary line for the table.
+  function productSummary(q) {
+    var lines = linesOf(q).map(normLine);
+    if (!lines.length) return "";
+    var first = lines[0].name;
+    var extra = lines.length - 1;
+    return first + (extra > 0 ? "  ·  +" + extra + " line" + (extra > 1 ? "s" : "") : "");
   }
 
   function sumByCur(list) {
@@ -204,9 +278,97 @@
     return keys.map(function (c) { return (shortForm ? moneyShort : money)(by[c], c); }).join("  ·  ");
   }
 
+  // ── client-side digest metrics (fallback when the digest table is empty) ────
+  function computeDigest() {
+    if (digest) {
+      return {
+        needsInfo: digest.open_needs_info || 0,
+        approvals: digest.needs_approval || 0,
+        replies: digest.recent_replies || 0,
+        source: "digest"
+      };
+    }
+    var needsInfo = quotes.filter(function (q) {
+      return linesOf(q).map(normLine).some(function (l) {
+        return l.status === "pending_info" || l.status === "pending_hassan";
+      });
+    }).length;
+    var approvals = quotes.filter(needsApproval).length;
+    var replies = quotes.filter(function (q) { return q.last_reply_text; }).length;
+    return { needsInfo: needsInfo, approvals: approvals, replies: replies, source: "client" };
+  }
+  function greenReady() {
+    return quotes.filter(function (q) { return tierOf(q) === "green" && isDraft(q); }).length;
+  }
+
+  // ── digest banner ───────────────────────────────────────────────────────────
+  function renderDigest() {
+    var bar = el("digestBar");
+    if (!bar) return;
+    var d = computeDigest();
+    var green = greenReady();
+    var total = d.needsInfo + d.approvals + d.replies + green;
+    if (!hasLoaded) { bar.hidden = true; return; }
+    if (total === 0) {
+      bar.hidden = false;
+      bar.className = "qc-digest calm";
+      bar.innerHTML = '<div class="qc-digest-calm"><span class="qc-digest-tick">' +
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>' +
+        'Inbox clear — no quotes are waiting on you right now.</div>';
+      return;
+    }
+    bar.hidden = false;
+    bar.className = "qc-digest";
+    var segs = [
+      { k: "green", n: green, label: green === 1 ? "ready to send" : "ready to send", cls: "seg-green",
+        ico: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/></svg>' },
+      { k: "info", n: d.needsInfo, label: "need input", cls: "seg-info",
+        ico: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>' },
+      { k: "approve", n: d.approvals, label: "thin-margin approvals", cls: "seg-approve",
+        ico: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>' },
+      { k: "reply", n: d.replies, label: d.replies === 1 ? "new reply" : "new replies", cls: "seg-reply",
+        ico: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' }
+    ];
+    bar.innerHTML =
+      '<div class="qc-digest-lead">Today&rsquo;s copilot brief' +
+        (d.source === "client" ? '<span class="qc-digest-live" title="Computed live from the loaded quotes">live</span>' : "") +
+      '</div>' +
+      '<div class="qc-digest-segs">' +
+      segs.map(function (s) {
+        var dim = s.n === 0 ? " dim" : "";
+        return '<button type="button" class="qc-seg ' + s.cls + dim + '" data-digest="' + s.k + '"' +
+          (s.n === 0 ? " disabled" : "") + '>' +
+          '<span class="qc-seg-ico">' + s.ico + "</span>" +
+          '<span class="qc-seg-n">' + s.n + "</span>" +
+          '<span class="qc-seg-l">' + esc(s.label) + "</span></button>";
+      }).join("") +
+      "</div>";
+  }
+  el("digestBar").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button[data-digest]") : null;
+    if (!b) return;
+    var k = b.getAttribute("data-digest");
+    // Reset filters, then apply the segment's focus.
+    el("search").value = "";
+    el("statusFilter").value = "all";
+    el("tierFilter").value = "all";
+    el("outcomeFilter").value = "all";
+    approvalOnly = false;
+    el("approvalFilter").setAttribute("aria-pressed", "false");
+    el("approvalFilter").classList.remove("on");
+    if (k === "green") { el("tierFilter").value = "green"; el("statusFilter").value = "draft"; }
+    else if (k === "approve") { approvalOnly = true; el("approvalFilter").setAttribute("aria-pressed", "true"); el("approvalFilter").classList.add("on"); }
+    else if (k === "info") { el("statusFilter").value = "draft"; digestFocus = "info"; }
+    else if (k === "reply") { digestFocus = "reply"; }
+    if (k !== "info" && k !== "reply") digestFocus = null;
+    renderTable();
+    el("quotesTable").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  var digestFocus = null; // 'info' | 'reply' — extra filters the segments can toggle
+
   // ── tiles ─────────────────────────────────────────────────────────────────
   function renderTiles() {
-    var drafts = quotes.filter(function (q) { return bucket(q) === "draft"; }).length;
+    var drafts = quotes.filter(isDraft).length;
     var won = quotes.filter(function (q) { return outcomeOf(q) === "won"; });
     var lost = quotes.filter(function (q) { return outcomeOf(q) === "lost"; });
     var decided = won.length + lost.length;
@@ -230,12 +392,11 @@
       "</div>";
     }).join("");
 
-    // approval filter chip count
     var chip = el("approvalChipN");
     if (chip) { chip.hidden = awaiting === 0; chip.textContent = awaiting; }
   }
 
-  // ── over-time chart (hand-rolled SVG, no external libs) ─────────────────────
+  // ── over-time chart (hand-rolled SVG) ───────────────────────────────────────
   function renderChart() {
     var host = el("chart");
     var months = {};
@@ -277,14 +438,14 @@
   }
 
   // ── loading / empty / error states ──────────────────────────────────────────
-  var COLSPAN = 9;
+  var COLSPAN = 11;
   function renderSkeleton() {
     el("tiles").innerHTML = "<div class=\"sk sk-tile\"></div>".repeat(6);
     el("chart").innerHTML = '<div class="sk sk-chart"></div>';
-    var widths = [16, 70, 130, 84, 48, 46, 50, 70, 96];
+    var widths = [16, 16, 70, 150, 84, 48, 46, 50, 70, 96, 16];
     var cells = widths.map(function (w, i) {
-      var cls = (i === 3 || i === 4) ? ' class="num"' : "";
-      var ml = (i === 3 || i === 4) ? "margin-left:auto;" : "";
+      var cls = (i === 4 || i === 5) ? ' class="num"' : "";
+      var ml = (i === 4 || i === 5) ? "margin-left:auto;" : "";
       return "<td" + cls + '><span class="sk sk-line" style="' + ml + "width:" + w + 'px"></span></td>';
     }).join("");
     el("quotesBody").innerHTML = ('<tr class="qc-skrow">' + cells + "</tr>").repeat(6);
@@ -326,10 +487,11 @@
   }
 
   // ── table ─────────────────────────────────────────────────────────────────
-  function caret(id, open) {
-    return '<button class="qc-caret' + (open ? " open" : "") + '" data-expand="' + esc(id) +
-      '" aria-label="' + (open ? "Collapse detail" : "Expand detail") + '" aria-expanded="' + (open ? "true" : "false") + '">' +
-      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>';
+  function tierCell(q) {
+    var t = tierOf(q);
+    if (!t) return '<span class="qc-tier none" title="Tier not computed yet">—</span>';
+    var lbl = { green: "Ready", amber: "Review", red: "Needs work" }[t];
+    return '<span class="qc-tier ' + t + '" title="Autonomy tier: ' + t + '"><i></i>' + lbl + "</span>";
   }
   function marginCell(q) {
     var p = numOrNull(q.margin_pct);
@@ -356,53 +518,30 @@
     }
     return '<span class="qc-mut">—</span>';
   }
-  function detailRow(q, id) {
-    var lines = linesOf(q);
-    var body;
-    if (!lines.length) {
-      body = '<p class="qc-detail-empty">No line-by-line detail was logged with this quote. ' +
-        'Once the pipeline writes per-line match reasons into its output, they appear here.</p>';
-    } else {
-      var rows = lines.map(function (raw) {
-        var l = normLine(raw);
-        var st = l.status === "priced" ? '<span class="pill sent">Priced</span>'
-          : l.status === "provisional" ? '<span class="pill provisional">Priced · confirm spec</span>'
-          : l.status === "pending_info" ? '<span class="pill pending">Needs info</span>'
-          : l.status === "pending_hassan" ? '<span class="pill info">Pending price</span>'
-          : "—";
-        return "<tr>" +
-          '<td class="ln">' + esc(l.ref || "—") + "</td>" +
-          "<td>" + esc(l.product) + (l.spec ? '<span class="ln-spec">' + esc(l.spec) + "</span>" : "") + "</td>" +
-          '<td class="ln-sku">' + (l.sku ? esc(l.sku) : '<span class="qc-mut">unmatched</span>') + "</td>" +
-          "<td>" + esc(l.reason) + "</td>" +
-          '<td class="num">' + confCell(l.conf) + "</td>" +
-          "<td>" + st + "</td>" +
-        "</tr>";
-      }).join("");
-      body = '<div class="qc-lines-wrap"><table class="qc-lines">' +
-        '<thead><tr><th>Line</th><th>Product</th><th>Matched SKU</th><th>Why this match</th><th class="num">Conf.</th><th>Status</th></tr></thead>' +
-        "<tbody>" + rows + "</tbody></table></div>";
-    }
-    var meta = [];
-    if (numOrNull(q.margin_pct) != null) meta.push("Overall margin " + q.margin_pct + "% (" + money(q.margin_amount, q.currency) + ")");
-    if (overallConf(q) != null) meta.push("Match confidence " + Math.round(overallConf(q)) + "/100");
-    if (q.approval_reason && needsApproval(q)) meta.push("Flagged: " + q.approval_reason);
-    var head = '<div class="qc-detail-head"><span class="qc-detail-title">Line-by-line match</span>' +
-      (meta.length ? '<span class="qc-detail-meta">' + esc(meta.join("  ·  ")) + "</span>" : "") + "</div>";
-    return '<tr class="qc-detail" data-detail="' + esc(id) + '"><td colspan="' + COLSPAN + '">' + head + body + "</td></tr>";
+  var CHEVRON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+
+  function filteredRows() {
+    var q = (el("search").value || "").trim().toLowerCase();
+    var sf = el("statusFilter").value;
+    var tf = el("tierFilter").value;
+    var of = el("outcomeFilter").value;
+    return quotes.filter(function (r) {
+      if (q) {
+        var hay = ((r.customer || "") + " " + productSummary(r)).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      if (sf !== "all" && bucket(r) !== sf) return false;
+      if (tf !== "all" && tierOf(r) !== tf) return false;
+      if (of !== "all" && outcomeOf(r) !== of) return false;
+      if (approvalOnly && !needsApproval(r)) return false;
+      if (digestFocus === "info" && !linesOf(r).map(normLine).some(function (l) { return l.status === "pending_info" || l.status === "pending_hassan"; })) return false;
+      if (digestFocus === "reply" && !r.last_reply_text) return false;
+      return true;
+    });
   }
 
   function renderTable() {
-    var q = (el("search").value || "").trim().toLowerCase();
-    var sf = el("statusFilter").value;
-    var of = el("outcomeFilter").value;
-    var rows = quotes.filter(function (r) {
-      if (q && (r.customer || "").toLowerCase().indexOf(q) === -1) return false;
-      if (sf !== "all" && bucket(r) !== sf) return false;
-      if (of !== "all" && outcomeOf(r) !== of) return false;
-      if (approvalOnly && !needsApproval(r)) return false;
-      return true;
-    });
+    var rows = filteredRows();
     el("rowCount").textContent = rows.length + " of " + quotes.length;
     var empty = el("emptyState");
     if (rows.length === 0) {
@@ -412,7 +551,7 @@
           "Quotes drafted by the RFQ pipeline land here automatically. Send a real request to the connected mailbox and the first draft will appear.");
       } else {
         empty.innerHTML = emptyPanel(ICON_FILTER, "No matches",
-          "No quotes fit these filters. Clear the search, drop the approval filter, or switch the send state and outcome to widen it.");
+          "No quotes fit these filters. Clear the search, drop the approval filter, or widen the tier / send state and outcome.");
       }
     } else {
       empty.hidden = true;
@@ -421,37 +560,131 @@
       var b = bucket(r);
       var oc = outcomeOf(r);
       var id = r.id != null ? String(r.id) : "";
-      var open = !!expanded[id];
       var flagged = needsApproval(r);
+      var sel = !!selected[id];
       var acts = '<span class="qc-acts">' +
         '<button class="qc-act win ' + (oc === "won" ? "on" : "") + '" data-id="' + esc(id) + '" data-act="won">Won</button>' +
         '<button class="qc-act lose ' + (oc === "lost" ? "on" : "") + '" data-id="' + esc(id) + '" data-act="lost">Lost</button>' +
         (oc !== "pending" ? '<button class="qc-act" data-id="' + esc(id) + '" data-act="pending">Reset</button>' : "") +
         "</span>";
-      var main = '<tr data-row="' + esc(id) + '" class="qc-row' + (open ? " open" : "") + (flagged ? " needs-approval" : "") + '">' +
-        '<td class="qc-col-x">' + caret(id, open) + "</td>" +
+      var summary = productSummary(r);
+      return '<tr data-row="' + esc(id) + '" class="qc-row' + (flagged ? " needs-approval" : "") + (sel ? " is-sel" : "") + (openId === id ? " is-open" : "") + '">' +
+        '<td class="qc-col-sel"><input type="checkbox" class="qc-rowsel" data-sel="' + esc(id) + '"' + (sel ? " checked" : "") + ' aria-label="Select quote"></td>' +
+        '<td class="qc-col-tier">' + tierCell(r) + "</td>" +
         "<td>" + esc(fmtDate(r.created_at)) + "</td>" +
-        '<td class="qc-cust">' + esc(r.customer || "—") + "</td>" +
-        '<td class="num">' + esc(money(r.total, r.currency)) + "</td>" +
+        '<td class="qc-cust"><span class="qc-cust-name">' + esc(r.customer || "—") + "</span>" +
+          (summary ? '<span class="qc-cust-prod">' + esc(summary) + "</span>" : "") +
+          (r.last_reply_text ? '<span class="qc-reply-dot" title="New customer reply on this thread">new reply</span>' : "") + "</td>" +
+        '<td class="num qc-total">' + esc(money(r.total, r.currency)) + "</td>" +
         '<td class="num">' + marginCell(r) + "</td>" +
         "<td>" + confCell(overallConf(r)) + "</td>" +
         "<td><span class='pill " + b + "'>" + (b === "draft" ? "Draft" : "Sent") + "</span></td>" +
         "<td>" + approvalCell(r, id) + "</td>" +
         "<td><div class='qc-outcome'><span class='pill " + oc + "'>" + oc.charAt(0).toUpperCase() + oc.slice(1) + "</span>" + acts + "</div></td>" +
+        '<td class="qc-col-open"><span class="qc-open-cue" aria-hidden="true">' + CHEVRON + "</span></td>" +
       "</tr>";
-      return main + (open ? detailRow(r, id) : "");
     }).join("");
+    syncSelectAll();
   }
 
-  function toggleExpand(id) {
-    if (!id) return;
-    if (expanded[id]) delete expanded[id]; else expanded[id] = true;
+  function render() { renderDigest(); renderTiles(); renderChart(); renderTable(); renderBulk(); }
+
+  // ── selection / bulk ────────────────────────────────────────────────────────
+  function onSelectAll() {
+    var on = el("selectAll").checked;
+    var rows = filteredRows();
+    rows.forEach(function (r) {
+      var id = r.id != null ? String(r.id) : "";
+      if (on) selected[id] = true; else delete selected[id];
+    });
     renderTable();
+    renderBulk();
+  }
+  function syncSelectAll() {
+    var rows = filteredRows();
+    var sa = el("selectAll");
+    if (!sa) return;
+    var selCount = rows.filter(function (r) { return selected[String(r.id)]; }).length;
+    sa.checked = rows.length > 0 && selCount === rows.length;
+    sa.indeterminate = selCount > 0 && selCount < rows.length;
+  }
+  function selectedQuotes() {
+    return quotes.filter(function (q) { return selected[String(q.id)]; });
+  }
+  function renderBulk() {
+    var bar = el("bulkBar");
+    var list = selectedQuotes();
+    if (!list.length) { bar.hidden = true; bar.innerHTML = ""; document.body.classList.remove("qc-has-bulk"); return; }
+    var drafts = list.filter(isDraft).length;
+    bar.hidden = false;
+    document.body.classList.add("qc-has-bulk");
+    bar.innerHTML =
+      '<span class="qc-bulk-n">' + list.length + " selected</span>" +
+      '<span class="qc-bulk-sub">' + drafts + " draft" + (drafts === 1 ? "" : "s") + "</span>" +
+      '<span class="qc-bulk-sp"></span>' +
+      '<button type="button" class="btn btn-primary btn-sm" id="bulkSend"' + (drafts === 0 ? " disabled" : "") + '>Send ' + drafts + " draft" + (drafts === 1 ? "" : "s") + "</button>" +
+      '<div class="qc-bulk-label"><input type="text" id="bulkLabelInput" class="qc-bulk-input" placeholder="Label name" maxlength="60">' +
+        '<button type="button" class="btn btn-ghost btn-sm" id="bulkLabel">Apply label</button></div>' +
+      '<button type="button" class="qc-bulk-clear" id="bulkClear" aria-label="Clear selection">Clear</button>';
+    el("bulkSend").addEventListener("click", bulkSend);
+    el("bulkLabel").addEventListener("click", bulkLabel);
+    el("bulkClear").addEventListener("click", function () { selected = {}; renderTable(); renderBulk(); });
   }
 
-  function render() { renderTiles(); renderChart(); renderTable(); }
+  // ── secured webhook client ──────────────────────────────────────────────────
+  function api(path, body) {
+    return sb.auth.getSession().then(function (res) {
+      var s = res.data && res.data.session;
+      var token = s && s.access_token;
+      if (!token) { return Promise.reject({ status: 401, message: "Session expired — sign in again." }); }
+      return fetch(WEBHOOK_BASE + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify(body || {})
+      }).then(function (r) {
+        return r.text().then(function (txt) {
+          var json = null;
+          try { json = txt ? JSON.parse(txt) : null; } catch (e) { json = null; }
+          if (r.status === 401 || r.status === 403) {
+            return Promise.reject({ status: r.status, message: (json && json.error) || "Not authorised — your session may have expired." });
+          }
+          if (!r.ok || (json && json.ok === false)) {
+            return Promise.reject({ status: r.status, message: (json && (json.error || json.message)) || ("Request failed (" + r.status + ").") });
+          }
+          return json || { ok: true };
+        });
+      });
+    });
+  }
+  function handleApiError(err) {
+    var msg = (err && err.message) || "Network error.";
+    if (err && (err.status === 401 || err.status === 403)) {
+      toast(msg, true);
+    } else {
+      toast(msg, true);
+    }
+  }
 
-  // ── write outcome back to Supabase ──────────────────────────────────────────
+  // ── confirm dialog (promise) ────────────────────────────────────────────────
+  function confirmDialog(title, bodyHtml, okLabel, danger) {
+    var dlg = el("confirmDialog");
+    el("confirmTitle").textContent = title;
+    el("confirmBody").innerHTML = bodyHtml;
+    var ok = el("confirmOk");
+    ok.textContent = okLabel || "Confirm";
+    ok.classList.toggle("is-danger", !!danger);
+    return new Promise(function (resolve) {
+      function onClose() {
+        dlg.removeEventListener("close", onClose);
+        resolve(dlg.returnValue === "ok");
+      }
+      dlg.addEventListener("close", onClose);
+      if (typeof dlg.showModal === "function") dlg.showModal();
+      else resolve(window.confirm(title));
+    });
+  }
+
+  // ── outcome write ───────────────────────────────────────────────────────────
   function setOutcome(id, outcome, btn) {
     if (!id) return;
     var acts = btn && btn.parentNode ? btn.parentNode.querySelectorAll("button") : [];
@@ -465,9 +698,7 @@
         else toast("Couldn't save: " + m, true);
         return;
       }
-      for (var k = 0; k < quotes.length; k++) {
-        if (String(quotes[k].id) === String(id)) { quotes[k].outcome = outcome; quotes[k].outcome_at = patch.outcome_at; break; }
-      }
+      patchLocal(id, { outcome: outcome, outcome_at: patch.outcome_at });
       render();
       toast("Marked " + outcome + ".");
     }).catch(function () {
@@ -476,27 +707,21 @@
     });
   }
 
-  // ── approve (margin governance) — optimistic UI, graceful degradation ───────
   function approve(id, btn) {
     if (!id) return;
-    // find the record & snapshot for rollback
-    var rec = null;
-    for (var i = 0; i < quotes.length; i++) if (String(quotes[i].id) === String(id)) { rec = quotes[i]; break; }
+    var rec = findQuote(id);
     if (!rec) return;
     var snapshot = { needs_approval: rec.needs_approval, approved_by: rec.approved_by, approved_at: rec.approved_at };
     var now = new Date().toISOString();
     var by = currentEmail || "console";
-
-    // optimistic: clear the flag & mark approved immediately
     rec.needs_approval = false; rec.approved_by = by; rec.approved_at = now;
     render();
-
+    if (openId === String(id)) renderDrawer();
     var patch = { needs_approval: false, approved_by: by, approved_at: now };
     sb.from("quotes").update(patch).eq("id", id).then(function (res) {
       if (res.error) {
-        // rollback
         rec.needs_approval = snapshot.needs_approval; rec.approved_by = snapshot.approved_by; rec.approved_at = snapshot.approved_at;
-        render();
+        render(); if (openId === String(id)) renderDrawer();
         var m = res.error.message || "";
         if (/column|needs_approval|approved_by/i.test(m)) toast("Run quotewright-expansion.sql in Supabase first.", true);
         else toast("Couldn't approve: " + m, true);
@@ -505,11 +730,447 @@
       toast("Approved.");
     }).catch(function () {
       rec.needs_approval = snapshot.needs_approval; rec.approved_by = snapshot.approved_by; rec.approved_at = snapshot.approved_at;
-      render();
+      render(); if (openId === String(id)) renderDrawer();
       toast("Network error — not approved.", true);
     });
   }
 
+  function findQuote(id) {
+    for (var i = 0; i < quotes.length; i++) if (String(quotes[i].id) === String(id)) return quotes[i];
+    return null;
+  }
+  function patchLocal(id, fields) {
+    var q = findQuote(id);
+    if (!q) return;
+    for (var k in fields) if (fields.hasOwnProperty(k)) q[k] = fields[k];
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  //  WORKSPACE DRAWER — thread, product-forward lines + resolution, draft + actions
+  // ════════════════════════════════════════════════════════════════════════════
+  function openDrawer(id) {
+    if (!id) return;
+    openId = String(id);
+    lastFocus = document.activeElement;
+    renderDrawer();
+    var scrim = el("drawerScrim"), dr = el("drawer");
+    scrim.hidden = false; dr.hidden = false; dr.setAttribute("aria-hidden", "false");
+    document.body.classList.add("qc-drawer-open");
+    // next frame → transition in
+    requestAnimationFrame(function () { scrim.classList.add("show"); dr.classList.add("show"); });
+    var closeBtn = el("drawer").querySelector(".qc-drawer-close");
+    if (closeBtn) closeBtn.focus();
+    renderTable(); // reflect is-open highlight
+  }
+  function closeDrawer() {
+    if (openId == null) return;
+    var scrim = el("drawerScrim"), dr = el("drawer");
+    scrim.classList.remove("show"); dr.classList.remove("show");
+    dr.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("qc-drawer-open");
+    var was = openId; openId = null;
+    var finish = function () {
+      scrim.hidden = true; dr.hidden = true;
+      dr.removeEventListener("transitionend", onEnd);
+    };
+    var onEnd = function (e) { if (e.target === dr && e.propertyName === "transform") finish(); };
+    dr.addEventListener("transitionend", onEnd);
+    setTimeout(finish, 420); // fallback if transitionend doesn't fire
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    renderTable();
+    void was;
+  }
+
+  function renderDrawer() {
+    if (openId == null) return;
+    var q = findQuote(openId);
+    if (!q) { closeDrawer(); return; }
+    el("drawerInner").innerHTML = drawerHtml(q);
+  }
+
+  function drawerHtml(q) {
+    var id = String(q.id);
+    var b = bucket(q);
+    var tier = tierOf(q);
+    var tierBadge = tier
+      ? '<span class="qc-tier ' + tier + '"><i></i>' + { green: "Ready", amber: "Review", red: "Needs work" }[tier] + "</span>"
+      : "";
+    var sentInfo = (b === "sent" && q.sent_at)
+      ? '<span class="qc-sentline">Sent ' + esc(fmtDateTime(q.sent_at)) + (q.sent_by ? " · " + esc(q.sent_by) : "") + "</span>" : "";
+
+    // ── header
+    var head =
+      '<div class="qc-dh">' +
+        '<button class="qc-drawer-close" aria-label="Close workspace">' +
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
+        '<div class="qc-dh-main">' +
+          '<div class="qc-dh-row">' +
+            '<h2 class="qc-dh-cust">' + esc(q.customer || "Quote") + "</h2>" +
+            '<span class="pill ' + b + '">' + (b === "draft" ? "Draft" : "Sent") + "</span>" +
+            tierBadge +
+          "</div>" +
+          '<div class="qc-dh-meta">' + esc(fmtDate(q.created_at)) +
+            '  ·  <span class="qc-dh-total">' + esc(money(q.total, q.currency)) + "</span>" +
+            (numOrNull(q.grand_total_vadeli) != null ? '  ·  term ' + esc(money(q.grand_total_vadeli, q.currency)) : "") +
+            (sentInfo ? "  ·  " + sentInfo : "") +
+          "</div>" +
+        "</div>" +
+      "</div>";
+
+    var reply = q.last_reply_text
+      ? '<div class="qc-dnote"><strong>New customer reply</strong><p>' + nl2br(q.last_reply_text) + "</p></div>" : "";
+
+    return head +
+      '<div class="qc-dbody">' +
+        reply +
+        threadPanel(q) +
+        linesPanel(q, id) +
+        draftPanel(q, id) +
+      "</div>";
+  }
+
+  // ── thread panel (reads thread_snapshot; no live Gmail call) ─────────────────
+  function normMsg(m) {
+    var from = m.from || m.sender || m.author || m.email || "";
+    var date = m.date || m.ts || m.timestamp || m.created_at || m.time || "";
+    var body = m.body || m.text || m.snippet || m.content || m.message || "";
+    var dir = (m.direction || m.type || m.role || "").toLowerCase();
+    var outbound;
+    if (dir === "outbound" || dir === "sent" || dir === "firm" || dir === "agent" || dir === "us") outbound = true;
+    else if (dir === "inbound" || dir === "received" || dir === "customer") outbound = false;
+    else outbound = FIRM_HINTS.some(function (h) { return String(from).toLowerCase().indexOf(h) !== -1; });
+    return { from: from, date: date, body: body, outbound: outbound };
+  }
+  function threadPanel(q) {
+    var msgs = threadOf(q).map(normMsg);
+    var inner;
+    if (!msgs.length) {
+      inner = '<div class="qc-empty-mini">The conversation snapshot appears once the pipeline stores <code>thread_snapshot</code>. ' +
+        "Until then, open the customer's thread from the draft below.</div>";
+    } else {
+      inner = '<div class="qc-thread">' + msgs.map(function (m) {
+        return '<div class="qc-msg ' + (m.outbound ? "out" : "in") + '">' +
+          '<div class="qc-msg-head"><span class="qc-msg-from">' + esc(m.from || (m.outbound ? "Hassan" : "Customer")) + "</span>" +
+            (m.date ? '<span class="qc-msg-date">' + esc(fmtDateTime(m.date)) + "</span>" : "") + "</div>" +
+          '<div class="qc-msg-body">' + nl2br(m.body) + "</div></div>";
+      }).join("") + "</div>";
+    }
+    return section("Conversation", msgs.length ? (msgs.length + " message" + (msgs.length > 1 ? "s" : "")) : "", inner);
+  }
+
+  // ── product-forward lines + resolution picker ────────────────────────────────
+  function statusPill(status) {
+    return status === "priced" ? '<span class="pill sent">Priced</span>'
+      : status === "provisional" ? '<span class="pill provisional">Priced · confirm spec</span>'
+      : status === "pending_info" ? '<span class="pill pending">Needs info</span>'
+      : status === "pending_hassan" ? '<span class="pill info">Pending price</span>'
+      : "";
+  }
+  function candChip(id, ref, c) {
+    var price = (c.unit_price != null && c.unit_price !== "")
+      ? '<span class="qc-cand-price">' + esc(money(c.unit_price, c.currency)) + "</span>" : "";
+    var conf = numOrNull(c.confidence);
+    var confTag = conf != null ? '<span class="qc-conf ' + confBand(conf) + '"><i></i>' + Math.round(conf) + "</span>" : "";
+    var specs = [c.specs, c.colour || c.color].filter(Boolean).join(" · ");
+    return '<button type="button" class="qc-cand" data-resolve="' + esc(id) + '" data-ref="' + esc(ref) + '" data-sku="' + esc(c.sku || "") + '">' +
+      '<span class="qc-cand-top"><span class="qc-cand-name">' + esc(c.name || c.urun_adi || c.sku || "Candidate") + "</span>" + price + "</span>" +
+      (specs ? '<span class="qc-cand-specs">' + esc(specs) + "</span>" : "") +
+      '<span class="qc-cand-foot">' + (c.sku ? '<span class="qc-cand-sku">' + esc(c.sku) + "</span>" : "") +
+        (c.reason ? '<span class="qc-cand-why">' + esc(c.reason) + "</span>" : "") + confTag + "</span>" +
+      '<span class="qc-cand-pick">Use this' +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>' +
+      "</button>";
+  }
+  function lineCard(q, id, raw) {
+    var l = normLine(raw);
+    var weak = lineWeak(l);
+    var unit = l.unit_cash != null && String(l.unit_cash).trim() !== "" ? esc(String(l.unit_cash)) : "";
+    var qty = l.qty != null ? esc(l.qty.toLocaleString("en-US")) + (l.qty_unit ? " " + esc(l.qty_unit) : "") : "";
+    var total = l.total_cash != null ? money(l.total_cash, q.currency) : "";
+    var metaBits = [];
+    if (l.spec) metaBits.push(esc(l.spec));
+    if (l.colors) metaBits.push(esc(l.colors));
+    var head =
+      '<div class="qc-line-head">' +
+        '<div class="qc-line-id">' + esc(l.ref || "—") + "</div>" +
+        '<div class="qc-line-main">' +
+          '<div class="qc-line-name">' + esc(l.name) + "</div>" +
+          (metaBits.length ? '<div class="qc-line-spec">' + metaBits.join(" · ") + "</div>" : "") +
+          '<div class="qc-line-tags">' +
+            (l.sku ? '<span class="qc-sku-tag">' + esc(l.sku) + "</span>" : '<span class="qc-sku-tag muted">unmatched</span>') +
+            (l.conf != null ? confCell(l.conf) : "") +
+          "</div>" +
+        "</div>" +
+        '<div class="qc-line-num">' +
+          (unit ? '<div class="qc-line-unit">' + unit + "</div>" : "") +
+          (qty ? '<div class="qc-line-qty">' + qty + "</div>" : "") +
+          (total ? '<div class="qc-line-total">' + esc(total) + "</div>" : "") +
+          statusPill(l.status) +
+        "</div>" +
+      "</div>";
+
+    var resolver = "";
+    if (weak) {
+      var chips = l.candidates.length
+        ? '<div class="qc-cands">' + l.candidates.map(function (c) { return candChip(id, l.ref, c); }).join("") + "</div>"
+        : '<div class="qc-empty-mini">No ranked candidates were logged for this line. Search the catalogue below.</div>';
+      resolver =
+        '<div class="qc-resolve">' +
+          '<div class="qc-resolve-lead">Resolve this line — one tap prices it, regenerates the draft &amp; teaches the pipeline.</div>' +
+          chips +
+          '<div class="qc-search-cat">' +
+            '<input type="text" class="qc-catsearch" data-ref="' + esc(l.ref) + '" placeholder="Search catalogue by name, SKU, colour or GSM…">' +
+            '<div class="qc-catresults" data-ref="' + esc(l.ref) + '"></div>' +
+          "</div>" +
+          '<div class="qc-line-actions">' +
+            '<button type="button" class="qc-mini-btn" data-clarify="' + esc(id) + '" data-ref="' + esc(l.ref) + '">Ask the customer for this spec</button>' +
+          "</div>" +
+        "</div>";
+    }
+    return '<div class="qc-line' + (weak ? " weak" : "") + '" data-line="' + esc(l.ref) + '">' + head + resolver + "</div>";
+  }
+  function linesPanel(q, id) {
+    var lines = linesOf(q);
+    var weakN = lines.map(normLine).filter(lineWeak).length;
+    var inner;
+    if (!lines.length) {
+      inner = '<div class="qc-empty-mini">No line-by-line detail was logged with this quote.</div>';
+    } else {
+      inner = '<div class="qc-lines-list">' + lines.map(function (raw) { return lineCard(q, id, raw); }).join("") + "</div>";
+    }
+    var sub = lines.length ? (lines.length + " line" + (lines.length > 1 ? "s" : "") + (weakN ? "  ·  " + weakN + " to resolve" : "  ·  all priced")) : "";
+    return section("Line items", sub, inner);
+  }
+
+  // ── draft + actions ──────────────────────────────────────────────────────────
+  function draftPanel(q, id) {
+    var txt = draftText(q);
+    var body =
+      '<textarea class="qc-draft" id="draftBox" spellcheck="true" aria-label="Draft reply">' + esc(txt) + "</textarea>" +
+      '<div class="qc-draft-actions">' +
+        '<button type="button" class="btn btn-primary qc-send" data-send="' + esc(id) + '">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>' +
+          'Approve &amp; send</button>' +
+        '<button type="button" class="btn btn-ghost qc-reply" data-reply="' + esc(id) + '">Send edited reply</button>' +
+        '<div class="qc-label-inline">' +
+          '<input type="text" class="qc-label-input" id="labelInput" placeholder="Label" maxlength="60">' +
+          '<button type="button" class="btn btn-ghost btn-sm qc-relabel" data-relabel="' + esc(id) + '" data-action="add">Add</button>' +
+          '<button type="button" class="btn btn-ghost btn-sm qc-relabel" data-relabel="' + esc(id) + '" data-action="remove">Remove</button>' +
+        "</div>" +
+      "</div>" +
+      '<p class="qc-gate-note">Sending emails the customer from the firm mailbox. Nothing leaves until you approve it here — this is the send gate.</p>';
+    return section("Draft reply", isDraft(q) ? "pending your send" : "sent", body);
+  }
+
+  function section(title, sub, inner) {
+    return '<section class="qc-dsec">' +
+      '<div class="qc-dsec-head"><h3>' + esc(title) + "</h3>" + (sub ? '<span class="qc-dsec-sub">' + esc(sub) + "</span>" : "") + "</div>" +
+      inner + "</section>";
+  }
+
+  // ── drawer event handling ────────────────────────────────────────────────────
+  function onDrawerClick(e) {
+    var t = e.target;
+    var closeBtn = t.closest ? t.closest(".qc-drawer-close") : null;
+    if (closeBtn) { closeDrawer(); return; }
+    var cand = t.closest ? t.closest("button[data-resolve]") : null;
+    if (cand) { resolveLine(cand.getAttribute("data-resolve"), cand.getAttribute("data-ref"), cand.getAttribute("data-sku"), cand); return; }
+    var use = t.closest ? t.closest("button[data-usesku]") : null;
+    if (use) { resolveLine(use.getAttribute("data-usesku"), use.getAttribute("data-ref"), use.getAttribute("data-sku"), use); return; }
+    var send = t.closest ? t.closest("button[data-send]") : null;
+    if (send) { doSend(send.getAttribute("data-send"), send); return; }
+    var rep = t.closest ? t.closest("button[data-reply]") : null;
+    if (rep) { doReply(rep.getAttribute("data-reply"), rep); return; }
+    var clar = t.closest ? t.closest("button[data-clarify]") : null;
+    if (clar) { doClarify(clar.getAttribute("data-clarify"), clar.getAttribute("data-ref"), clar); return; }
+    var rel = t.closest ? t.closest("button[data-relabel]") : null;
+    if (rel) { doRelabel(rel.getAttribute("data-relabel"), rel.getAttribute("data-action"), rel); return; }
+  }
+  var catTimer = null;
+  function onDrawerInput(e) {
+    var inp = e.target;
+    if (inp && inp.classList && inp.classList.contains("qc-catsearch")) {
+      var ref = inp.getAttribute("data-ref");
+      var val = inp.value.trim();
+      if (catTimer) clearTimeout(catTimer);
+      catTimer = setTimeout(function () { catalogSearch(ref, val); }, 260);
+    }
+  }
+  function catResultsEl(ref) {
+    var list = el("drawerInner").querySelectorAll('.qc-catresults');
+    for (var i = 0; i < list.length; i++) if (list[i].getAttribute("data-ref") === String(ref)) return list[i];
+    return null;
+  }
+  function catalogSearch(ref, term) {
+    var host = catResultsEl(ref);
+    if (!host) return;
+    if (!term) { host.innerHTML = ""; return; }
+    host.innerHTML = '<div class="qc-cat-loading">Searching…</div>';
+    var like = "%" + term.replace(/[%,]/g, " ") + "%";
+    var digits = term.replace(/[^0-9]/g, "");
+    var orExpr = "urun_adi.ilike." + like + ",sku.ilike." + like + ",color.ilike." + like + ",product_line.ilike." + like;
+    if (digits) orExpr += ",gsm.eq." + digits;
+    sb.from("products")
+      .select("sku,urun_adi,gsm,color,product_line,satis_eur,satis_usd,is_microfiber")
+      .or(orExpr).limit(8)
+      .then(function (res) {
+        if (openId == null) return;
+        if (res.error) { host.innerHTML = '<div class="qc-empty-mini">Catalogue search failed: ' + esc(res.error.message) + "</div>"; return; }
+        var rows = res.data || [];
+        if (!rows.length) { host.innerHTML = '<div class="qc-empty-mini">No catalogue products match “' + esc(term) + '”.</div>'; return; }
+        host.innerHTML = rows.map(function (p) {
+          var mf = String(p.is_microfiber) === "true";
+          var price = mf ? (p.satis_usd != null ? money(p.satis_usd, "USD") + "/m²" : "") : (p.satis_eur != null ? money(p.satis_eur, "EUR") + "/m²" : "");
+          var specs = [p.gsm ? p.gsm + " gsm" : "", p.color, p.product_line].filter(Boolean).join(" · ");
+          return '<div class="qc-catrow">' +
+            '<div class="qc-catrow-main"><span class="qc-catrow-name">' + esc(p.urun_adi || p.sku) + "</span>" +
+              (specs ? '<span class="qc-catrow-specs">' + esc(specs) + "</span>" : "") +
+              '<span class="qc-sku-tag">' + esc(p.sku) + "</span></div>" +
+            '<div class="qc-catrow-right">' + (price ? '<span class="qc-catrow-price">' + esc(price) + "</span>" : "") +
+              '<button type="button" class="qc-mini-btn primary" data-usesku="' + esc(openId) + '" data-ref="' + esc(ref) + '" data-sku="' + esc(p.sku) + '">Use</button></div>' +
+          "</div>";
+        }).join("");
+      }, function () {
+        if (host) host.innerHTML = '<div class="qc-empty-mini">Catalogue search failed (network).</div>';
+      });
+  }
+
+  function resolveLine(id, ref, sku, btn) {
+    if (!id || !sku) return;
+    var card = btn.closest ? btn.closest(".qc-line") : null;
+    if (card) card.classList.add("is-resolving");
+    if (btn) { btn.classList.add("is-busy"); btn.disabled = true; }
+    api("qw/resolve-line", { quote_id: id, line_ref: ref, chosen_sku: sku }).then(function (r) {
+      var q = findQuote(id);
+      if (q) {
+        if (r.output) q.output = r.output;
+        if (r.total != null) q.total = r.total;
+        if (r.draft_id) q.gmail_draft_id = r.draft_id;
+      }
+      render();
+      if (openId === String(id)) renderDrawer();
+      toast("Line resolved — quote updated.");
+    }).catch(function (err) {
+      if (card) card.classList.remove("is-resolving");
+      if (btn) { btn.classList.remove("is-busy"); btn.disabled = false; }
+      handleApiError(err);
+    });
+  }
+
+  function doSend(id, btn) {
+    var q = findQuote(id);
+    if (!q) return;
+    confirmDialog("Send this quote?",
+      "This emails <strong>" + esc(q.customer || "the customer") + "</strong> the drafted quotation from the firm mailbox.",
+      "Send now").then(function (ok) {
+      if (!ok) return;
+      btn.disabled = true; btn.classList.add("is-busy");
+      api("qw/send-quote", { quote_id: id }).then(function (r) {
+        patchLocal(id, { status: (r && r.status) || "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
+        render();
+        if (openId === String(id)) renderDrawer();
+        toast("Quote sent to " + (q.customer || "customer") + ".");
+      }).catch(function (err) {
+        btn.disabled = false; btn.classList.remove("is-busy");
+        handleApiError(err);
+      });
+    });
+  }
+  function doReply(id, btn) {
+    var box = el("draftBox");
+    var body = box ? box.value.trim() : "";
+    if (!body) { toast("Write a reply first.", true); if (box) box.focus(); return; }
+    var q = findQuote(id);
+    confirmDialog("Send edited reply?",
+      "This sends your edited message to <strong>" + esc((q && q.customer) || "the customer") + "</strong> on the existing thread.",
+      "Send reply").then(function (ok) {
+      if (!ok) return;
+      btn.disabled = true; btn.classList.add("is-busy");
+      api("qw/reply", { quote_id: id, body: body }).then(function () {
+        patchLocal(id, { status: "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
+        render();
+        if (openId === String(id)) renderDrawer();
+        toast("Reply sent.");
+      }).catch(function (err) {
+        btn.disabled = false; btn.classList.remove("is-busy");
+        handleApiError(err);
+      });
+    });
+  }
+  function doClarify(id, ref, btn) {
+    btn.disabled = true; btn.classList.add("is-busy");
+    api("qw/clarify", { quote_id: id, line_ref: ref }).then(function () {
+      btn.disabled = false; btn.classList.remove("is-busy");
+      toast("Clarification email sent to the customer.");
+    }).catch(function (err) {
+      btn.disabled = false; btn.classList.remove("is-busy");
+      handleApiError(err);
+    });
+  }
+  function doRelabel(id, action, btn) {
+    var inp = el("labelInput");
+    var label = inp ? inp.value.trim() : "";
+    if (!label) { toast("Type a label name first.", true); if (inp) inp.focus(); return; }
+    btn.disabled = true; btn.classList.add("is-busy");
+    api("qw/relabel", { quote_id: id, label: label, action: action }).then(function () {
+      btn.disabled = false; btn.classList.remove("is-busy");
+      toast((action === "remove" ? "Removed" : "Applied") + " label “" + label + "”.");
+    }).catch(function (err) {
+      btn.disabled = false; btn.classList.remove("is-busy");
+      handleApiError(err);
+    });
+  }
+
+  // ── bulk actions ─────────────────────────────────────────────────────────────
+  function bulkSend() {
+    var drafts = selectedQuotes().filter(isDraft);
+    if (!drafts.length) { toast("No drafts selected.", true); return; }
+    confirmDialog("Send " + drafts.length + " quote" + (drafts.length > 1 ? "s" : "") + "?",
+      "This emails " + drafts.length + " customer" + (drafts.length > 1 ? "s" : "") + " their drafted quotation. This can't be undone.",
+      "Send all", true).then(function (ok) {
+      if (!ok) return;
+      var btn = el("bulkSend");
+      if (btn) { btn.disabled = true; btn.textContent = "Sending…"; }
+      var done = 0, failed = 0;
+      var next = function (i) {
+        if (i >= drafts.length) {
+          render(); renderBulk();
+          toast("Sent " + done + (failed ? " · " + failed + " failed" : "") + ".", failed > 0);
+          return;
+        }
+        var qid = String(drafts[i].id);
+        api("qw/send-quote", { quote_id: qid }).then(function (r) {
+          done++; patchLocal(qid, { status: (r && r.status) || "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
+          delete selected[qid];
+          next(i + 1);
+        }).catch(function () { failed++; next(i + 1); });
+      };
+      next(0);
+    });
+  }
+  function bulkLabel() {
+    var inp = el("bulkLabelInput");
+    var label = inp ? inp.value.trim() : "";
+    if (!label) { toast("Type a label name.", true); if (inp) inp.focus(); return; }
+    var list = selectedQuotes();
+    confirmDialog("Label " + list.length + " quote" + (list.length > 1 ? "s" : "") + "?",
+      "Applies the Gmail label “<strong>" + esc(label) + "</strong>” to " + list.length + " thread" + (list.length > 1 ? "s" : "") + ".",
+      "Apply label").then(function (ok) {
+      if (!ok) return;
+      var btn = el("bulkLabel");
+      if (btn) { btn.disabled = true; btn.textContent = "Applying…"; }
+      var done = 0, failed = 0;
+      var next = function (i) {
+        if (i >= list.length) { renderBulk(); toast("Labelled " + done + (failed ? " · " + failed + " failed" : "") + ".", failed > 0); return; }
+        api("qw/relabel", { quote_id: String(list[i].id), label: label, action: "add" })
+          .then(function () { done++; next(i + 1); })
+          .catch(function () { failed++; next(i + 1); });
+      };
+      next(0);
+    });
+  }
+
+  // ── toast ────────────────────────────────────────────────────────────────────
   var toastTimer = null;
   function toast(msg, bad) {
     var t = el("toast");
@@ -517,10 +1178,10 @@
     t.textContent = msg;
     t.className = "qc-toast show" + (bad ? " bad" : "");
     if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.className = "qc-toast" + (bad ? " bad" : ""); }, 2600);
+    toastTimer = setTimeout(function () { t.className = "qc-toast" + (bad ? " bad" : ""); }, 3000);
   }
 
-  // ── load ────────────────────────────────────────────────────────────────────
+  // ── load ─────────────────────────────────────────────────────────────────────
   function loadQuotes() {
     if (loading) return;
     hideTableError();
@@ -533,10 +1194,20 @@
       if (res.error) { showTableError(res.error.message); return; }
       quotes = res.data || [];
       hasLoaded = true;
-      render();
+      // prune selections / open drawer that no longer exist
+      Object.keys(selected).forEach(function (id) { if (!findQuote(id)) delete selected[id]; });
+      loadDigest().then(function () { render(); if (openId != null) renderDrawer(); });
     }, function (err) {
       setRefreshing(false);
       showTableError((err && err.message) || "Network error — check your connection and try again.");
     });
+  }
+  // digest table is optional — degrade to client-side metrics if it's absent.
+  function loadDigest() {
+    var q = sb.from("digest").select("*").order("generated_at", { ascending: false }).limit(1);
+    if (cfg.OWNER) q = q.eq("owner", cfg.OWNER);
+    return q.then(function (res) {
+      digest = (!res.error && res.data && res.data.length) ? res.data[0] : null;
+    }, function () { digest = null; });
   }
 })();

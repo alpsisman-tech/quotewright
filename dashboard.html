@@ -22,7 +22,7 @@
       <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
     </svg>
-    Quotewright <span class="qc-tag">Quote console</span>
+    Quotewright <span class="qc-tag">Copilot</span>
   </a>
   <div class="qc-top-right">
     <span id="whoami" class="qc-who"></span>
@@ -37,7 +37,7 @@
     <div class="qc-login-card">
       <div class="kicker">Internal access</div>
       <h1>Quote console</h1>
-      <p class="sub">Sign in to review quotes drafted by the RFQ pipeline.</p>
+      <p class="sub">Sign in to review, resolve and send quotes drafted by the RFQ pipeline — without leaving this page.</p>
       <form id="loginForm" novalidate>
         <div class="field">
           <label for="email">Email</label>
@@ -57,11 +57,14 @@
   <section id="dashView" class="wrap" hidden>
     <div class="qc-head">
       <div>
-        <div class="kicker">Quotes</div>
+        <div class="kicker">Copilot</div>
         <h1 class="qc-h1">Quote activity</h1>
       </div>
       <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
     </div>
+
+    <!-- Digest banner -->
+    <div class="qc-digest" id="digestBar" hidden></div>
 
     <div class="qc-tiles" id="tiles"></div>
 
@@ -77,13 +80,19 @@
     </div>
 
     <div class="qc-controls">
-      <input id="search" type="search" placeholder="Search customer&hellip;" class="qc-search">
-      <select id="statusFilter" class="qc-select">
+      <input id="search" type="search" placeholder="Search customer or product&hellip;" class="qc-search">
+      <select id="statusFilter" class="qc-select" aria-label="Send state">
         <option value="all">All send states</option>
         <option value="draft">Draft (pending send)</option>
         <option value="sent">Sent</option>
       </select>
-      <select id="outcomeFilter" class="qc-select">
+      <select id="tierFilter" class="qc-select" aria-label="Autonomy tier">
+        <option value="all">All tiers</option>
+        <option value="green">Green — ready</option>
+        <option value="amber">Amber — review</option>
+        <option value="red">Red — needs work</option>
+      </select>
+      <select id="outcomeFilter" class="qc-select" aria-label="Outcome">
         <option value="all">All outcomes</option>
         <option value="pending">Pending decision</option>
         <option value="won">Won</option>
@@ -99,10 +108,12 @@
       <table class="qc-table" id="quotesTable">
         <thead>
           <tr>
-            <th class="qc-col-x" aria-label="Expand"></th>
-            <th>Date</th><th>Customer</th><th class="num">Total</th>
+            <th class="qc-col-sel"><input type="checkbox" id="selectAll" aria-label="Select all"></th>
+            <th class="qc-col-tier" aria-label="Tier"></th>
+            <th>Date</th><th>Customer &amp; products</th><th class="num">Total</th>
             <th class="num">Margin</th><th>Confidence</th>
             <th>Send</th><th>Approval</th><th>Outcome</th>
+            <th class="qc-col-open" aria-label="Open"></th>
           </tr>
         </thead>
         <tbody id="quotesBody"></tbody>
@@ -113,8 +124,32 @@
   </section>
 
   <div id="bootError" class="qc-boot-error" hidden></div>
-  <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
 </main>
+
+<!-- Overlay layer — OUTSIDE <main> (which is z-index:1); the fixed scrim/drawer/bulk
+     bar must escape that stacking context to sit above the sticky page header. -->
+<!-- Bulk action bar -->
+<div id="bulkBar" class="qc-bulkbar" role="region" aria-label="Bulk actions" hidden></div>
+
+<!-- Quote workspace drawer -->
+<div id="drawerScrim" class="qc-scrim" hidden></div>
+<aside id="drawer" class="qc-drawer" role="dialog" aria-modal="true" aria-label="Quote workspace" aria-hidden="true" hidden>
+  <div class="qc-drawer-inner" id="drawerInner"></div>
+</aside>
+
+<!-- Confirm dialog (uses the top layer, so stacking context is irrelevant) -->
+<dialog id="confirmDialog" class="qc-confirm">
+  <form method="dialog" class="qc-confirm-card">
+    <h3 id="confirmTitle">Confirm</h3>
+    <p id="confirmBody"></p>
+    <div class="qc-confirm-acts">
+      <button value="cancel" class="btn btn-ghost btn-sm" formnovalidate>Cancel</button>
+      <button value="ok" class="btn btn-primary btn-sm" id="confirmOk" formnovalidate>Confirm</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
 
 <script src="vendor/supabase.js"></script>
 <script src="dashboard-config.js"></script>
