@@ -46,6 +46,48 @@ body.qc { background: var(--bg); min-height: 100vh; color: var(--ink); }
 .qc-login .btn-primary { width: 100%; margin-top: 6px; justify-content: center; }
 .qc-error { color: #b42318; font-size: 13px; margin-top: 12px; min-height: 1em; }
 
+/* auth — sign-in / sign-up toggle */
+.qc-authtabs { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 3px; margin: 0 0 20px; background: var(--row); border: 1px solid var(--hair); border-radius: 12px; }
+.qc-authtab { position: relative; z-index: 1; appearance: none; border: 0; background: transparent; font: inherit; font-family: var(--font); font-size: 13.5px; font-weight: 600; color: var(--soft); padding: 8px 10px; border-radius: 9px; cursor: pointer; transition: color .18s; }
+.qc-authtab[aria-selected="true"] { color: var(--ink); }
+.qc-authtab-ind { position: absolute; z-index: 0; top: 3px; left: 3px; width: calc(50% - 3px); height: calc(100% - 6px); background: #fff; border-radius: 9px; box-shadow: 0 1px 2px rgba(0,0,0,.08); transition: transform .28s var(--spring); }
+.qc-login[data-mode="signup"] .qc-authtab-ind { transform: translateX(100%); }
+
+/* password rules */
+.qc-pwrules { list-style: none; margin: 9px 0 0; padding: 0; display: grid; gap: 4px; }
+.qc-pwrules li { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--soft); font-family: var(--mono); }
+.qc-pwtick { flex: none; width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--line-strong); position: relative; transition: background .18s, border-color .18s; }
+.qc-pwrules li.ok { color: var(--ink); }
+.qc-pwrules li.ok .qc-pwtick { background: var(--lime); border-color: var(--lime); }
+.qc-pwrules li.ok .qc-pwtick::after { content: ""; position: absolute; left: 3.5px; top: 1px; width: 4px; height: 7px; border: solid #111; border-width: 0 1.6px 1.6px 0; transform: rotate(45deg); }
+
+/* "or" divider + Google */
+.qc-or { display: flex; align-items: center; gap: 12px; margin: 16px 0 12px; color: var(--soft); font-size: 12px; font-family: var(--mono); letter-spacing: .04em; }
+.qc-or::before, .qc-or::after { content: ""; flex: 1; height: 1px; background: var(--hair); }
+.qc-google { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: #fff; color: var(--ink); border: 1px solid var(--hair); font-weight: 600; transition: transform .3s var(--spring), border-color .16s, background .16s; }
+.qc-google:hover { border-color: var(--ink); background: var(--row); transform: translateY(-1px); }
+.qc-google:disabled { opacity: .55; cursor: default; transform: none; }
+.qc-google-g { flex: 0 0 auto; }
+
+/* post-signup notice */
+.qc-authnotice { text-align: center; padding: 6px 2px 2px; }
+.qc-authnotice-ico { width: 48px; height: 48px; margin: 4px auto 14px; display: grid; place-items: center; border-radius: 14px; background: var(--lime-dim); color: #4e6a10; }
+.qc-authnotice h2 { font-family: var(--font); font-weight: 600; font-size: 20px; letter-spacing: -.02em; margin: 0 0 8px; color: var(--ink); }
+.qc-authnotice p { margin: 0 auto 16px; color: var(--soft); font-size: 14px; line-height: 1.55; max-width: 30ch; }
+.qc-authnotice b { color: var(--ink); }
+
+/* awaiting-activation screen */
+.qc-pending { text-align: center; max-width: 440px; }
+.qc-pending-ico { width: 54px; height: 54px; margin: 2px auto 16px; display: grid; place-items: center; border-radius: 16px; background: var(--lime-dim); color: #4e6a10; }
+.qc-pending h1 { font-size: 25px; text-wrap: balance; }
+.qc-pending .sub { max-width: 40ch; margin: 8px auto 12px; }
+.qc-pending b { color: var(--ink); }
+.qc-pending-note { font-size: 12.5px; color: var(--grey); margin: 0 auto 20px; max-width: 38ch; line-height: 1.5; }
+.qc-pending-acts { display: flex; gap: 10px; justify-content: center; }
+
+/* admin nav link — subtle distinction from tenant sections */
+.qc-nav-admin { margin-left: auto; }
+
 /* dashboard */
 #dashView { padding-top: 34px; padding-bottom: 80px; }
 .qc-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
@@ -653,3 +695,15 @@ body.qc-has-bulk .qc-toast.show { bottom: 86px; }
 /* ── drawer header: subtle inner-light on the translucent chrome ───────────── */
 .qc-dh { box-shadow: 0 1px 0 rgba(17,17,17,.02); }
 .qc-dh-cust { letter-spacing: -.035em; }
+
+/* ── narrow-viewport console chrome (shared header + subnav) ────────────────
+   The top bar and section nav weren't built for < ~560px; without this the long
+   signed-in email and the 5 nav items inflate body width and clip the page. */
+@media (max-width: 560px) {
+  .qc-top { padding: 12px 16px; gap: 10px; }
+  .qc-who { display: none; }            /* email hidden on phones; Sign out stays */
+  .qc-subnav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .qc-subnav::-webkit-scrollbar { display: none; }
+  .qc-subnav a { flex: 0 0 auto; }
+  .qc-nav-admin { margin-left: 0; }
+}
