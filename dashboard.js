@@ -25,6 +25,13 @@
   var openId = null;         // quote currently in the workspace drawer
   var lastFocus = null;      // element focused before the drawer opened
 
+  // Tenancy (Wave A). resolvedOwner is the CALLER's tenant, resolved server-side
+  // from account_profiles — never trusted from client input. Falls back to the
+  // legacy config OWNER before the tenancy SQL is applied (graceful degradation).
+  var resolvedOwner = cfg.OWNER || null;
+  var authMode = "signin";   // "signin" | "signup"
+  var dashStarted = false;   // load the dashboard exactly once per session
+
   var WEBHOOK_BASE = "https://alpsisman.app.n8n.cloud/webhook/";
 
   var MARGIN_LOW = 15, MARGIN_MID = 30;
@@ -51,7 +58,34 @@
   sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   var currentEmail = "";
 
-  el("logoutBtn").addEventListener("click", function () { sb.auth.signOut().then(showLogin); });
+  el("logoutBtn").addEventListener("click", signOut);
+
+  // ── auth surface wiring (Google, sign-in/sign-up toggle, pending screen) ──
+  var googleBtn = el("googleBtn");
+  if (googleBtn) googleBtn.addEventListener("click", googleSignIn);
+
+  var tabSignin = el("tabSignin"), tabSignup = el("tabSignup");
+  if (tabSignin) tabSignin.addEventListener("click", function () { setMode("signin"); });
+  if (tabSignup) tabSignup.addEventListener("click", function () { setMode("signup"); });
+
+  var pwInput = el("password");
+  if (pwInput) pwInput.addEventListener("input", function () { if (authMode === "signup") renderPwRules(pwInput.value); });
+
+  var noticeBack = el("noticeBack");
+  if (noticeBack) noticeBack.addEventListener("click", function () { showNotice(null); setMode("signin"); });
+
+  var pendingRefresh = el("pendingRefresh");
+  if (pendingRefresh) pendingRefresh.addEventListener("click", function () {
+    pendingRefresh.disabled = true; pendingRefresh.textContent = "Checking…";
+    sb.auth.getSession().then(function (res) {
+      var s = res.data && res.data.session;
+      pendingRefresh.disabled = false; pendingRefresh.textContent = "Check again";
+      if (s && s.user) decideRoute(s); else showLogin();
+    });
+  });
+  var pendingLogout = el("pendingLogout");
+  if (pendingLogout) pendingLogout.addEventListener("click", signOut);
+
   el("refreshBtn").addEventListener("click", loadQuotes);
   el("search").addEventListener("input", renderTable);
   el("statusFilter").addEventListener("change", renderTable);
@@ -96,10 +130,15 @@
   el("drawerInner").addEventListener("click", onDrawerClick);
   el("drawerInner").addEventListener("input", onDrawerInput);
 
+  // Route on every auth change — this also catches the OAuth return, where
+  // supabase-js parses the session out of the URL and fires SIGNED_IN.
+  sb.auth.onAuthStateChange(function (evt, session) {
+    if (evt === "SIGNED_OUT") { showLogin(); return; }
+    if (session && session.user) decideRoute(session);
+  });
   sb.auth.getSession().then(function (res) {
     var s = res.data && res.data.session;
-    if (s && s.user) { currentEmail = s.user.email || ""; showDash(currentEmail); loadQuotes(); }
-    else showLogin();
+    if (s && s.user) decideRoute(s); else showLogin();
   });
 
   // ── auth ──────────────────────────────────────────────────────────────────
@@ -108,29 +147,157 @@
     var err = el("loginError");
     if (err) err.textContent = "";
     if (!sb) { if (err) err.textContent = "Dashboard isn't configured yet (missing Supabase key)."; return; }
+    var email = el("email").value.trim(), pw = el("password").value;
+    if (authMode === "signup") return doSignup(email, pw, err);
     var btn = el("loginBtn");
-    btn.disabled = true; btn.textContent = "Signing in...";
-    sb.auth.signInWithPassword({ email: el("email").value.trim(), password: el("password").value })
+    btn.disabled = true; btn.textContent = "Signing in…";
+    sb.auth.signInWithPassword({ email: email, password: pw })
       .then(function (res) {
-        btn.disabled = false; btn.textContent = "Sign in";
+        btn.disabled = false; setSubmitLabel();
         if (res.error) { if (err) err.textContent = res.error.message; return; }
-        currentEmail = (res.data.user && res.data.user.email) || "";
-        showDash(currentEmail); loadQuotes();
+        if (res.data && res.data.session) decideRoute(res.data.session);
       })
-      .catch(function () { btn.disabled = false; btn.textContent = "Sign in"; if (err) err.textContent = "Network error."; });
+      .catch(function () { btn.disabled = false; setSubmitLabel(); if (err) err.textContent = "Network error."; });
   }
+
+  function doSignup(email, pw, err) {
+    var v = pwCheck(pw);
+    if (!email) { if (err) err.textContent = "Enter your email to create an account."; return; }
+    if (!v.ok) { if (err) err.textContent = "Choose a password with " + v.msg + "."; return; }
+    var btn = el("loginBtn");
+    btn.disabled = true; btn.textContent = "Creating account…";
+    sb.auth.signUp({ email: email, password: pw })
+      .then(function (res) {
+        btn.disabled = false; setSubmitLabel();
+        if (res.error) { if (err) err.textContent = res.error.message; return; }
+        // Email-confirmation ON → no session yet → tell them to check their inbox.
+        // Confirmation OFF → session present, but the account is still PENDING, so
+        // decideRoute lands them on the awaiting-activation screen. Either way, a
+        // fresh signup never sees another tenant's data.
+        if (res.data && res.data.session) decideRoute(res.data.session);
+        else showNotice(email);
+      })
+      .catch(function () { btn.disabled = false; setSubmitLabel(); if (err) err.textContent = "Network error."; });
+  }
+
+  function googleSignIn() {
+    var err = el("loginError"); if (err) err.textContent = "";
+    var btn = el("googleBtn"); if (btn) btn.disabled = true;
+    // Full-page redirect to Google via Supabase; on return, onAuthStateChange /
+    // getSession picks up the session from the URL. redirectTo MUST be in
+    // Supabase → Auth → URL Configuration → Redirect URLs (and Google's console).
+    sb.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin + window.location.pathname }
+    }).then(function (res) {
+      if (res && res.error) { if (btn) btn.disabled = false; if (err) err.textContent = res.error.message; }
+    }).catch(function () { if (btn) btn.disabled = false; if (err) err.textContent = "Network error."; });
+  }
+
+  function signOut() { sb.auth.signOut().then(showLogin, showLogin); }
+
+  // Password policy (client-side hint; Supabase enforces its own minimum too).
+  function pwCheck(pw) {
+    pw = pw || "";
+    var len = pw.length >= 8, letter = /[A-Za-z]/.test(pw), num = /[0-9]/.test(pw);
+    var need = [];
+    if (!len) need.push("at least 8 characters");
+    if (!letter) need.push("a letter");
+    if (!num) need.push("a number");
+    return { ok: len && letter && num, len: len, letter: letter, num: num, msg: need.join(", ") };
+  }
+  function renderPwRules(pw) {
+    var v = pwCheck(pw), box = el("pwRules"); if (!box) return;
+    var map = { len: v.len, letter: v.letter, num: v.num };
+    Array.prototype.forEach.call(box.querySelectorAll("[data-rule]"), function (li) {
+      li.classList.toggle("ok", !!map[li.getAttribute("data-rule")]);
+    });
+  }
+
+  function setSubmitLabel() { var b = el("loginBtn"); if (b) b.textContent = authMode === "signup" ? "Create account" : "Sign in"; }
+
+  function setMode(mode) {
+    authMode = mode === "signup" ? "signup" : "signin";
+    var signup = authMode === "signup";
+    var ts = el("tabSignin"), tu = el("tabSignup");
+    if (ts) ts.setAttribute("aria-selected", signup ? "false" : "true");
+    if (tu) tu.setAttribute("aria-selected", signup ? "true" : "false");
+    var card = el("loginView"); if (card) card.setAttribute("data-mode", authMode);
+    setSubmitLabel();
+    var pw = el("password");
+    if (pw) pw.setAttribute("autocomplete", signup ? "new-password" : "current-password");
+    var rules = el("pwRules"); if (rules) rules.hidden = !signup;
+    if (signup && pw) renderPwRules(pw.value);
+    el("authKicker").textContent = signup ? "Create account" : "Sign in";
+    el("authTitle").textContent = signup ? "Create your account" : "Quote console";
+    el("authSub").textContent = signup
+      ? "Set up access to your team’s quote console. A manager approves new accounts before they open."
+      : "Review, resolve and send quotes drafted by the RFQ pipeline — without leaving this page.";
+    var err = el("loginError"); if (err) err.textContent = "";
+    showNotice(null); // ensure the form (not the notice) is visible
+  }
+
+  function showNotice(email) {
+    var form = el("loginForm"), notice = el("authNotice"), tabs = document.querySelector(".qc-authtabs");
+    if (email) {
+      el("noticeEmail").textContent = email;
+      if (form) form.hidden = true;
+      if (tabs) tabs.hidden = true;
+      if (notice) notice.hidden = false;
+    } else {
+      if (form) form.hidden = false;
+      if (tabs) tabs.hidden = false;
+      if (notice) notice.hidden = true;
+    }
+  }
+
+  // Resolve the caller's tenant/role/status, then route.
+  function decideRoute(session) {
+    currentEmail = (session.user && session.user.email) || "";
+    if (!window.QWTenancy) { showDash(currentEmail, { isAdmin: false, owner: resolvedOwner }); startDash(session.user); return; }
+    QWTenancy.resolve(sb).then(function (p) {
+      if (p.anon) { showLogin(); return; }
+      if (!p.active) { showPending(p.email || currentEmail); return; }
+      resolvedOwner = p.owner || cfg.OWNER || null;
+      showDash(currentEmail, p);
+      startDash(p.user);
+    }, function () { showPending(currentEmail); });
+  }
+
+  // First successful dashboard entry only: load data + run per-user onboarding.
+  function startDash(user) {
+    if (dashStarted) return;
+    dashStarted = true;
+    loadQuotes();
+    if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
+      window.QWOnboarding.check(sb, resolvedOwner, user);
+    }
+  }
+
   function showLogin() {
-    el("loginView").hidden = false; el("dashView").hidden = true;
+    el("loginView").hidden = false;
+    el("dashView").hidden = true;
+    var pv = el("pendingView"); if (pv) pv.hidden = true;
     el("logoutBtn").hidden = true; el("whoami").textContent = "";
+    var nav = el("subnav"); if (nav) nav.hidden = true;
+    var an = el("adminNav"); if (an) an.hidden = true;
+    setMode("signin");
   }
-  function showDash(email) {
+  function showPending(email) {
+    el("loginView").hidden = true;
+    el("dashView").hidden = true;
+    var pv = el("pendingView"); if (pv) pv.hidden = false;
+    var pe = el("pendingEmail"); if (pe) pe.textContent = email || "";
+    el("logoutBtn").hidden = false; el("whoami").textContent = email || "";
+    var nav = el("subnav"); if (nav) nav.hidden = true;
+    var an = el("adminNav"); if (an) an.hidden = true;
+  }
+  function showDash(email, profile) {
     el("loginView").hidden = true; el("dashView").hidden = false;
+    var pv = el("pendingView"); if (pv) pv.hidden = true;
     el("logoutBtn").hidden = false; el("whoami").textContent = email || "";
     var nav = el("subnav"); if (nav) nav.hidden = false;
-    // First-run onboarding (self-contained, fail-safe). No-op if already onboarded.
-    if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
-      window.QWOnboarding.check(sb, cfg.OWNER);
-    }
+    var an = el("adminNav"); if (an) an.hidden = !(profile && profile.isAdmin);
   }
 
   // ── helpers ───────────────────────────────────────────────────────────────
@@ -1205,7 +1372,7 @@
     if (!hasLoaded) renderSkeleton(); else el("rowCount").textContent = "Loading…";
     setRefreshing(true);
     var query = sb.from("quotes").select("*").order("created_at", { ascending: false }).limit(1000);
-    if (cfg.OWNER) query = query.eq("owner", cfg.OWNER);
+    if (resolvedOwner) query = query.eq("owner", resolvedOwner);
     query.then(function (res) {
       setRefreshing(false);
       if (res.error) { showTableError(res.error.message); return; }
@@ -1222,7 +1389,7 @@
   // digest table is optional — degrade to client-side metrics if it's absent.
   function loadDigest() {
     var q = sb.from("digest").select("*").order("generated_at", { ascending: false }).limit(1);
-    if (cfg.OWNER) q = q.eq("owner", cfg.OWNER);
+    if (resolvedOwner) q = q.eq("owner", resolvedOwner);
     return q.then(function (res) {
       digest = (!res.error && res.data && res.data.length) ? res.data[0] : null;
     }, function () { digest = null; });

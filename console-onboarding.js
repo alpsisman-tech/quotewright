@@ -32,16 +32,28 @@
 
   window.QWOnboarding = { check: check };
 
-  function check(sb, owner) {
+  // Gate on the SIGNED-IN USER (auth user_metadata.onboarded), not the shared tenant
+  // row — so every newly-activated account sees the questionnaire once, even when they
+  // join a tenant that another user already configured. The wizard still prefills from
+  // (and saves to) the tenant's autonomy_settings row.
+  function check(sb, owner, user) {
     if (ran || !sb) return;
     ran = true;
-    owner = owner || "hassannonwovens";
-    sb.from("autonomy_settings").select("*").eq("owner", owner).maybeSingle().then(function (res) {
-      // Fail-safe: any error, no row, or missing/true onboarded → don't block.
-      if (!res || res.error || !res.data) return;
-      if (res.data.onboarded !== false) return;
-      open(sb, owner, res.data);
-    }, function () { /* network error → fail open */ });
+    owner = owner || (window.QW_CONFIG && window.QW_CONFIG.OWNER) || "hassannonwovens";
+
+    function proceed(u) {
+      var md = (u && u.user_metadata) || {};
+      if (md.onboarded === true) return; // this user already did it → never block
+      // Load the tenant settings row for prefill (fail-safe: missing/error → blank).
+      sb.from("autonomy_settings").select("*").eq("owner", owner).maybeSingle().then(function (res) {
+        var row = (res && !res.error && res.data) ? res.data : {};
+        open(sb, owner, row);
+      }, function () { open(sb, owner, {}); });
+    }
+
+    if (user) proceed(user);
+    else sb.auth.getUser().then(function (r) { proceed(r && r.data && r.data.user); },
+                              function () { /* network → fail open (don't trap) */ });
   }
 
   function open(sb, owner, row) {
@@ -263,14 +275,25 @@
       setNum(patch, "followup_days", num("ob_followup_days"), DEFAULTS.followup_days);
       setNum(patch, "max_followups", num("ob_max_followups"), DEFAULTS.max_followups);
 
+      // Mark the SIGNED-IN USER onboarded (auth user_metadata) — the real per-account
+      // gate — regardless of whether the tenant-settings save succeeds, so a schema
+      // mismatch never traps the user in the wizard on the next login.
+      function markUser(cb) {
+        if (sb.auth && typeof sb.auth.updateUser === "function") {
+          sb.auth.updateUser({ data: { onboarded: true } }).then(function () { cb(); }, function () { cb(); });
+        } else { cb(); }
+      }
       sb.from("autonomy_settings").update(patch).eq("owner", owner).select().then(function (res) {
-        if (res.error || !res.data || !res.data.length) {
-          // Fail-safe: never trap the user. Close and let them into the console.
-          fail(res.error && res.error.message);
-          return;
-        }
-        close(true);
-      }, function () { fail("network"); });
+        markUser(function () {
+          if (res.error || !res.data || !res.data.length) {
+            // Tenant settings didn't save (e.g. schema not migrated) — the user is
+            // still marked onboarded, so let them into the console.
+            fail(res.error && res.error.message);
+            return;
+          }
+          close(true);
+        });
+      }, function () { markUser(function () { fail("network"); }); });
     }
     function setNum(patch, key, val, dflt) {
       var n = (val == null) ? dflt : val;

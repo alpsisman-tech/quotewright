@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Quotewright</title>
+<meta name="description" content="Quotewright account administration.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
+</head>
+<body class="qc">
+
+<header class="qc-top">
+  <a class="logo" href="dashboard.html" aria-label="Quotewright quote console">
+    <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="7" fill="#111"/>
+      <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
+    </svg>
+    Quotewright <span class="qc-tag">Admin</span>
+  </a>
+  <div class="qc-top-right">
+    <span id="whoami" class="qc-who"></span>
+    <button id="logoutBtn" class="btn btn-ghost btn-sm" hidden>Sign out</button>
+  </div>
+</header>
+
+<nav class="qc-subnav" id="subnav" aria-label="Console sections" hidden>
+  <a href="dashboard.html">Quotes</a>
+  <a href="customers.html">Customers</a>
+  <a href="gaps.html">Catalogue gaps</a>
+  <a href="settings.html">Settings</a>
+  <a href="admin.html" class="qc-nav-admin" aria-current="page">Admin</a>
+</nav>
+
+<main class="qc-main">
+
+  <!-- Not signed in -->
+  <section id="gateView" class="qc-login" hidden>
+    <div class="qc-login-card">
+      <div class="kicker">Admin</div>
+      <h1>Sign in required</h1>
+      <p class="sub">This page manages who can access Quotewright. Sign in to the console first, then come back.</p>
+      <a class="btn btn-primary" href="dashboard.html">Go to sign in</a>
+    </div>
+  </section>
+
+  <!-- Signed in, but not an admin -->
+  <section id="deniedView" class="qc-login" hidden>
+    <div class="qc-login-card qc-pending">
+      <div class="qc-pending-ico" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      </div>
+      <div class="kicker">Restricted</div>
+      <h1>Admin access only</h1>
+      <p class="sub">You’re signed in as <b id="deniedEmail"></b>, but this page is for administrators. Head back to your quote console.</p>
+      <a class="btn btn-ghost btn-sm" href="dashboard.html">Back to the console</a>
+    </div>
+  </section>
+
+  <!-- Admin console -->
+  <section id="adminView" class="wrap" hidden>
+    <div class="qc-head">
+      <div>
+        <div class="kicker">Accounts</div>
+        <h1 class="qc-h1">Approve &amp; assign</h1>
+        <p class="ad-lede">Every new sign-up arrives <b>pending</b>. Connect it to a company, set its role, then activate — that’s what unlocks their console. Nothing is visible to an account until you do.</p>
+      </div>
+      <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
+    </div>
+
+    <div class="ad-toolbar">
+      <div class="ad-counts" id="adCounts"></div>
+      <button type="button" class="btn btn-ghost btn-sm" id="newTenantBtn">+ New tenant</button>
+    </div>
+
+    <!-- inline new-tenant creator -->
+    <form id="newTenantForm" class="ad-newtenant" hidden>
+      <div class="ad-newtenant-fields">
+        <div class="ad-field">
+          <label for="ntName">Company name</label>
+          <input id="ntName" type="text" placeholder="e.g. Acme Textiles" autocomplete="off">
+        </div>
+        <div class="ad-field">
+          <label for="ntKey">Tenant key</label>
+          <input id="ntKey" type="text" placeholder="acmetextiles" autocomplete="off" spellcheck="false">
+          <p class="ad-hint">Lowercase, no spaces. This is the <code>owner</code> the pipeline writes with.</p>
+        </div>
+      </div>
+      <div class="ad-newtenant-acts">
+        <button type="button" class="btn btn-ghost btn-sm" id="ntCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="ntSave">Create tenant</button>
+      </div>
+      <div class="qc-error" id="ntError" role="alert"></div>
+    </form>
+
+    <div class="qc-tablewrap ad-tablewrap">
+      <table class="qc-table ad-table" id="acctTable">
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>Tenant</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="ad-col-act">Action</th>
+          </tr>
+        </thead>
+        <tbody id="acctBody"></tbody>
+      </table>
+      <div id="adminEmpty" class="qc-empty" hidden></div>
+      <div id="adminError" class="qc-tableerror" hidden></div>
+    </div>
+  </section>
+
+  <div id="bootError" class="qc-boot-error" hidden></div>
+</main>
+
+<div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
+
+<script src="vendor/supabase.js"></script>
+<script src="dashboard-config.js"></script>
+<script src="console-tenancy.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
