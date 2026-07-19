@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Insights — Quotewright console</title>
+<meta name="description" content="Internal Quotewright console — reporting &amp; insights.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="console-views.css">
+<link rel="stylesheet" href="insights.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
+</head>
+<body class="qc">
+
+<header class="qc-top">
+  <a class="logo" href="dashboard.html" aria-label="Quotewright quote console">
+    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="7" fill="#111"/>
+      <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
+    </svg>
+    Quotewright <span class="qc-tag">Insights</span>
+  </a>
+  <div class="qc-top-right">
+    <span id="whoami" class="qc-who"></span>
+    <button id="logoutBtn" class="btn btn-ghost btn-sm" hidden>Sign out</button>
+  </div>
+</header>
+
+<nav class="qc-subnav" id="subnav" aria-label="Console sections" hidden>
+  <a href="dashboard.html" class="in-back">&larr; Console</a>
+  <a href="dashboard.html">Quotes</a>
+  <a href="customers.html">Customers</a>
+  <a href="gaps.html">Catalogue gaps</a>
+  <a href="insights.html" aria-current="page">Insights</a>
+  <a href="settings.html">Settings</a>
+</nav>
+
+<main class="qc-main">
+
+  <!-- Login -->
+  <section id="loginView" class="qc-login" hidden>
+    <div class="qc-login-card">
+      <div class="kicker">Internal access</div>
+      <h1>Insights</h1>
+      <p class="sub">Sign in to see win-rate, pipeline value, margins and turnaround across your quotes.</p>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" required placeholder="you@company.com">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+        </div>
+        <button type="submit" class="btn btn-primary" id="loginBtn">Sign in</button>
+        <div id="loginError" class="qc-error" role="alert"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- App -->
+  <section id="appView" class="wrap qc-view" hidden>
+    <div class="qc-head">
+      <div>
+        <div class="kicker">Insights</div>
+        <h1 class="qc-h1">Reporting</h1>
+        <p class="qc-lede">How the pipeline is performing — win-rate, pipeline value, margins and turnaround, drawn live from your quotes. Everything here reflects only the quotes your account can see.</p>
+      </div>
+      <div class="in-head-actions">
+        <select id="rangeSel" class="qc-select" aria-label="Time range">
+          <option value="90">Last 90 days</option>
+          <option value="180">Last 180 days</option>
+          <option value="365">Last 12 months</option>
+          <option value="all" selected>All time</option>
+        </select>
+        <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
+      </div>
+    </div>
+
+    <!-- Stat tiles -->
+    <div class="qc-tiles" id="tiles"></div>
+
+    <!-- Charts -->
+    <div class="in-grid" id="grid"></div>
+
+    <div id="emptyState" class="qc-empty qc-card" hidden></div>
+    <div id="tableError" class="qc-tableerror qc-card" hidden></div>
+  </section>
+
+  <div id="bootError" class="qc-boot-error" hidden></div>
+  <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
+</main>
+
+<div id="inTip" class="in-tip" role="status" aria-live="off" hidden></div>
+
+<script src="vendor/supabase.js"></script>
+<script src="dashboard-config.js"></script>
+<script src="console-views.js"></script>
+<script src="insights.js"></script>
+</body>
+</html>
