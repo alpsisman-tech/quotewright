@@ -1,0 +1,213 @@
+/* Quotewright console — LIQUID-GLASS LEFT SIDEBAR.
+   One vertical nav replaces the old two stacked top bars, on every console page
+   (dashboard / insights / customers / gaps / activity / settings / admin).
+
+   Inherits Seam Studio tokens from styles.css (white / ink / Inter / lime #D2FF37).
+   The rail itself reads as glass: a translucent frosted panel, floated off the
+   window edges, with a specular top highlight, a 1px light border and a soft
+   drop shadow. prefers-reduced-transparency / -motion get solid, still fallbacks.
+
+   No inline scripts (site CSP is script-src 'self'); the mobile drawer is wired
+   in console-nav.js. */
+
+:root {
+  --sb-w: 246px;          /* rail width           */
+  --sb-gap: 14px;         /* inset from window     */
+  --z-mobar: 44;
+  --z-navscrim: 55;
+  --z-sidebar: 56;
+}
+
+/* ── ambient: a whisper of colour behind the glass so it feels alive ─────────── */
+body.qc { position: relative; }
+body.qc::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(58% 46% at 4% -2%, rgba(210,255,55,.12), transparent 68%),
+    radial-gradient(48% 42% at -2% 102%, rgba(19,19,19,.035), transparent 70%);
+}
+body.qc > main, body.qc > .qc-mobar { position: relative; z-index: 1; }
+
+/* ── the rail ────────────────────────────────────────────────────────────────
+   #subnav keeps its id so the existing reveal logic (el("subnav").hidden = …)
+   shows / hides the whole rail on auth. */
+.qc-sidebar {
+  position: fixed; top: var(--sb-gap); left: var(--sb-gap); bottom: var(--sb-gap);
+  width: var(--sb-w); z-index: var(--z-sidebar);
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 16px 14px 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.65);
+  background:
+    linear-gradient(163deg, rgba(255,255,255,.80), rgba(255,255,255,.56) 52%, rgba(244,246,249,.62));
+  -webkit-backdrop-filter: blur(28px) saturate(185%);
+  backdrop-filter: blur(28px) saturate(185%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.92),        /* specular top edge            */
+    inset 0 0 0 1px rgba(255,255,255,.14),
+    0 0 0 1px rgba(19,19,19,.035),              /* crisp separation on white    */
+    0 26px 52px -30px rgba(19,19,19,.30);       /* floats off the surface       */
+  overflow: hidden;
+}
+/* soft sheen catching light across the top of the panel */
+.qc-sidebar::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 120px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.55), transparent);
+  opacity: .7;
+}
+.qc-sidebar > * { position: relative; }
+
+/* ── brand ───────────────────────────────────────────────────────────────── */
+.qc-side-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 8px 2px; text-decoration: none;
+  font-family: var(--font); font-weight: 600; font-size: 17px; letter-spacing: -.03em;
+  color: var(--ink);
+}
+.qc-side-brand svg { flex: 0 0 auto; }
+.qc-side-brand .qc-tag {
+  font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--soft);
+  border: 1px solid rgba(19,19,19,.14); border-radius: 100px; padding: 2px 8px;
+  background: rgba(255,255,255,.5);
+}
+
+/* ── nav links ───────────────────────────────────────────────────────────── */
+.qc-side-nav { display: flex; flex-direction: column; gap: 3px; overflow-y: auto; margin: 2px -4px; padding: 0 4px; }
+.qc-side-nav::-webkit-scrollbar { width: 0; }
+.qc-side-nav a {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 42px; padding: 9px 12px; border-radius: 12px;
+  font-family: var(--font); font-size: 14.5px; font-weight: 500; letter-spacing: -.011em;
+  color: var(--soft); text-decoration: none;
+  transition: color .18s ease, background .18s ease, box-shadow .2s ease, transform .12s var(--expo);
+}
+.qc-side-nav a svg { width: 19px; height: 19px; flex: 0 0 auto; stroke: currentColor; opacity: .85; transition: opacity .18s; }
+.qc-side-nav a span { flex: 1; }
+.qc-side-nav a:hover { color: var(--ink); background: rgba(19,19,19,.05); }
+.qc-side-nav a:hover svg { opacity: 1; }
+.qc-side-nav a:active { transform: scale(.985); transition-duration: .06s; }
+.qc-side-nav a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.qc-side-nav a[aria-current="page"] {
+  color: var(--ink); font-weight: 600;
+  background: linear-gradient(180deg, rgba(210,255,55,.92), rgba(210,255,55,.74));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 8px 18px -10px var(--lime-glow);
+}
+.qc-side-nav a[aria-current="page"] svg { opacity: 1; }
+.qc-side-nav a[aria-current="page"]:hover { background: linear-gradient(180deg, rgba(210,255,55,.98), rgba(210,255,55,.8)); }
+/* defeat the legacy dashboard.css `.qc-nav-admin { margin-left:auto }` (was a top-bar rule) */
+.qc-side-nav .qc-nav-admin { margin-left: 0; margin-top: 2px; }
+.qc-nav-sep { height: 1px; margin: 6px 8px; background: rgba(19,19,19,.07); }
+
+/* ── footer: user · take the tour · sign out ─────────────────────────────── */
+.qc-side-foot {
+  margin-top: auto; display: flex; flex-direction: column; gap: 8px;
+  padding-top: 12px; border-top: 1px solid rgba(19,19,19,.08);
+}
+.qc-side-user { display: flex; align-items: center; gap: 10px; padding: 2px 6px 4px; min-width: 0; }
+.qc-side-avatar {
+  flex: 0 0 auto; width: 30px; height: 30px; border-radius: 9px;
+  display: grid; place-items: center; background: var(--ink); color: #fff;
+  font-family: var(--font); font-weight: 600; font-size: 13px; text-transform: uppercase;
+}
+.qc-side-user .qc-who {
+  font-family: var(--mono); font-size: 12px; color: var(--soft);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.qc-side-foot .qw-tourbtn,
+.qc-side-foot #logoutBtn { width: 100%; justify-content: center; }
+.qc-side-foot .qw-tourbtn { background: rgba(255,255,255,.55); }
+.qc-side-foot #logoutBtn { background: transparent; }
+/* the rail always has room for these — defeat legacy ≤560px top-bar rules that
+   hid the email (dashboard.css) and the tour-button label (console-tour.css). */
+.qc-side-user .qc-who { display: block; }
+.qc-side-foot .qw-tourbtn span { display: inline; }
+
+/* ── mobile top bar (glass) — shown only on narrow + authed ──────────────── */
+.qc-mobar {
+  display: none; align-items: center; gap: 12px;
+  position: fixed; top: 0; left: 0; right: 0; height: 56px; padding: 0 14px;
+  z-index: var(--z-mobar);
+  border-bottom: 1px solid rgba(19,19,19,.06);
+  background: rgba(255,255,255,.72);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+.qc-burger {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center; cursor: pointer;
+  border: 1px solid rgba(19,19,19,.1); background: rgba(255,255,255,.6); color: var(--ink);
+  transition: background .16s, border-color .16s, transform .1s var(--expo);
+}
+.qc-burger:hover { background: #fff; border-color: rgba(19,19,19,.2); }
+.qc-burger:active { transform: scale(.94); }
+.qc-burger:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.qc-burger svg { width: 20px; height: 20px; stroke: currentColor; }
+.qc-mobar-brand {
+  display: flex; align-items: center; gap: 9px; text-decoration: none;
+  font-family: var(--font); font-weight: 600; font-size: 16px; letter-spacing: -.03em; color: var(--ink);
+}
+.qc-mobar-brand .qc-tag {
+  font-family: var(--mono); font-size: 9.5px; font-weight: 500; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--soft);
+  border: 1px solid rgba(19,19,19,.14); border-radius: 100px; padding: 2px 7px;
+}
+
+/* scrim behind the mobile drawer */
+.qc-nav-scrim {
+  position: fixed; inset: 0; z-index: var(--z-navscrim);
+  background: rgba(17,17,17,.4); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+  opacity: 0; visibility: hidden; transition: opacity .3s var(--expo), visibility .3s;
+}
+.qc-nav-scrim.show { opacity: 1; visibility: visible; }
+
+/* ── layout: push content right of the rail ──────────────────────────────── */
+.qc-main { margin-left: calc(var(--sb-w) + var(--sb-gap) * 2); transition: margin-left .32s var(--expo); }
+/* logged-out (rail hidden) → full-width, centred login card */
+body.qc:has(#subnav[hidden]) .qc-main { margin-left: 0; }
+
+/* ── responsive: collapse to a top bar + slide-in glass drawer ───────────── */
+@media (max-width: 860px) {
+  .qc-main { margin-left: 0 !important; }
+  body.qc:has(#subnav:not([hidden])) .qc-main { padding-top: 56px; }
+  body.qc:has(#subnav:not([hidden])) .qc-mobar { display: flex; }
+
+  .qc-sidebar {
+    top: 0; left: 0; bottom: 0; width: min(302px, 86vw);
+    border-radius: 0 22px 22px 0;
+    transform: translateX(-114%);
+    transition: transform .34s var(--expo);
+    /* As a drawer the rail floats over varying page content — go near-opaque so the
+       background can't bleed through unevenly and labels stay legible. */
+    background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(251,252,255,.92));
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    backdrop-filter: blur(30px) saturate(180%);
+  }
+  .qc-sidebar.open { transform: translateX(0); box-shadow: 0 0 0 1px rgba(19,19,19,.05), 40px 0 80px -40px rgba(19,19,19,.5); }
+}
+
+/* small phones: give the login card room, tighten the drawer */
+@media (max-width: 430px) {
+  .qc-sidebar { width: min(310px, 90vw); padding: 14px 12px; }
+}
+
+/* ── accessibility fallbacks ─────────────────────────────────────────────── */
+@media (prefers-reduced-transparency: reduce) {
+  body.qc::before { display: none; }
+  .qc-sidebar {
+    background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none;
+    border-color: var(--hair);
+    box-shadow: 0 0 0 1px rgba(19,19,19,.05), 0 20px 44px -30px rgba(19,19,19,.3);
+  }
+  .qc-sidebar::before { display: none; }
+  .qc-side-brand .qc-tag, .qc-mobar-brand .qc-tag { background: var(--row); }
+  .qc-mobar { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .qc-burger, .qc-side-foot .qw-tourbtn { background: var(--row); }
+}
+@media (prefers-contrast: more) {
+  .qc-sidebar { background: #fff; border-color: var(--ink); }
+  .qc-side-nav a { color: var(--ink); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qc-sidebar, .qc-main, .qc-nav-scrim, .qc-burger, .qc-side-nav a { transition: none; }
+}

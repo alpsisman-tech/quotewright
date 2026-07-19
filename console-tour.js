@@ -26,9 +26,9 @@
 
   // ── the walkthrough ─────────────────────────────────────────────────────────
   var STEPS = [
-    { page: "dashboard.html", sel: "#subnav", place: "bottom", tab: "needsyou",
-      kick: "Welcome", title: "Your whole console, one bar",
-      body: "Everything lives under these sections — <b>Quotes</b> is home base, with Insights, Customers, Catalogue gaps, Activity and Settings a click away. Let's walk through what each one does." },
+    { page: "dashboard.html", sel: "#sideNav", place: "right", tab: "needsyou",
+      kick: "Welcome", title: "Your whole console, one rail",
+      body: "Everything lives on this glass rail — <b>Quotes</b> is home base, with Insights, Customers, Catalogue gaps, Activity and Settings a click away. Let's walk through what each one does." },
 
     { page: "dashboard.html", sel: "#digestBar", place: "bottom", tab: "needsyou",
       kick: "Daily brief", title: "What's waiting on you today",
@@ -341,8 +341,16 @@
 
   function maybeAutoStart(sb) {
     if (started || isActive()) return;
+    // STRICT SEQUENCING: the first-run onboarding wizard runs FIRST. Never auto-start
+    // the tour while the wizard is on screen — console-onboarding.js calls us back on
+    // finish. (Manual "Take the tour" still works; it doesn't route through here.)
+    if (window.QWOnboardingActive) return;
     if (!sb || !sb.auth || typeof sb.auth.getUser !== "function") return;
     sb.auth.getUser().then(function (r) {
+      // Re-check the gate: the wizard may have opened during this async read (its
+      // own DB load resolves after our entry check), so this is the authoritative
+      // point right before we'd start. Prevents the tour racing over the wizard.
+      if (window.QWOnboardingActive || started || isActive()) return;
       var u = r && r.data && r.data.user;
       var md = (u && u.user_metadata) || {};
       if (md.tour_done === true) return;      // already toured
@@ -354,7 +362,7 @@
   // ── "Take the tour" header button ────────────────────────────────────────────
   function mountButton() {
     if (document.getElementById("qwTourBtn")) return;
-    var host = document.querySelector(".qc-top-right");
+    var host = document.querySelector(".qc-side-foot");
     if (!host) return;
     var b = document.createElement("button");
     b.type = "button"; b.id = "qwTourBtn"; b.className = "qw-tourbtn";

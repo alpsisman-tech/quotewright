@@ -140,6 +140,9 @@
       if (lv) lv.hidden = false; if (av) av.hidden = true;
       if (logoutBtn) logoutBtn.hidden = true;
       var who = el("whoami"); if (who) who.textContent = "";
+      // Signed-out state must NOT wear the app rail (login card stands alone).
+      var nav = el("subnav"); if (nav) nav.hidden = true;
+      var an = el("adminNav"); if (an) an.hidden = true;
     }
     function onAuthed(email) {
       API.email = email;
@@ -154,6 +157,8 @@
       // resolver isn't loaded), API.owner stays cfg.OWNER and nothing changes.
       var proceed = function () {
         if (typeof opts.onAuth === "function") opts.onAuth(sb, email);
+        // Admin link in the rail: visible only to admins (API.isAdmin resolved above).
+        var an = el("adminNav"); if (an) an.hidden = !API.isAdmin;
         if (window.QWOnboarding && typeof window.QWOnboarding.check === "function") {
           window.QWOnboarding.check(sb, API.owner || cfg.OWNER);
         }
