@@ -39,23 +39,22 @@ body.qc > main, body.qc > .qc-mobar { position: relative; z-index: 1; }
   padding: 14px 14px 14px;
   transition: width .34s var(--expo), box-shadow .34s var(--expo);
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,.42);
-  background:
-    linear-gradient(163deg, rgba(255,255,255,.56), rgba(255,255,255,.32) 52%, rgba(244,246,249,.38));
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255,255,255,.2);
+  /* fully translucent: no white fill — just frosted backdrop-blur. brightness
+     lifts dark content behind it so the ink labels stay legible. */
+  background: rgba(255,255,255,.04);
+  -webkit-backdrop-filter: blur(32px) saturate(155%) brightness(1.08);
+  backdrop-filter: blur(32px) saturate(155%) brightness(1.08);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.8),         /* specular top edge            */
-    inset 0 0 0 1px rgba(255,255,255,.1),
-    0 0 0 1px rgba(19,19,19,.025),              /* whisper separation on white  */
-    0 18px 40px -30px rgba(19,19,19,.2);        /* floats off the surface       */
+    inset 0 1px 0 rgba(255,255,255,.4),         /* faint specular top edge      */
+    0 18px 40px -32px rgba(19,19,19,.14);       /* soft float                   */
   overflow: hidden;
 }
 /* soft sheen catching light across the top of the panel */
 .qc-sidebar::before {
   content: ""; position: absolute; inset: 0 0 auto; height: 120px; pointer-events: none;
-  background: linear-gradient(180deg, rgba(255,255,255,.4), transparent);
-  opacity: .55;
+  background: linear-gradient(180deg, rgba(255,255,255,.2), transparent);
+  opacity: .35;
 }
 .qc-sidebar > * { position: relative; }
 
