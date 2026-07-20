@@ -149,24 +149,28 @@
     ];
   }
 
-  // ── Palette: Seam Studio light theme. Greige base, a soft on-brand lime,
-  //    and a cool pale tint — kept light so dark ink text stays readable. ──
-  var c1 = hex('F4F2EA');  // greige / near-white
-  var c2 = hex('E4F59A');  // soft lime (brand lime dialled back)
-  var c3 = hex('E8EBF0');  // cool pale tint
+  // ── Palette: Seam Studio light theme, greige + lime only (no cool blue).
+  //    A light greige, a present on-brand lime that carries real coverage,
+  //    and a warm sage-greige for depth — all kept light so dark ink text
+  //    stays readable, but bold enough that the field visibly spans the page. ──
+  var c1 = hex('F2F1E6');  // light greige (lightest)
+  var c2 = hex('CBEB4E');  // present on-brand lime (the star, near full presence)
+  var c3 = hex('DEE6C2');  // warm sage-greige for depth (replaces the cool tint)
   gl.uniform4f(U.u_color1, c1[0], c1[1], c1[2], 1.0);
-  gl.uniform4f(U.u_color2, c2[0], c2[1], c2[2], 0.90);
+  gl.uniform4f(U.u_color2, c2[0], c2[1], c2[2], 1.0);
   gl.uniform4f(U.u_color3, c3[0], c3[1], c3[2], 1.0);
 
-  // ── Look uniforms (calm, premium, flowing — not a rainbow) ──
-  gl.uniform1f(U.u_scale, 0.70);
+  // ── Look uniforms — bolder, page-spanning flow. Larger features (u_scale),
+  //    more visible drift (u_swirl/u_distortion), biased toward lime
+  //    (u_proportion), still smooth and premium (no hard edges). ──
+  gl.uniform1f(U.u_scale, 1.05);
   gl.uniform1f(U.u_rotation, 0.0);
-  gl.uniform1f(U.u_proportion, 0.50);
-  gl.uniform1f(U.u_softness, 0.90);
+  gl.uniform1f(U.u_proportion, 0.44);
+  gl.uniform1f(U.u_softness, 0.80);
   gl.uniform1f(U.u_shape, 2.0);          // halves — smooth, no hard edges
-  gl.uniform1f(U.u_shapeScale, 0.60);
-  gl.uniform1f(U.u_distortion, 0.20);
-  gl.uniform1f(U.u_swirl, 0.60);
+  gl.uniform1f(U.u_shapeScale, 0.50);
+  gl.uniform1f(U.u_distortion, 0.30);
+  gl.uniform1f(U.u_swirl, 0.85);
   gl.uniform1f(U.u_swirlIterations, 8.0);
 
   var t0 = performance.now();
@@ -197,8 +201,8 @@
 
   function frame(now) {
     raf = 0;
-    // Slow, premium drift: ~0.12 shader-time units per second.
-    draw((now - t0) * 0.00012);
+    // Slow, premium drift: ~0.15 shader-time units per second.
+    draw((now - t0) * 0.00015);
     if (running) raf = requestAnimationFrame(frame);
   }
 

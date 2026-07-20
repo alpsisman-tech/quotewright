@@ -240,7 +240,7 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 /* ============================================================
    HERO
    ============================================================ */
-.hero{padding:clamp(70px,10vw,124px) 0 var(--s7);text-align:center;position:relative;overflow:hidden}
+.hero{padding:clamp(62px,8vw,104px) 0 var(--s6);text-align:center;position:relative;overflow:hidden}
 /* faint lime aura behind the hero — subtle depth, not a gradient wash */
 .hero::before{content:'';position:absolute;left:50%;top:-16%;width:min(880px,120%);height:520px;transform:translateX(-50%);pointer-events:none;z-index:-1;
   background:radial-gradient(50% 50% at 50% 40%,var(--lime-edge),transparent 70%);opacity:.7;filter:blur(6px)}
@@ -258,7 +258,7 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
    THE LOOM — signature demo (RFQ email → finished quote)
    IDs/classes kept stable for app.js.
    ============================================================ */
-.loom-wrap{padding:var(--s7) 0 var(--s5)}
+.loom-wrap{padding:var(--s6) 0 0}
 /* two separate floating cards — the liquid field shows between & around them (no shared container, no connector) */
 .loom{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.4vw,26px);background:transparent;border:0;box-shadow:none;overflow:visible;text-align:left;align-items:stretch}
 .loom-panel{padding:26px;min-height:432px;display:flex;flex-direction:column}
@@ -291,24 +291,11 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 .q-approve{margin-top:15px;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--soft);flex-wrap:wrap}
 .q-approve .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--hair);padding:7px 13px;border-radius:var(--r-pill);font-weight:500;color:var(--ink)}
 .q-approve .chip.ok{background:var(--lime);border-color:var(--lime);color:#111}
-/* caption under the pair — a floating translucent pill (glass material), centred over the liquid */
-.loom-bar{grid-column:1/-1;justify-self:center;display:inline-flex;justify-content:center;align-items:center;gap:16px;margin-top:8px;padding:10px 8px 10px 18px;border:1px solid rgba(255,255,255,.6);border-radius:var(--r-pill);background:rgba(255,255,255,.66);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%);box-shadow:var(--e2);font-size:12.5px;color:var(--soft);flex-wrap:wrap;max-width:100%}
-@media (prefers-reduced-transparency:reduce){.loom-bar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}}
-.loom-bar .steps{display:flex;gap:18px;flex-wrap:wrap}
-.loom-bar .step{display:flex;align-items:center;gap:7px;transition:color .25s;font-weight:500}
-.loom-bar .step i{width:7px;height:7px;border-radius:50%;background:var(--line-strong);transition:background .25s,box-shadow .25s}
-.loom-bar .step.on{color:var(--ink)}
-.loom-bar .step.on i{background:var(--lime);box-shadow:0 0 0 3px var(--lime-dim)}
-.replay{background:none;border:1px solid var(--hair);border-radius:var(--r-pill);cursor:pointer;font-family:var(--font);font-size:12.5px;font-weight:500;color:var(--ink);padding:8px 15px;display:inline-flex;gap:7px;align-items:center;transition:background .2s,border-color .2s,transform .2s;white-space:nowrap}
-.replay:hover{border-color:var(--ink);transform:translateY(-1px)}
-.replay:active{transform:scale(.95)}
-.replay svg{transition:transform .5s var(--expo)}
-.replay:hover svg{transform:rotate(-90deg)}
 
 /* ============================================================
    TICKER — languages / trade-terms marquee
    ============================================================ */
-.ticker{border-top:1px solid rgba(19,19,19,.10);border-bottom:1px solid rgba(19,19,19,.10);padding:16px 0;overflow:hidden;background:transparent;margin-top:var(--s8);position:relative}
+.ticker{border-top:1px solid rgba(19,19,19,.10);border-bottom:1px solid rgba(19,19,19,.10);padding:15px 0;overflow:hidden;background:transparent;margin-top:var(--s6);margin-bottom:0;position:relative}
 .ticker::before,.ticker::after{content:'';position:absolute;top:0;bottom:0;width:72px;z-index:2;pointer-events:none}
 .ticker::before{left:0;background:linear-gradient(90deg,rgba(247,246,239,.92),transparent)}
 .ticker::after{right:0;background:linear-gradient(270deg,rgba(247,246,239,.92),transparent)}
@@ -324,19 +311,23 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
    Canvas is same-origin (qw-liquid.js) — CSP-safe, no libraries.
    ============================================================ */
 .hero-liquid{position:relative;isolation:isolate;overflow:hidden;
+  /* own the vertical rhythm: the hero sets the top, the ticker is the flush bottom —
+     no inherited section padding leaving a liquid gap below the ticker */
+  padding:0;
   /* fallback / no-WebGL2 look: a calm greige→pale-tint wash so the region still reads as designed */
   background:linear-gradient(180deg,#F4F2EA 0%,#EEF1EA 42%,#F3F4F2 74%,#FBFBFA 100%)}
 .hero-liquid-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block;pointer-events:none}
 /* every real child rides above the canvas */
 .hero-liquid > *:not(.hero-liquid-canvas){position:relative;z-index:1}
-/* soft top veil — guarantees hero-heading contrast over the field without a heavy scrim */
+/* localized text backing — a soft halo behind just the hero copy, so the animated field
+   shows through boldly across the rest of the section (not a full veil that flattens it) */
 .hero-liquid::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:radial-gradient(130% 62% at 50% 16%,rgba(255,255,255,.55),rgba(255,255,255,0) 58%)}
+  background:radial-gradient(78% 40% at 50% 13%,rgba(255,255,255,.62),rgba(255,255,255,0) 66%)}
 /* the standalone lime aura is redundant now the field supplies the colour */
 .hero-liquid .hero::before{display:none}
 .hero-liquid .hero{overflow:visible}
 @media (prefers-reduced-transparency:reduce){
-  .hero-liquid::after{background:radial-gradient(130% 62% at 50% 16%,rgba(255,255,255,.78),rgba(255,255,255,0) 58%)}
+  .hero-liquid::after{background:radial-gradient(88% 46% at 50% 13%,rgba(255,255,255,.82),rgba(255,255,255,0) 62%)}
 }
 
 /* ============================================================
@@ -638,7 +629,6 @@ footer .foot-desc{font-size:13.5px;max-width:34ch;line-height:1.65;margin-top:14
 @media (max-width:560px){
   .cards{grid-template-columns:1fr}
   .flow,.pipeline{grid-template-columns:1fr}
-  .loom-bar .steps{display:none}
   .proof span{padding:0 10px}
   .hero h1,.page-hero h1{font-size:clamp(29px,8.2vw,38px);letter-spacing:-.03em}
   .bigquote{font-size:clamp(25px,7.4vw,34px)}
