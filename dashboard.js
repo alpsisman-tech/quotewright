@@ -13,6 +13,297 @@
 (function () {
   "use strict";
 
+  // ── i18n (EN/TR) — engine is window.QWI18n (console-i18n.js, loaded first) ──
+  function tt(key, vars) { return (window.QWI18n && QWI18n.t) ? QWI18n.t(key, vars) : key; }
+  if (window.QWI18n && QWI18n.add) QWI18n.add({
+    en: {
+      // auth card
+      "auth.kickerSignin": "Sign in", "auth.kickerSignup": "Create account",
+      "auth.titleSignin": "Quote console", "auth.titleSignup": "Create your account",
+      "auth.subSignin": "Review, resolve and send quotes drafted by the RFQ pipeline — without leaving this page.",
+      "auth.subSignup": "Set up access to your team’s quote console. A manager approves new accounts before they open.",
+      "auth.createAccount": "Create account", "auth.creatingAccount": "Creating account…",
+      "auth.or": "or", "auth.continueGoogle": "Continue with Google",
+      "auth.rule8": "At least 8 characters", "auth.ruleLetter": "A letter", "auth.ruleNumber": "A number",
+      "auth.pwLen8": "at least 8 characters", "auth.pwLetter": "a letter", "auth.pwNumber": "a number",
+      "auth.enterEmail": "Enter your email to create an account.",
+      "auth.choosePw": "Choose a password with {req}.",
+      "auth.notConfigured": "Not configured: set SUPABASE_ANON_KEY in dashboard-config.js (Supabase -> Project Settings -> API -> anon public).",
+      "auth.notConfiguredShort": "Dashboard isn’t configured yet (missing Supabase key).",
+      "auth.checkEmail": "Check your email",
+      "auth.noticeBody1": "We’ve sent a confirmation link to", "auth.noticeBody2": ". Confirm it, then a manager activates your account before the console opens.",
+      "auth.backToSignin": "Back to sign in",
+      // pending
+      "pending.kicker": "Almost there",
+      "pending.title": "Your account is awaiting activation",
+      "pending.body1": "You’re signed in as", "pending.body2": ". A manager needs to approve your account and connect it to your company before the quote console opens. You’ll get access as soon as that’s done — no need to sign up again.",
+      "pending.note": "This usually takes a short while. If it’s urgent, let your Quotewright administrator know you’re waiting.",
+      // chart + view tabs
+      "dash.chartTitle": "Quotes over time", "dash.legendWon": "Won", "dash.legendOther": "Other",
+      "dash.needsYou": "Needs you", "dash.allQuotes": "All quotes",
+      "dash.chartEmptyTitle": "No dated quotes yet",
+      "dash.chartEmptyBody": "Once quotes start landing, this chart tracks your monthly volume and how many were won.",
+      "dash.chartAria": "Quotes per month, won portion highlighted",
+      // controls
+      "dash.searchPh": "Search customer, product or SKU…",
+      "dash.sortAttention": "Sort: Needs attention first", "dash.sortNewest": "Sort: Newest first",
+      "dash.sortOldest": "Sort: Oldest first", "dash.sortValue": "Sort: Highest value", "dash.sortMargin": "Sort: Lowest margin",
+      "dash.sfAll": "All send states", "dash.sfDraft": "Draft (pending send)", "dash.sfSent": "Sent",
+      "dash.tfAll": "All tiers", "dash.tfGreen": "Green — ready", "dash.tfAmber": "Amber — review", "dash.tfRed": "Red — needs work",
+      "dash.ofAll": "All outcomes", "dash.ofPending": "Pending decision", "dash.ofWon": "Won", "dash.ofLost": "Lost",
+      "dash.needsApproval": "Needs approval",
+      "dash.ariaSort": "Sort", "dash.ariaSend": "Send state", "dash.ariaTier": "Autonomy tier", "dash.ariaOutcome": "Outcome",
+      // table headers
+      "dash.thDate": "Date", "dash.thCust": "Customer & products", "dash.thTotal": "Total",
+      "dash.thMargin": "Margin", "dash.thConf": "Confidence", "dash.thSend": "Send",
+      "dash.thApproval": "Approval", "dash.thOutcome": "Outcome", "dash.thTier": "Tier", "dash.thOpen": "Open",
+      "dash.selectAll": "Select all", "dash.selectQuote": "Select quote",
+      "dash.drawerAria": "Quote workspace", "dash.bulkAria": "Bulk actions",
+      // digest
+      "dash.digestClear": "Inbox clear — no quotes are waiting on you right now.",
+      "dash.copilotBrief": "Today’s copilot brief", "dash.liveBadge": "live", "dash.liveTitle": "Computed live from the loaded quotes",
+      "dash.segReady": "ready to send", "dash.segInfo": "need input", "dash.segApprove": "thin-margin approvals",
+      "dash.segReply1": "new reply", "dash.segReplyN": "new replies",
+      // tiles
+      "dash.tileQuotes": "Quotes logged", "dash.tilePending": "Pending decision",
+      "dash.stillInDraft": "{n} still in draft", "dash.tileAwaiting": "Awaiting approval",
+      "dash.marginFlagged": "margin / discount flagged", "dash.noneFlagged": "none flagged",
+      "dash.tileWinRate": "Win rate", "dash.wonLost": "{won} won · {lost} lost",
+      "dash.tileQuoted": "Quoted value", "dash.tileWonValue": "Won value", "dash.mixed": "+{n} mixed",
+      // states / rowcount
+      "dash.loadErrTitle": "Couldn’t load quotes",
+      "dash.loadErrBody": "Something went wrong reaching the quote store.",
+      "dash.tryAgain": "Try again",
+      "dash.rowOf": "{a} of {b}", "dash.showingOf": "Showing {a} of {b}",
+      "dash.emptyNoneTitle": "No quotes yet",
+      "dash.emptyNoneBody": "Quotes drafted by the RFQ pipeline land here automatically. Send a real request to the connected mailbox and the first draft will appear.",
+      "dash.emptyNoMatchTitle": "No matches",
+      "dash.emptyNoMatchBody": "No quotes fit these filters. Clear the search, drop the approval filter, or widen the tier / send state and outcome.",
+      "dash.loadMore": "Load {n} more", "dash.ofShown": "{a} of {b} shown",
+      "dash.netErrConn": "Network error — check your connection and try again.",
+      // table cells
+      "dash.tierReady": "Ready", "dash.tierReview": "Review", "dash.tierWork": "Needs work",
+      "dash.tierNone": "Tier not computed yet", "dash.tierTitle": "Autonomy tier: {t}",
+      "dash.marginTitle": "{v} margin",
+      "dash.approve": "Approve", "dash.approved": "Approved", "dash.approvedByTitle": "Approved by {who}",
+      "dash.draft": "Draft", "dash.sent": "Sent",
+      "dash.ocPending": "Pending", "dash.ocWon": "Won", "dash.ocLost": "Lost",
+      "dash.won": "Won", "dash.lost": "Lost", "dash.reset": "Reset",
+      "dash.newReplyDot": "new reply", "dash.newReplyTitle": "New customer reply on this thread",
+      "dash.plusLine": "+{n} line", "dash.plusLines": "+{n} lines",
+      // needs-you
+      "dash.nyReplyT": "Customer replied", "dash.nyReplyS": "They’re waiting on a response",
+      "dash.nyApproveT": "Needs your approval", "dash.nyApproveS": "Margin or discount flagged — decide before it sends",
+      "dash.nyInfoT": "Lines to resolve", "dash.nyInfoS": "A line is missing a spec or price",
+      "dash.nyReadyT": "Ready to send", "dash.nyReadyS": "Priced, high-confidence drafts",
+      "dash.send": "Send", "dash.open": "Open", "dash.viewInLedger": "View in ledger",
+      "dash.moreInLedger": "+{n} more in the full ledger →",
+      "dash.nyCaughtT": "You’re all caught up", "dash.nyNoneT": "Nothing needs you yet",
+      "dash.nyCaughtB": "No quotes are waiting on a human right now. New drafts, approvals and customer replies surface here the moment they need you.",
+      "dash.nyNoneB": "When the RFQ pipeline drafts a quote or a customer replies, anything needing your attention lands here first.",
+      "dash.openCust": "Open {c}",
+      // drawer
+      "dash.quoteFallback": "Quote", "dash.closeWorkspace": "Close workspace",
+      "dash.sentLine": "Sent {dt}", "dash.term": "term {v}",
+      "dash.newReplyHead": "New customer reply",
+      "dash.convo": "Conversation", "dash.msg1": "1 message", "dash.msgN": "{n} messages",
+      "dash.threadEmpty": "The conversation snapshot appears once the pipeline stores <code>thread_snapshot</code>. Until then, open the customer’s thread from the draft below.",
+      "dash.customer": "Customer",
+      "dash.priced": "Priced", "dash.provisional": "Priced · confirm spec",
+      "dash.needsInfo": "Needs info", "dash.pendingPrice": "Pending price",
+      "dash.candidate": "Candidate", "dash.useThis": "Use this",
+      "dash.unmatched": "unmatched",
+      "dash.resolveLead": "Resolve this line — one tap prices it, regenerates the draft & teaches the pipeline.",
+      "dash.noCands": "No ranked candidates were logged for this line. Search the catalogue below.",
+      "dash.catSearchPh": "Search catalogue by name, SKU, colour or GSM…",
+      "dash.askSpec": "Ask the customer for this spec",
+      "dash.noLineDetail": "No line-by-line detail was logged with this quote.",
+      "dash.line1": "1 line", "dash.lineN": "{n} lines", "dash.toResolve": "{n} to resolve", "dash.allPriced": "all priced",
+      "dash.lineItems": "Line items",
+      "dash.approveSend": "Approve & send", "dash.sendEdited": "Send edited reply",
+      "dash.labelPh": "Label", "dash.add": "Add", "dash.remove": "Remove",
+      "dash.gateNote": "Sending emails the customer from the firm mailbox. Nothing leaves until you approve it here — this is the send gate.",
+      "dash.draftReply": "Draft reply", "dash.pendingSend": "pending your send", "dash.sentLc": "sent",
+      "dash.lineResolved": "Line resolved — quote updated.",
+      "dash.searching": "Searching…", "dash.catFail": "Catalogue search failed: {msg}",
+      "dash.catNoMatch": "No catalogue products match “{term}”.", "dash.use": "Use", "dash.catFailNet": "Catalogue search failed (network).",
+      // toasts / actions
+      "dash.ocWonLc": "won", "dash.ocLostLc": "lost",
+      "dash.markedDemo": "Marked {o} · demo — not saved.", "dash.marked": "Marked {o}.",
+      "dash.runAnalyticsSql": "Run quote-analytics.sql in Supabase first.",
+      "dash.couldntSave": "Couldn’t save: {m}",
+      "dash.approvedDemo": "Approved · demo — not saved.",
+      "dash.runExpansionSql": "Run quotewright-expansion.sql in Supabase first.",
+      "dash.couldntApprove": "Couldn’t approve: {m}", "dash.approvedToast": "Approved.",
+      "dash.netErrNotApproved": "Network error — not approved.",
+      "dash.sessionExpired": "Session expired — sign in again.",
+      "dash.notAuthorised": "Not authorised — your session may have expired.",
+      "dash.requestFailed": "Request failed ({status}).",
+      "dash.sendQTitle": "Send this quote?",
+      "dash.sendQBody": "This emails <strong>{c}</strong> the drafted quotation from the firm mailbox.",
+      "dash.sendNow": "Send now", "dash.quoteSentTo": "Quote sent to {c}.",
+      "dash.theCustomer": "the customer",
+      "dash.writeReplyFirst": "Write a reply first.",
+      "dash.sendEditedTitle": "Send edited reply?",
+      "dash.sendEditedBody": "This sends your edited message to <strong>{c}</strong> on the existing thread.",
+      "dash.sendReply": "Send reply", "dash.replySent": "Reply sent.",
+      "dash.clarifySent": "Clarification email sent to the customer.",
+      "dash.typeLabelFirst": "Type a label name first.",
+      "dash.labelApplied": "Applied label “{l}”.", "dash.labelRemoved": "Removed label “{l}”.",
+      "dash.noDraftsSel": "No drafts selected.",
+      "dash.bulkSendTitle1": "Send 1 quote?", "dash.bulkSendTitleN": "Send {n} quotes?",
+      "dash.bulkSendBody1": "This emails 1 customer their drafted quotation. This can’t be undone.",
+      "dash.bulkSendBodyN": "This emails {n} customers their drafted quotation. This can’t be undone.",
+      "dash.sendAll": "Send all", "dash.sending": "Sending…",
+      "dash.sentN": "Sent {n}", "dash.failedN": " · {n} failed",
+      "dash.typeLabelName": "Type a label name.",
+      "dash.bulkLabelTitle1": "Label 1 quote?", "dash.bulkLabelTitleN": "Label {n} quotes?",
+      "dash.bulkLabelBody1": "Applies the Gmail label “{l}” to 1 thread.",
+      "dash.bulkLabelBodyN": "Applies the Gmail label “{l}” to {n} threads.",
+      "dash.applyLabel": "Apply label", "dash.applying": "Applying…", "dash.labelledN": "Labelled {n}",
+      "dash.nSelected": "{n} selected", "dash.nDraft1": "1 draft", "dash.nDraftN": "{n} drafts",
+      "dash.sendNDraft1": "Send 1 draft", "dash.sendNDraftN": "Send {n} drafts",
+      "dash.labelNamePh": "Label name", "dash.clear": "Clear", "dash.clearSel": "Clear selection"
+    },
+    tr: {
+      "auth.kickerSignin": "Giriş yap", "auth.kickerSignup": "Hesap oluştur",
+      "auth.titleSignin": "Teklif konsolu", "auth.titleSignup": "Hesabınızı oluşturun",
+      "auth.subSignin": "RFQ akışının hazırladığı teklifleri bu sayfadan çıkmadan inceleyin, tamamlayın ve gönderin.",
+      "auth.subSignup": "Ekibinizin teklif konsoluna erişim kurun. Yeni hesaplar açılmadan önce bir yönetici onaylar.",
+      "auth.createAccount": "Hesap oluştur", "auth.creatingAccount": "Hesap oluşturuluyor…",
+      "auth.or": "veya", "auth.continueGoogle": "Google ile devam et",
+      "auth.rule8": "En az 8 karakter", "auth.ruleLetter": "Bir harf", "auth.ruleNumber": "Bir rakam",
+      "auth.pwLen8": "en az 8 karakter", "auth.pwLetter": "bir harf", "auth.pwNumber": "bir rakam",
+      "auth.enterEmail": "Hesap oluşturmak için e-postanızı girin.",
+      "auth.choosePw": "Şu koşulları sağlayan bir parola seçin: {req}.",
+      "auth.notConfigured": "Yapılandırılmadı: dashboard-config.js içinde SUPABASE_ANON_KEY değerini ayarlayın (Supabase -> Project Settings -> API -> anon public).",
+      "auth.notConfiguredShort": "Konsol henüz yapılandırılmadı (Supabase anahtarı eksik).",
+      "auth.checkEmail": "E-postanızı kontrol edin",
+      "auth.noticeBody1": "Şu adrese bir onay bağlantısı gönderdik:", "auth.noticeBody2": " Bunu onaylayın; ardından bir yönetici, konsol açılmadan önce hesabınızı etkinleştirir.",
+      "auth.backToSignin": "Girişe geri dön",
+      "pending.kicker": "Neredeyse hazır",
+      "pending.title": "Hesabınız etkinleştirilmeyi bekliyor",
+      "pending.body1": "", "pending.body2": " olarak giriş yaptınız. Teklif konsolu açılmadan önce bir yöneticinin hesabınızı onaylayıp şirketinize bağlaması gerekir. Bu tamamlanır tamamlanmaz erişim kazanırsınız — yeniden kaydolmanıza gerek yok.",
+      "pending.note": "Bu genellikle kısa sürer. Acilse, beklediğinizi Quotewright yöneticinize bildirin.",
+      "dash.chartTitle": "Zaman içinde teklifler", "dash.legendWon": "Kazanıldı", "dash.legendOther": "Diğer",
+      "dash.needsYou": "Sizi bekleyenler", "dash.allQuotes": "Tüm teklifler",
+      "dash.chartEmptyTitle": "Henüz tarihli teklif yok",
+      "dash.chartEmptyBody": "Teklifler gelmeye başladığında bu grafik aylık hacminizi ve kaçının kazanıldığını izler.",
+      "dash.chartAria": "Aylık teklifler, kazanılan kısım vurgulanmış",
+      "dash.searchPh": "Müşteri, ürün veya SKU ara…",
+      "dash.sortAttention": "Sıralama: Önce ilgi gerekenler", "dash.sortNewest": "Sıralama: Önce en yeni",
+      "dash.sortOldest": "Sıralama: Önce en eski", "dash.sortValue": "Sıralama: En yüksek değer", "dash.sortMargin": "Sıralama: En düşük marj",
+      "dash.sfAll": "Tüm gönderim durumları", "dash.sfDraft": "Taslak (gönderim bekliyor)", "dash.sfSent": "Gönderildi",
+      "dash.tfAll": "Tüm kademeler", "dash.tfGreen": "Yeşil — hazır", "dash.tfAmber": "Sarı — incele", "dash.tfRed": "Kırmızı — çalışma gerek",
+      "dash.ofAll": "Tüm sonuçlar", "dash.ofPending": "Karar bekliyor", "dash.ofWon": "Kazanıldı", "dash.ofLost": "Kaybedildi",
+      "dash.needsApproval": "Onay gerekiyor",
+      "dash.ariaSort": "Sıralama", "dash.ariaSend": "Gönderim durumu", "dash.ariaTier": "Otonomi kademesi", "dash.ariaOutcome": "Sonuç",
+      "dash.thDate": "Tarih", "dash.thCust": "Müşteri ve ürünler", "dash.thTotal": "Toplam",
+      "dash.thMargin": "Marj", "dash.thConf": "Güven", "dash.thSend": "Gönderim",
+      "dash.thApproval": "Onay", "dash.thOutcome": "Sonuç", "dash.thTier": "Kademe", "dash.thOpen": "Aç",
+      "dash.selectAll": "Tümünü seç", "dash.selectQuote": "Teklifi seç",
+      "dash.drawerAria": "Teklif çalışma alanı", "dash.bulkAria": "Toplu işlemler",
+      "dash.digestClear": "Gelen kutusu temiz — şu anda sizi bekleyen teklif yok.",
+      "dash.copilotBrief": "Günün Copilot özeti", "dash.liveBadge": "canlı", "dash.liveTitle": "Yüklenen tekliflerden canlı hesaplandı",
+      "dash.segReady": "göndermeye hazır", "dash.segInfo": "bilgi gerekiyor", "dash.segApprove": "düşük marj onayları",
+      "dash.segReply1": "yeni yanıt", "dash.segReplyN": "yeni yanıt",
+      "dash.tileQuotes": "Kaydedilen teklif", "dash.tilePending": "Karar bekliyor",
+      "dash.stillInDraft": "{n} hâlâ taslakta", "dash.tileAwaiting": "Onay bekliyor",
+      "dash.marginFlagged": "marj / iskonto işaretlendi", "dash.noneFlagged": "işaretli yok",
+      "dash.tileWinRate": "Kazanma oranı", "dash.wonLost": "{won} kazanıldı · {lost} kaybedildi",
+      "dash.tileQuoted": "Teklif edilen değer", "dash.tileWonValue": "Kazanılan değer", "dash.mixed": "+{n} karışık",
+      "dash.loadErrTitle": "Teklifler yüklenemedi",
+      "dash.loadErrBody": "Teklif deposuna erişirken bir sorun oluştu.",
+      "dash.tryAgain": "Tekrar dene",
+      "dash.rowOf": "{a} / {b}", "dash.showingOf": "{b} içinden {a} gösteriliyor",
+      "dash.emptyNoneTitle": "Henüz teklif yok",
+      "dash.emptyNoneBody": "RFQ akışının hazırladığı teklifler buraya otomatik gelir. Bağlı posta kutusuna gerçek bir talep gönderin; ilk taslak görünecektir.",
+      "dash.emptyNoMatchTitle": "Eşleşme yok",
+      "dash.emptyNoMatchBody": "Bu filtrelere uyan teklif yok. Aramayı temizleyin, onay filtresini kaldırın ya da kademe / gönderim durumu ve sonucu genişletin.",
+      "dash.loadMore": "{n} tane daha yükle", "dash.ofShown": "{b} içinden {a} gösteriliyor",
+      "dash.netErrConn": "Ağ hatası — bağlantınızı kontrol edip tekrar deneyin.",
+      "dash.tierReady": "Hazır", "dash.tierReview": "İncele", "dash.tierWork": "Çalışma gerek",
+      "dash.tierNone": "Kademe henüz hesaplanmadı", "dash.tierTitle": "Otonomi kademesi: {t}",
+      "dash.marginTitle": "{v} marj",
+      "dash.approve": "Onayla", "dash.approved": "Onaylandı", "dash.approvedByTitle": "Onaylayan: {who}",
+      "dash.draft": "Taslak", "dash.sent": "Gönderildi",
+      "dash.ocPending": "Beklemede", "dash.ocWon": "Kazanıldı", "dash.ocLost": "Kaybedildi",
+      "dash.won": "Kazanıldı", "dash.lost": "Kaybedildi", "dash.reset": "Sıfırla",
+      "dash.newReplyDot": "yeni yanıt", "dash.newReplyTitle": "Bu konuda yeni müşteri yanıtı",
+      "dash.plusLine": "+{n} satır", "dash.plusLines": "+{n} satır",
+      "dash.nyReplyT": "Müşteri yanıtladı", "dash.nyReplyS": "Yanıt bekliyorlar",
+      "dash.nyApproveT": "Onayınız gerekiyor", "dash.nyApproveS": "Marj veya iskonto işaretlendi — göndermeden önce karar verin",
+      "dash.nyInfoT": "Çözülecek satırlar", "dash.nyInfoS": "Bir satırda özellik veya fiyat eksik",
+      "dash.nyReadyT": "Göndermeye hazır", "dash.nyReadyS": "Fiyatlandırılmış, yüksek güvenli taslaklar",
+      "dash.send": "Gönder", "dash.open": "Aç", "dash.viewInLedger": "Kayıtta görüntüle",
+      "dash.moreInLedger": "tam kayıtta +{n} tane daha →",
+      "dash.nyCaughtT": "Her şey güncel", "dash.nyNoneT": "Henüz sizi bekleyen bir şey yok",
+      "dash.nyCaughtB": "Şu anda bir insanı bekleyen teklif yok. Yeni taslaklar, onaylar ve müşteri yanıtları sizi gerektiği an burada belirir.",
+      "dash.nyNoneB": "RFQ akışı bir teklif hazırladığında ya da bir müşteri yanıt verdiğinde, ilginizi gerektiren her şey önce burada görünür.",
+      "dash.openCust": "{c} teklifini aç",
+      "dash.quoteFallback": "Teklif", "dash.closeWorkspace": "Çalışma alanını kapat",
+      "dash.sentLine": "Gönderildi {dt}", "dash.term": "vadeli {v}",
+      "dash.newReplyHead": "Yeni müşteri yanıtı",
+      "dash.convo": "Yazışma", "dash.msg1": "1 mesaj", "dash.msgN": "{n} mesaj",
+      "dash.threadEmpty": "Yazışma anlık görüntüsü, akış <code>thread_snapshot</code> verisini kaydettiğinde görünür. O zamana kadar aşağıdaki taslaktan müşterinin konusunu açın.",
+      "dash.customer": "Müşteri",
+      "dash.priced": "Fiyatlandı", "dash.provisional": "Fiyatlandı · özelliği doğrula",
+      "dash.needsInfo": "Bilgi gerekiyor", "dash.pendingPrice": "Fiyat bekliyor",
+      "dash.candidate": "Aday", "dash.useThis": "Bunu kullan",
+      "dash.unmatched": "eşleşmedi",
+      "dash.resolveLead": "Bu satırı çözün — tek dokunuş fiyatlandırır, taslağı yeniden oluşturur ve akışa öğretir.",
+      "dash.noCands": "Bu satır için sıralı aday kaydedilmedi. Aşağıdaki katalogda arayın.",
+      "dash.catSearchPh": "Katalogda ada, SKU'ya, renge veya GSM'e göre ara…",
+      "dash.askSpec": "Bu özelliği müşteriden iste",
+      "dash.noLineDetail": "Bu teklifle satır satır ayrıntı kaydedilmedi.",
+      "dash.line1": "1 satır", "dash.lineN": "{n} satır", "dash.toResolve": "{n} çözülecek", "dash.allPriced": "tümü fiyatlandı",
+      "dash.lineItems": "Satır kalemleri",
+      "dash.approveSend": "Onayla ve gönder", "dash.sendEdited": "Düzenlenmiş yanıtı gönder",
+      "dash.labelPh": "Etiket", "dash.add": "Ekle", "dash.remove": "Kaldır",
+      "dash.gateNote": "Gönderim, müşteriye firma posta kutusundan e-posta atar. Siz burada onaylamadan hiçbir şey gitmez — gönderim kapısı budur.",
+      "dash.draftReply": "Taslak yanıt", "dash.pendingSend": "gönderiminizi bekliyor", "dash.sentLc": "gönderildi",
+      "dash.lineResolved": "Satır çözüldü — teklif güncellendi.",
+      "dash.searching": "Aranıyor…", "dash.catFail": "Katalog araması başarısız: {msg}",
+      "dash.catNoMatch": "“{term}” ile eşleşen katalog ürünü yok.", "dash.use": "Kullan", "dash.catFailNet": "Katalog araması başarısız (ağ).",
+      "dash.ocWonLc": "kazanıldı", "dash.ocLostLc": "kaybedildi",
+      "dash.markedDemo": "{o} olarak işaretlendi · demo — kaydedilmedi.", "dash.marked": "{o} olarak işaretlendi.",
+      "dash.runAnalyticsSql": "Önce Supabase'de quote-analytics.sql çalıştırın.",
+      "dash.couldntSave": "Kaydedilemedi: {m}",
+      "dash.approvedDemo": "Onaylandı · demo — kaydedilmedi.",
+      "dash.runExpansionSql": "Önce Supabase'de quotewright-expansion.sql çalıştırın.",
+      "dash.couldntApprove": "Onaylanamadı: {m}", "dash.approvedToast": "Onaylandı.",
+      "dash.netErrNotApproved": "Ağ hatası — onaylanmadı.",
+      "dash.sessionExpired": "Oturum sona erdi — yeniden giriş yapın.",
+      "dash.notAuthorised": "Yetkiniz yok — oturumunuz sona ermiş olabilir.",
+      "dash.requestFailed": "İstek başarısız ({status}).",
+      "dash.sendQTitle": "Bu teklif gönderilsin mi?",
+      "dash.sendQBody": "Bu, hazırlanan teklifi firma posta kutusundan <strong>{c}</strong> adresine e-postayla gönderir.",
+      "dash.sendNow": "Şimdi gönder", "dash.quoteSentTo": "Teklif {c} adresine gönderildi.",
+      "dash.theCustomer": "müşteriye",
+      "dash.writeReplyFirst": "Önce bir yanıt yazın.",
+      "dash.sendEditedTitle": "Düzenlenmiş yanıt gönderilsin mi?",
+      "dash.sendEditedBody": "Bu, düzenlediğiniz mesajı mevcut yazışmada <strong>{c}</strong> adresine gönderir.",
+      "dash.sendReply": "Yanıtı gönder", "dash.replySent": "Yanıt gönderildi.",
+      "dash.clarifySent": "Açıklama e-postası müşteriye gönderildi.",
+      "dash.typeLabelFirst": "Önce bir etiket adı yazın.",
+      "dash.labelApplied": "“{l}” etiketi uygulandı.", "dash.labelRemoved": "“{l}” etiketi kaldırıldı.",
+      "dash.noDraftsSel": "Seçili taslak yok.",
+      "dash.bulkSendTitle1": "1 teklif gönderilsin mi?", "dash.bulkSendTitleN": "{n} teklif gönderilsin mi?",
+      "dash.bulkSendBody1": "Bu, 1 müşteriye hazırlanan teklifini e-postayla gönderir. Bu geri alınamaz.",
+      "dash.bulkSendBodyN": "Bu, {n} müşteriye hazırlanan tekliflerini e-postayla gönderir. Bu geri alınamaz.",
+      "dash.sendAll": "Tümünü gönder", "dash.sending": "Gönderiliyor…",
+      "dash.sentN": "{n} gönderildi", "dash.failedN": " · {n} başarısız",
+      "dash.typeLabelName": "Bir etiket adı yazın.",
+      "dash.bulkLabelTitle1": "1 teklif etiketlensin mi?", "dash.bulkLabelTitleN": "{n} teklif etiketlensin mi?",
+      "dash.bulkLabelBody1": "“{l}” Gmail etiketini 1 konuya uygular.",
+      "dash.bulkLabelBodyN": "“{l}” Gmail etiketini {n} konuya uygular.",
+      "dash.applyLabel": "Etiket uygula", "dash.applying": "Uygulanıyor…", "dash.labelledN": "{n} etiketlendi",
+      "dash.nSelected": "{n} seçildi", "dash.nDraft1": "1 taslak", "dash.nDraftN": "{n} taslak",
+      "dash.sendNDraft1": "1 taslak gönder", "dash.sendNDraftN": "{n} taslak gönder",
+      "dash.labelNamePh": "Etiket adı", "dash.clear": "Temizle", "dash.clearSel": "Seçimi temizle"
+    }
+  });
+
   var el = function (id) { return document.getElementById(id); };
   var cfg = window.QW_CONFIG || {};
   var boot = el("bootError");
@@ -51,12 +342,13 @@
   if (!configured) {
     if (boot) {
       boot.hidden = false;
-      boot.textContent = "Not configured: set SUPABASE_ANON_KEY in dashboard-config.js (Supabase -> Project Settings -> API -> anon public).";
+      boot.textContent = tt("auth.notConfigured");
     }
     return;
   }
 
   sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  if (window.QWI18n && QWI18n.setClient) QWI18n.setClient(sb);
   var currentEmail = "";
 
   el("logoutBtn").addEventListener("click", signOut);
@@ -77,10 +369,10 @@
 
   var pendingRefresh = el("pendingRefresh");
   if (pendingRefresh) pendingRefresh.addEventListener("click", function () {
-    pendingRefresh.disabled = true; pendingRefresh.textContent = "Checking…";
+    pendingRefresh.disabled = true; pendingRefresh.textContent = tt("common.checking");
     sb.auth.getSession().then(function (res) {
       var s = res.data && res.data.session;
-      pendingRefresh.disabled = false; pendingRefresh.textContent = "Check again";
+      pendingRefresh.disabled = false; pendingRefresh.textContent = tt("common.checkAgain");
       if (s && s.user) decideRoute(s); else showLogin();
     });
   });
@@ -208,26 +500,26 @@
     e.preventDefault();
     var err = el("loginError");
     if (err) err.textContent = "";
-    if (!sb) { if (err) err.textContent = "Dashboard isn't configured yet (missing Supabase key)."; return; }
+    if (!sb) { if (err) err.textContent = tt("auth.notConfiguredShort"); return; }
     var email = el("email").value.trim(), pw = el("password").value;
     if (authMode === "signup") return doSignup(email, pw, err);
     var btn = el("loginBtn");
-    btn.disabled = true; btn.textContent = "Signing in…";
+    btn.disabled = true; btn.textContent = tt("common.signingIn");
     sb.auth.signInWithPassword({ email: email, password: pw })
       .then(function (res) {
         btn.disabled = false; setSubmitLabel();
         if (res.error) { if (err) err.textContent = res.error.message; return; }
         if (res.data && res.data.session) decideRoute(res.data.session);
       })
-      .catch(function () { btn.disabled = false; setSubmitLabel(); if (err) err.textContent = "Network error."; });
+      .catch(function () { btn.disabled = false; setSubmitLabel(); if (err) err.textContent = tt("common.networkError"); });
   }
 
   function doSignup(email, pw, err) {
     var v = pwCheck(pw);
-    if (!email) { if (err) err.textContent = "Enter your email to create an account."; return; }
-    if (!v.ok) { if (err) err.textContent = "Choose a password with " + v.msg + "."; return; }
+    if (!email) { if (err) err.textContent = tt("auth.enterEmail"); return; }
+    if (!v.ok) { if (err) err.textContent = tt("auth.choosePw", { req: v.msg }); return; }
     var btn = el("loginBtn");
-    btn.disabled = true; btn.textContent = "Creating account…";
+    btn.disabled = true; btn.textContent = tt("auth.creatingAccount");
     sb.auth.signUp({ email: email, password: pw })
       .then(function (res) {
         btn.disabled = false; setSubmitLabel();
@@ -239,7 +531,7 @@
         if (res.data && res.data.session) decideRoute(res.data.session);
         else showNotice(email);
       })
-      .catch(function () { btn.disabled = false; setSubmitLabel(); if (err) err.textContent = "Network error."; });
+      .catch(function () { btn.disabled = false; setSubmitLabel(); if (err) err.textContent = tt("common.networkError"); });
   }
 
   function googleSignIn() {
@@ -253,7 +545,7 @@
       options: { redirectTo: window.location.origin + window.location.pathname }
     }).then(function (res) {
       if (res && res.error) { if (btn) btn.disabled = false; if (err) err.textContent = res.error.message; }
-    }).catch(function () { if (btn) btn.disabled = false; if (err) err.textContent = "Network error."; });
+    }).catch(function () { if (btn) btn.disabled = false; if (err) err.textContent = tt("common.networkError"); });
   }
 
   function signOut() { sb.auth.signOut().then(showLogin, showLogin); }
@@ -263,9 +555,9 @@
     pw = pw || "";
     var len = pw.length >= 8, letter = /[A-Za-z]/.test(pw), num = /[0-9]/.test(pw);
     var need = [];
-    if (!len) need.push("at least 8 characters");
-    if (!letter) need.push("a letter");
-    if (!num) need.push("a number");
+    if (!len) need.push(tt("auth.pwLen8"));
+    if (!letter) need.push(tt("auth.pwLetter"));
+    if (!num) need.push(tt("auth.pwNumber"));
     return { ok: len && letter && num, len: len, letter: letter, num: num, msg: need.join(", ") };
   }
   function renderPwRules(pw) {
@@ -276,7 +568,15 @@
     });
   }
 
-  function setSubmitLabel() { var b = el("loginBtn"); if (b) b.textContent = authMode === "signup" ? "Create account" : "Sign in"; }
+  function setSubmitLabel() { var b = el("loginBtn"); if (b) b.textContent = authMode === "signup" ? tt("auth.createAccount") : tt("common.signIn"); }
+
+  // Keep the three auth text nodes in sync with the current mode + language.
+  function applyAuthText() {
+    var signup = authMode === "signup";
+    var k = el("authKicker"); if (k) k.textContent = signup ? tt("auth.kickerSignup") : tt("auth.kickerSignin");
+    var ti = el("authTitle"); if (ti) ti.textContent = signup ? tt("auth.titleSignup") : tt("auth.titleSignin");
+    var su = el("authSub"); if (su) su.textContent = signup ? tt("auth.subSignup") : tt("auth.subSignin");
+  }
 
   function setMode(mode) {
     authMode = mode === "signup" ? "signup" : "signin";
@@ -290,11 +590,7 @@
     if (pw) pw.setAttribute("autocomplete", signup ? "new-password" : "current-password");
     var rules = el("pwRules"); if (rules) rules.hidden = !signup;
     if (signup && pw) renderPwRules(pw.value);
-    el("authKicker").textContent = signup ? "Create account" : "Sign in";
-    el("authTitle").textContent = signup ? "Create your account" : "Quote console";
-    el("authSub").textContent = signup
-      ? "Set up access to your team’s quote console. A manager approves new accounts before they open."
-      : "Review, resolve and send quotes drafted by the RFQ pipeline — without leaving this page.";
+    applyAuthText();
     var err = el("loginError"); if (err) err.textContent = "";
     showNotice(null); // ensure the form (not the notice) is visible
   }
@@ -316,6 +612,7 @@
   // Resolve the caller's tenant/role/status, then route.
   function decideRoute(session) {
     currentEmail = (session.user && session.user.email) || "";
+    if (window.QWI18n) { QWI18n.setClient(sb); QWI18n.reconcileUser(session.user); }
     if (!window.QWTenancy) { showDash(currentEmail, { isAdmin: false, owner: resolvedOwner }); startDash(session.user); return; }
     QWTenancy.resolve(sb).then(function (p) {
       if (p.anon) { showLogin(); return; }
@@ -447,6 +744,10 @@
     var o = (q.outcome || "pending").toLowerCase();
     return (o === "won" || o === "lost") ? o : "pending";
   }
+  // Localized lowercase outcome word for inline toasts ("Marked won.").
+  function outcomeWord(o) {
+    return o === "won" ? tt("dash.ocWonLc") : o === "lost" ? tt("dash.ocLostLc") : tt("dash.ocPending").toLowerCase();
+  }
   function tierOf(q) {
     var t = (q.autonomy_tier || "").toLowerCase();
     return (t === "green" || t === "amber" || t === "red") ? t : null;
@@ -551,7 +852,7 @@
     if (!lines.length) return "";
     var first = lines[0].name;
     var extra = lines.length - 1;
-    return first + (extra > 0 ? "  ·  +" + extra + " line" + (extra > 1 ? "s" : "") : "");
+    return first + (extra > 0 ? "  ·  " + (extra === 1 ? tt("dash.plusLine", { n: extra }) : tt("dash.plusLines", { n: extra })) : "");
   }
 
   function normCur(c) {
@@ -578,7 +879,7 @@
     var order = ["EUR", "USD", "GBP", "TRY"], parts = [];
     order.forEach(function (c) { if (by[c] != null) parts.push((shortForm ? moneyShort : money)(by[c], c)); });
     Object.keys(by).forEach(function (c) { if (c !== "__mixed" && order.indexOf(c) < 0) parts.push((shortForm ? moneyShort : money)(by[c], c)); });
-    if (by.__mixed) parts.push("+" + by.__mixed + " mixed");
+    if (by.__mixed) parts.push(tt("dash.mixed", { n: by.__mixed }));
     return parts.length ? parts.join("  ·  ") : "—";
   }
 
@@ -618,24 +919,24 @@
       bar.className = "qc-digest calm";
       bar.innerHTML = '<div class="qc-digest-calm"><span class="qc-digest-tick">' +
         '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>' +
-        'Inbox clear — no quotes are waiting on you right now.</div>';
+        esc(tt("dash.digestClear")) + '</div>';
       return;
     }
     bar.hidden = false;
     bar.className = "qc-digest";
     var segs = [
-      { k: "green", n: green, label: green === 1 ? "ready to send" : "ready to send", cls: "seg-green",
+      { k: "green", n: green, label: tt("dash.segReady"), cls: "seg-green",
         ico: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/></svg>' },
-      { k: "info", n: d.needsInfo, label: "need input", cls: "seg-info",
+      { k: "info", n: d.needsInfo, label: tt("dash.segInfo"), cls: "seg-info",
         ico: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>' },
-      { k: "approve", n: d.approvals, label: "thin-margin approvals", cls: "seg-approve",
+      { k: "approve", n: d.approvals, label: tt("dash.segApprove"), cls: "seg-approve",
         ico: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>' },
-      { k: "reply", n: d.replies, label: d.replies === 1 ? "new reply" : "new replies", cls: "seg-reply",
+      { k: "reply", n: d.replies, label: d.replies === 1 ? tt("dash.segReply1") : tt("dash.segReplyN"), cls: "seg-reply",
         ico: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' }
     ];
     bar.innerHTML =
-      '<div class="qc-digest-lead">Today&rsquo;s copilot brief' +
-        (d.source === "client" ? '<span class="qc-digest-live" title="Computed live from the loaded quotes">live</span>' : "") +
+      '<div class="qc-digest-lead">' + esc(tt("dash.copilotBrief")) +
+        (d.source === "client" ? '<span class="qc-digest-live" title="' + esc(tt("dash.liveTitle")) + '">' + esc(tt("dash.liveBadge")) + '</span>' : "") +
       '</div>' +
       '<div class="qc-digest-segs">' +
       segs.map(function (s) {
@@ -681,12 +982,12 @@
     var awaiting = quotes.filter(needsApproval).length;
 
     var tiles = [
-      { n: quotes.length, l: "Quotes logged" },
-      { n: pending, l: "Pending decision", sub2: drafts + " still in draft" },
-      { n: awaiting, l: "Awaiting approval", warn: awaiting > 0, sub2: awaiting > 0 ? "margin / discount flagged" : "none flagged" },
-      { n: winRate == null ? "—" : winRate + "%", l: "Win rate", accent: true, sub2: won.length + " won · " + lost.length + " lost" },
-      { n: curJoin(sumByCur(quotes), true), l: "Quoted value", small: true },
-      { n: curJoin(sumByCur(won), true), l: "Won value", small: true, dark: true },
+      { n: quotes.length, l: tt("dash.tileQuotes") },
+      { n: pending, l: tt("dash.tilePending"), sub2: tt("dash.stillInDraft", { n: drafts }) },
+      { n: awaiting, l: tt("dash.tileAwaiting"), warn: awaiting > 0, sub2: awaiting > 0 ? tt("dash.marginFlagged") : tt("dash.noneFlagged") },
+      { n: winRate == null ? "—" : winRate + "%", l: tt("dash.tileWinRate"), accent: true, sub2: tt("dash.wonLost", { won: won.length, lost: lost.length }) },
+      { n: curJoin(sumByCur(quotes), true), l: tt("dash.tileQuoted"), small: true },
+      { n: curJoin(sumByCur(won), true), l: tt("dash.tileWonValue"), small: true, dark: true },
     ];
     el("tiles").innerHTML = tiles.map(function (t) {
       return '<div class="qc-tile' + (t.accent ? " accent" : "") + (t.dark ? " dark" : "") + (t.warn ? " warn" : "") + '">' +
@@ -715,8 +1016,8 @@
     });
     var keys = Object.keys(months).sort();
     if (!keys.length) {
-      host.innerHTML = '<div class="empty">' + emptyPanel(ICON_INBOX, "No dated quotes yet",
-        "Once quotes start landing, this chart tracks your monthly volume and how many were won.") + "</div>";
+      host.innerHTML = '<div class="empty">' + emptyPanel(ICON_INBOX, tt("dash.chartEmptyTitle"),
+        tt("dash.chartEmptyBody")) + "</div>";
       return;
     }
     keys = keys.slice(-12);
@@ -758,10 +1059,10 @@
       if (totH > 0) parts.push('<rect class="bar-rest" x="' + bx.toFixed(1) + '" y="' + yTop.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + totH.toFixed(1) + '" rx="6"/>');
       if (wonH > 0) parts.push('<rect class="bar-won" x="' + bx.toFixed(1) + '" y="' + (baseY - wonH).toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + wonH.toFixed(1) + '" rx="6"/>');
       if (x.total > 0) parts.push('<text class="axis-lbl cnt" x="' + cx.toFixed(1) + '" y="' + (yTop - 9).toFixed(1) + '" text-anchor="middle" font-size="19" font-weight="600">' + x.total + "</text>");
-      var lbl = x.d.toLocaleDateString("en-GB", { month: "short" });
-      parts.push('<text class="axis-lbl" x="' + cx.toFixed(1) + '" y="' + (VBH - 12) + '" text-anchor="middle" font-size="15">' + lbl + "</text>");
+      var lbl = (window.QWI18n ? QWI18n.monthShort(x.d) : x.d.toLocaleDateString("en-GB", { month: "short" }));
+      parts.push('<text class="axis-lbl" x="' + cx.toFixed(1) + '" y="' + (VBH - 12) + '" text-anchor="middle" font-size="15">' + esc(lbl) + "</text>");
     });
-    host.innerHTML = '<svg viewBox="0 0 ' + VBW + ' ' + VBH + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Quotes per month, won portion highlighted">' + parts.join("") + "</svg>";
+    host.innerHTML = '<svg viewBox="0 0 ' + VBW + ' ' + VBH + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="' + esc(tt("dash.chartAria")) + '">' + parts.join("") + "</svg>";
   }
 
   // ── loading / empty / error states ──────────────────────────────────────────
@@ -778,7 +1079,7 @@
     el("quotesBody").innerHTML = ('<tr class="qc-skrow">' + cells + "</tr>").repeat(6);
     el("emptyState").hidden = true;
     hideTableError();
-    el("rowCount").textContent = "Loading…";
+    el("rowCount").textContent = tt("common.loading");
   }
   function emptyPanel(icon, title, body) {
     return '<div class="ico">' + icon + "</div><h4>" + esc(title) + "</h4><p>" + esc(body) + "</p>";
@@ -788,9 +1089,9 @@
   var ICON_WARN = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>';
   function showTableError(msg) {
     var t = el("tableError");
-    t.innerHTML = '<div class="ico">' + ICON_WARN + "</div><h4>Couldn’t load quotes</h4>" +
-      "<p>" + esc(msg || "Something went wrong reaching the quote store.") + "</p>" +
-      '<button type="button" id="retryBtn" class="btn btn-primary btn-sm">Try again</button>';
+    t.innerHTML = '<div class="ico">' + ICON_WARN + "</div><h4>" + esc(tt("dash.loadErrTitle")) + "</h4>" +
+      "<p>" + esc(msg || tt("dash.loadErrBody")) + "</p>" +
+      '<button type="button" id="retryBtn" class="btn btn-primary btn-sm">' + esc(tt("dash.tryAgain")) + '</button>';
     t.hidden = false;
     el("quotesTable").style.display = "none";
     el("emptyState").hidden = true;
@@ -812,21 +1113,21 @@
     b.classList.toggle("is-loading", on);
     // The button holds an icon + label span; only swap the label so the icon stays.
     var lbl = b.querySelector("span") || b;
-    lbl.textContent = on ? "Refreshing…" : "Refresh";
+    lbl.textContent = on ? tt("common.refreshing") : tt("common.refresh");
   }
 
   // ── table ─────────────────────────────────────────────────────────────────
   function tierCell(q) {
     var t = tierOf(q);
-    if (!t) return '<span class="qc-tier none" title="Tier not computed yet">—</span>';
-    var lbl = { green: "Ready", amber: "Review", red: "Needs work" }[t];
-    return '<span class="qc-tier ' + t + '" title="Autonomy tier: ' + t + '"><i></i>' + lbl + "</span>";
+    if (!t) return '<span class="qc-tier none" title="' + esc(tt("dash.tierNone")) + '">—</span>';
+    var lbl = { green: tt("dash.tierReady"), amber: tt("dash.tierReview"), red: tt("dash.tierWork") }[t];
+    return '<span class="qc-tier ' + t + '" title="' + esc(tt("dash.tierTitle", { t: t })) + '"><i></i>' + esc(lbl) + "</span>";
   }
   function marginCell(q) {
     var p = numOrNull(q.margin_pct);
     if (p == null) return '<span class="qc-mut">—</span>';
     var band = marginBand(p);
-    return '<span class="qc-margin ' + band + '" title="' + esc(money(q.margin_amount, q.currency)) + ' margin">' +
+    return '<span class="qc-margin ' + band + '" title="' + esc(tt("dash.marginTitle", { v: money(q.margin_amount, q.currency) })) + '">' +
       esc(p.toFixed(p % 1 === 0 ? 0 : 1)) + '%</span>';
   }
   function confCell(v) {
@@ -838,12 +1139,12 @@
     if (needsApproval(q)) {
       return '<button class="qc-approve" data-approve="' + esc(id) + '"' +
         (q.approval_reason ? ' title="' + esc(q.approval_reason) + '"' : "") + '>' +
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Approve</button>';
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>' + esc(tt("dash.approve")) + '</button>';
     }
     if (q.approved_by) {
-      return '<span class="qc-approved" title="Approved by ' + esc(q.approved_by) +
+      return '<span class="qc-approved" title="' + esc(tt("dash.approvedByTitle", { who: q.approved_by })) +
         (q.approved_at ? " · " + esc(fmtDate(q.approved_at)) : "") + '">' +
-        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Approved</span>';
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>' + esc(tt("dash.approved")) + '</span>';
     }
     return '<span class="qc-mut">—</span>';
   }
@@ -879,14 +1180,14 @@
     var total = rows.length;
     var empty = el("emptyState");
     if (total === 0) {
-      el("rowCount").textContent = "0 of " + quotes.length;
+      el("rowCount").textContent = tt("dash.rowOf", { a: 0, b: quotes.length });
       empty.hidden = false;
       if (quotes.length === 0) {
-        empty.innerHTML = emptyPanel(ICON_INBOX, "No quotes yet",
-          "Quotes drafted by the RFQ pipeline land here automatically. Send a real request to the connected mailbox and the first draft will appear.");
+        empty.innerHTML = emptyPanel(ICON_INBOX, tt("dash.emptyNoneTitle"),
+          tt("dash.emptyNoneBody"));
       } else {
-        empty.innerHTML = emptyPanel(ICON_FILTER, "No matches",
-          "No quotes fit these filters. Clear the search, drop the approval filter, or widen the tier / send state and outcome.");
+        empty.innerHTML = emptyPanel(ICON_FILTER, tt("dash.emptyNoMatchTitle"),
+          tt("dash.emptyNoMatchBody"));
       }
       el("quotesBody").innerHTML = "";
       var mb0 = el("moreBar"); if (mb0) mb0.hidden = true;
@@ -897,15 +1198,15 @@
     if (renderLimit > total) renderLimit = Math.max(PAGE, Math.ceil(total / PAGE) * PAGE);
     var shown = Math.min(renderLimit, total);
     var pageRows = rows.slice(0, shown);
-    el("rowCount").textContent = shown < total ? ("Showing " + shown + " of " + total) : (total + " of " + quotes.length);
+    el("rowCount").textContent = shown < total ? tt("dash.showingOf", { a: shown, b: total }) : tt("dash.rowOf", { a: total, b: quotes.length });
     // Load-more control (pagination for 50+ rows).
     var mb = el("moreBar");
     if (mb) {
       if (shown < total) {
         mb.hidden = false;
-        mb.innerHTML = '<button type="button" id="loadMore" class="btn btn-ghost btn-sm">Load ' +
-          Math.min(PAGE, total - shown) + ' more</button>' +
-          '<span class="qc-more-count">' + shown + " of " + total + " shown</span>";
+        mb.innerHTML = '<button type="button" id="loadMore" class="btn btn-ghost btn-sm">' +
+          esc(tt("dash.loadMore", { n: Math.min(PAGE, total - shown) })) + '</button>' +
+          '<span class="qc-more-count">' + esc(tt("dash.ofShown", { a: shown, b: total })) + "</span>";
       } else { mb.hidden = true; mb.innerHTML = ""; }
     }
     el("quotesBody").innerHTML = pageRows.map(function (r) {
@@ -915,24 +1216,24 @@
       var flagged = needsApproval(r);
       var sel = !!selected[id];
       var acts = '<span class="qc-acts">' +
-        '<button class="qc-act win ' + (oc === "won" ? "on" : "") + '" data-id="' + esc(id) + '" data-act="won">Won</button>' +
-        '<button class="qc-act lose ' + (oc === "lost" ? "on" : "") + '" data-id="' + esc(id) + '" data-act="lost">Lost</button>' +
-        (oc !== "pending" ? '<button class="qc-act" data-id="' + esc(id) + '" data-act="pending">Reset</button>' : "") +
+        '<button class="qc-act win ' + (oc === "won" ? "on" : "") + '" data-id="' + esc(id) + '" data-act="won">' + esc(tt("dash.won")) + '</button>' +
+        '<button class="qc-act lose ' + (oc === "lost" ? "on" : "") + '" data-id="' + esc(id) + '" data-act="lost">' + esc(tt("dash.lost")) + '</button>' +
+        (oc !== "pending" ? '<button class="qc-act" data-id="' + esc(id) + '" data-act="pending">' + esc(tt("dash.reset")) + '</button>' : "") +
         "</span>";
       var summary = productSummary(r);
       return '<tr data-row="' + esc(id) + '" class="qc-row' + (flagged ? " needs-approval" : "") + (sel ? " is-sel" : "") + (openId === id ? " is-open" : "") + '">' +
-        '<td class="qc-col-sel"><input type="checkbox" class="qc-rowsel" data-sel="' + esc(id) + '"' + (sel ? " checked" : "") + ' aria-label="Select quote"></td>' +
+        '<td class="qc-col-sel"><input type="checkbox" class="qc-rowsel" data-sel="' + esc(id) + '"' + (sel ? " checked" : "") + ' aria-label="' + esc(tt("dash.selectQuote")) + '"></td>' +
         '<td class="qc-col-tier">' + tierCell(r) + "</td>" +
-        "<td>" + esc(fmtDate(r.created_at)) + "</td>" +
-        '<td class="qc-cust"><span class="qc-cust-name">' + esc(r.customer || "—") + "</span>" +
-          (summary ? '<span class="qc-cust-prod">' + esc(summary) + "</span>" : "") +
-          (r.last_reply_text ? '<span class="qc-reply-dot" title="New customer reply on this thread">new reply</span>' : "") + "</td>" +
-        '<td class="num qc-total">' + esc(money(r.total, r.currency)) + "</td>" +
+        '<td lang="en">' + esc(fmtDate(r.created_at)) + "</td>" +
+        '<td class="qc-cust"><span class="qc-cust-name" lang="en">' + esc(r.customer || "—") + "</span>" +
+          (summary ? '<span class="qc-cust-prod" lang="en">' + esc(summary) + "</span>" : "") +
+          (r.last_reply_text ? '<span class="qc-reply-dot" title="' + esc(tt("dash.newReplyTitle")) + '">' + esc(tt("dash.newReplyDot")) + '</span>' : "") + "</td>" +
+        '<td class="num qc-total" lang="en">' + esc(money(r.total, r.currency)) + "</td>" +
         '<td class="num">' + marginCell(r) + "</td>" +
         "<td>" + confCell(overallConf(r)) + "</td>" +
-        "<td><span class='pill " + b + "'>" + (b === "draft" ? "Draft" : "Sent") + "</span></td>" +
+        "<td><span class='pill " + b + "'>" + (b === "draft" ? esc(tt("dash.draft")) : esc(tt("dash.sent"))) + "</span></td>" +
         "<td>" + approvalCell(r, id) + "</td>" +
-        "<td><div class='qc-outcome'><span class='pill " + oc + "'>" + oc.charAt(0).toUpperCase() + oc.slice(1) + "</span>" + acts + "</div></td>" +
+        "<td><div class='qc-outcome'><span class='pill " + oc + "'>" + esc(tt("dash.oc" + oc.charAt(0).toUpperCase() + oc.slice(1))) + "</span>" + acts + "</div></td>" +
         '<td class="qc-col-open"><span class="qc-open-cue" aria-hidden="true">' + CHEVRON + "</span></td>" +
       "</tr>";
     }).join("");
@@ -975,20 +1276,20 @@
     var id = String(q.id);
     var tier = tierOf(q);
     var tierBadge = tier ? '<span class="qc-tier ' + tier + '"><i></i>' +
-      { green: "Ready", amber: "Review", red: "Needs work" }[tier] + "</span>" : "";
+      esc({ green: tt("dash.tierReady"), amber: tt("dash.tierReview"), red: tt("dash.tierWork") }[tier]) + "</span>" : "";
     var summary = productSummary(q);
     var meta = [money(q.total, q.currency), fmtDate(q.created_at)]
       .filter(function (x) { return x && x !== "—"; }).join("  ·  ");
     var actHtml;
-    if (action === "approve") actHtml = '<button class="btn btn-primary btn-sm" data-approve="' + esc(id) + '">Approve</button>';
+    if (action === "approve") actHtml = '<button class="btn btn-primary btn-sm" data-approve="' + esc(id) + '">' + esc(tt("dash.approve")) + '</button>';
     else if (action === "send") actHtml = '<button class="btn btn-primary btn-sm qc-send" data-send="' + esc(id) + '">' +
-      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>Send</button>';
-    else actHtml = '<span class="qc-ny-open" aria-hidden="true">Open' + CHEVRON + "</span>";
-    return '<div class="qc-ny-card" data-row="' + esc(id) + '" tabindex="0" role="button" aria-label="Open ' + esc(q.customer || "quote") + '">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>' + esc(tt("dash.send")) + '</button>';
+    else actHtml = '<span class="qc-ny-open" aria-hidden="true">' + esc(tt("dash.open")) + CHEVRON + "</span>";
+    return '<div class="qc-ny-card" data-row="' + esc(id) + '" tabindex="0" role="button" aria-label="' + esc(tt("dash.openCust", { c: q.customer || tt("dash.quoteFallback") })) + '">' +
       '<div class="qc-ny-main">' +
-        '<div class="qc-ny-top"><span class="qc-ny-cust">' + esc(q.customer || "—") + "</span>" + tierBadge + "</div>" +
-        (summary ? '<div class="qc-ny-prod">' + esc(summary) + "</div>" : "") +
-        (meta ? '<div class="qc-ny-meta">' + esc(meta) + "</div>" : "") +
+        '<div class="qc-ny-top"><span class="qc-ny-cust" lang="en">' + esc(q.customer || "—") + "</span>" + tierBadge + "</div>" +
+        (summary ? '<div class="qc-ny-prod" lang="en">' + esc(summary) + "</div>" : "") +
+        (meta ? '<div class="qc-ny-meta" lang="en">' + esc(meta) + "</div>" : "") +
       "</div>" +
       '<div class="qc-ny-act">' + actHtml + "</div>" +
     "</div>";
@@ -999,17 +1300,15 @@
     if (!hasLoaded) { host.innerHTML = ""; return; }
     var s = needsYouSets();
     var groups = [
-      { key: "reply", items: s.reply, title: "Customer replied", sub: "They’re waiting on a response", icon: ICON_REPLY, action: "open", jump: "reply" },
-      { key: "approve", items: s.approve, title: "Needs your approval", sub: "Margin or discount flagged — decide before it sends", icon: ICON_WARN, action: "approve", jump: "approve" },
-      { key: "info", items: s.info, title: "Lines to resolve", sub: "A line is missing a spec or price", icon: ICON_INFO, action: "open", jump: "info" },
-      { key: "ready", items: s.ready, title: "Ready to send", sub: "Priced, high-confidence drafts", icon: ICON_SEND, action: "send", jump: "ready" }
+      { key: "reply", items: s.reply, title: tt("dash.nyReplyT"), sub: tt("dash.nyReplyS"), icon: ICON_REPLY, action: "open", jump: "reply" },
+      { key: "approve", items: s.approve, title: tt("dash.nyApproveT"), sub: tt("dash.nyApproveS"), icon: ICON_WARN, action: "approve", jump: "approve" },
+      { key: "info", items: s.info, title: tt("dash.nyInfoT"), sub: tt("dash.nyInfoS"), icon: ICON_INFO, action: "open", jump: "info" },
+      { key: "ready", items: s.ready, title: tt("dash.nyReadyT"), sub: tt("dash.nyReadyS"), icon: ICON_SEND, action: "send", jump: "ready" }
     ].filter(function (g) { return g.items.length; });
     if (!groups.length) {
       host.innerHTML = '<div class="qc-empty qc-ny-empty">' + emptyPanel(ICON_CHECK,
-        quotes.length ? "You’re all caught up" : "Nothing needs you yet",
-        quotes.length
-          ? "No quotes are waiting on a human right now. New drafts, approvals and customer replies surface here the moment they need you."
-          : "When the RFQ pipeline drafts a quote or a customer replies, anything needing your attention lands here first.") + "</div>";
+        quotes.length ? tt("dash.nyCaughtT") : tt("dash.nyNoneT"),
+        quotes.length ? tt("dash.nyCaughtB") : tt("dash.nyNoneB")) + "</div>";
       return;
     }
     var CAP = 6;
@@ -1020,10 +1319,10 @@
           '<span class="qc-ny-gico ' + g.key + '">' + g.icon + "</span>" +
           '<h3>' + esc(g.title) + '<span class="qc-ny-gn">' + g.items.length + "</span></h3>" +
           '<span class="qc-ny-gsub">' + esc(g.sub) + "</span>" +
-          '<button type="button" class="qc-ny-all" data-jump="' + g.jump + '">View in ledger' + CHEVRON + "</button>" +
+          '<button type="button" class="qc-ny-all" data-jump="' + g.jump + '">' + esc(tt("dash.viewInLedger")) + CHEVRON + "</button>" +
         "</div>" +
         '<div class="qc-ny-cards">' + shown.map(function (q) { return nyCard(q, g.action); }).join("") + "</div>" +
-        (more > 0 ? '<button type="button" class="qc-ny-morelink" data-jump="' + g.jump + '">+' + more + " more in the full ledger →</button>" : "") +
+        (more > 0 ? '<button type="button" class="qc-ny-morelink" data-jump="' + g.jump + '">' + esc(tt("dash.moreInLedger", { n: more })) + "</button>" : "") +
       "</section>";
     }).join("");
   }
@@ -1084,13 +1383,13 @@
     bar.hidden = false;
     document.body.classList.add("qc-has-bulk");
     bar.innerHTML =
-      '<span class="qc-bulk-n">' + list.length + " selected</span>" +
-      '<span class="qc-bulk-sub">' + drafts + " draft" + (drafts === 1 ? "" : "s") + "</span>" +
+      '<span class="qc-bulk-n">' + esc(tt("dash.nSelected", { n: list.length })) + "</span>" +
+      '<span class="qc-bulk-sub">' + esc(drafts === 1 ? tt("dash.nDraft1") : tt("dash.nDraftN", { n: drafts })) + "</span>" +
       '<span class="qc-bulk-sp"></span>' +
-      '<button type="button" class="btn btn-primary btn-sm" id="bulkSend"' + (drafts === 0 ? " disabled" : "") + '>Send ' + drafts + " draft" + (drafts === 1 ? "" : "s") + "</button>" +
-      '<div class="qc-bulk-label"><input type="text" id="bulkLabelInput" class="qc-bulk-input" placeholder="Label name" maxlength="60">' +
-        '<button type="button" class="btn btn-ghost btn-sm" id="bulkLabel">Apply label</button></div>' +
-      '<button type="button" class="qc-bulk-clear" id="bulkClear" aria-label="Clear selection">Clear</button>';
+      '<button type="button" class="btn btn-primary btn-sm" id="bulkSend"' + (drafts === 0 ? " disabled" : "") + '>' + esc(drafts === 1 ? tt("dash.sendNDraft1") : tt("dash.sendNDraftN", { n: drafts })) + "</button>" +
+      '<div class="qc-bulk-label"><input type="text" id="bulkLabelInput" class="qc-bulk-input" placeholder="' + esc(tt("dash.labelNamePh")) + '" maxlength="60">' +
+        '<button type="button" class="btn btn-ghost btn-sm" id="bulkLabel">' + esc(tt("dash.applyLabel")) + '</button></div>' +
+      '<button type="button" class="qc-bulk-clear" id="bulkClear" aria-label="' + esc(tt("dash.clearSel")) + '">' + esc(tt("dash.clear")) + '</button>';
     el("bulkSend").addEventListener("click", bulkSend);
     el("bulkLabel").addEventListener("click", bulkLabel);
     el("bulkClear").addEventListener("click", function () { selected = {}; renderTable(); renderBulk(); });
@@ -1118,7 +1417,7 @@
     return sb.auth.getSession().then(function (res) {
       var s = res.data && res.data.session;
       var token = s && s.access_token;
-      if (!token) { return Promise.reject({ status: 401, message: "Session expired — sign in again." }); }
+      if (!token) { return Promise.reject({ status: 401, message: tt("dash.sessionExpired") }); }
       return fetch(WEBHOOK_BASE + path, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
@@ -1128,10 +1427,10 @@
           var json = null;
           try { json = txt ? JSON.parse(txt) : null; } catch (e) { json = null; }
           if (r.status === 401 || r.status === 403) {
-            return Promise.reject({ status: r.status, message: (json && json.error) || "Not authorised — your session may have expired." });
+            return Promise.reject({ status: r.status, message: (json && json.error) || tt("dash.notAuthorised") });
           }
           if (!r.ok || (json && json.ok === false)) {
-            return Promise.reject({ status: r.status, message: (json && (json.error || json.message)) || ("Request failed (" + r.status + ").") });
+            return Promise.reject({ status: r.status, message: (json && (json.error || json.message)) || tt("dash.requestFailed", { status: r.status }) });
           }
           return json || { ok: true };
         });
@@ -1139,7 +1438,7 @@
     });
   }
   function handleApiError(err) {
-    var msg = (err && err.message) || "Network error.";
+    var msg = (err && err.message) || tt("common.networkError");
     if (err && (err.status === 401 || err.status === 403)) {
       toast(msg, true);
     } else {
@@ -1153,7 +1452,7 @@
     el("confirmTitle").textContent = title;
     el("confirmBody").innerHTML = bodyHtml;
     var ok = el("confirmOk");
-    ok.textContent = okLabel || "Confirm";
+    ok.textContent = okLabel || tt("common.confirm");
     ok.classList.toggle("is-danger", !!danger);
     return new Promise(function (resolve) {
       function onClose() {
@@ -1172,7 +1471,7 @@
     if (window.QWDemo && QWDemo.isOn()) {
       patchLocal(id, { outcome: outcome, outcome_at: new Date().toISOString() });
       render(); if (openId === String(id)) renderDrawer();
-      toast("Marked " + outcome + " · demo — not saved.");
+      toast(tt("dash.markedDemo", { o: outcomeWord(outcome) }));
       return;
     }
     var acts = btn && btn.parentNode ? btn.parentNode.querySelectorAll("button") : [];
@@ -1182,16 +1481,16 @@
       for (var j = 0; j < acts.length; j++) acts[j].disabled = false;
       if (res.error) {
         var m = res.error.message || "";
-        if (/column|outcome/i.test(m)) toast("Run quote-analytics.sql in Supabase first.", true);
-        else toast("Couldn't save: " + m, true);
+        if (/column|outcome/i.test(m)) toast(tt("dash.runAnalyticsSql"), true);
+        else toast(tt("dash.couldntSave", { m: m }), true);
         return;
       }
       patchLocal(id, { outcome: outcome, outcome_at: patch.outcome_at });
       render();
-      toast("Marked " + outcome + ".");
+      toast(tt("dash.marked", { o: outcomeWord(outcome) }));
     }).catch(function () {
       for (var n = 0; n < acts.length; n++) acts[n].disabled = false;
-      toast("Network error.", true);
+      toast(tt("common.networkError"), true);
     });
   }
 
@@ -1205,22 +1504,22 @@
     rec.needs_approval = false; rec.approved_by = by; rec.approved_at = now;
     render();
     if (openId === String(id)) renderDrawer();
-    if (window.QWDemo && QWDemo.isOn()) { toast("Approved · demo — not saved."); return; }
+    if (window.QWDemo && QWDemo.isOn()) { toast(tt("dash.approvedDemo")); return; }
     var patch = { needs_approval: false, approved_by: by, approved_at: now };
     sb.from("quotes").update(patch).eq("id", id).then(function (res) {
       if (res.error) {
         rec.needs_approval = snapshot.needs_approval; rec.approved_by = snapshot.approved_by; rec.approved_at = snapshot.approved_at;
         render(); if (openId === String(id)) renderDrawer();
         var m = res.error.message || "";
-        if (/column|needs_approval|approved_by/i.test(m)) toast("Run quotewright-expansion.sql in Supabase first.", true);
-        else toast("Couldn't approve: " + m, true);
+        if (/column|needs_approval|approved_by/i.test(m)) toast(tt("dash.runExpansionSql"), true);
+        else toast(tt("dash.couldntApprove", { m: m }), true);
         return;
       }
-      toast("Approved.");
+      toast(tt("dash.approvedToast"));
     }).catch(function () {
       rec.needs_approval = snapshot.needs_approval; rec.approved_by = snapshot.approved_by; rec.approved_at = snapshot.approved_at;
       render(); if (openId === String(id)) renderDrawer();
-      toast("Network error — not approved.", true);
+      toast(tt("dash.netErrNotApproved"), true);
     });
   }
 
@@ -1282,32 +1581,32 @@
     var b = bucket(q);
     var tier = tierOf(q);
     var tierBadge = tier
-      ? '<span class="qc-tier ' + tier + '"><i></i>' + { green: "Ready", amber: "Review", red: "Needs work" }[tier] + "</span>"
+      ? '<span class="qc-tier ' + tier + '"><i></i>' + esc({ green: tt("dash.tierReady"), amber: tt("dash.tierReview"), red: tt("dash.tierWork") }[tier]) + "</span>"
       : "";
     var sentInfo = (b === "sent" && q.sent_at)
-      ? '<span class="qc-sentline">Sent ' + esc(fmtDateTime(q.sent_at)) + (q.sent_by ? " · " + esc(q.sent_by) : "") + "</span>" : "";
+      ? '<span class="qc-sentline">' + esc(tt("dash.sentLine", { dt: fmtDateTime(q.sent_at) })) + (q.sent_by ? " · " + esc(q.sent_by) : "") + "</span>" : "";
 
     // ── header
     var head =
       '<div class="qc-dh">' +
-        '<button class="qc-drawer-close" aria-label="Close workspace">' +
+        '<button class="qc-drawer-close" aria-label="' + esc(tt("dash.closeWorkspace")) + '">' +
           '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
         '<div class="qc-dh-main">' +
           '<div class="qc-dh-row">' +
-            '<h2 class="qc-dh-cust">' + esc(q.customer || "Quote") + "</h2>" +
-            '<span class="pill ' + b + '">' + (b === "draft" ? "Draft" : "Sent") + "</span>" +
+            '<h2 class="qc-dh-cust" lang="en">' + esc(q.customer || tt("dash.quoteFallback")) + "</h2>" +
+            '<span class="pill ' + b + '">' + (b === "draft" ? esc(tt("dash.draft")) : esc(tt("dash.sent"))) + "</span>" +
             tierBadge +
           "</div>" +
-          '<div class="qc-dh-meta">' + esc(fmtDate(q.created_at)) +
-            '  ·  <span class="qc-dh-total">' + esc(money(q.total, q.currency)) + "</span>" +
-            (numOrNull(q.grand_total_vadeli) != null ? '  ·  term ' + esc(money(q.grand_total_vadeli, q.currency)) : "") +
+          '<div class="qc-dh-meta"><span lang="en">' + esc(fmtDate(q.created_at)) + "</span>" +
+            '  ·  <span class="qc-dh-total" lang="en">' + esc(money(q.total, q.currency)) + "</span>" +
+            (numOrNull(q.grand_total_vadeli) != null ? '  ·  ' + esc(tt("dash.term", { v: money(q.grand_total_vadeli, q.currency) })) : "") +
             (sentInfo ? "  ·  " + sentInfo : "") +
           "</div>" +
         "</div>" +
       "</div>";
 
     var reply = q.last_reply_text
-      ? '<div class="qc-dnote"><strong>New customer reply</strong><p>' + nl2br(q.last_reply_text) + "</p></div>" : "";
+      ? '<div class="qc-dnote"><strong>' + esc(tt("dash.newReplyHead")) + '</strong><p>' + nl2br(q.last_reply_text) + "</p></div>" : "";
 
     return head +
       '<div class="qc-dbody">' +
@@ -1334,25 +1633,24 @@
     var msgs = threadOf(q).map(normMsg);
     var inner;
     if (!msgs.length) {
-      inner = '<div class="qc-empty-mini">The conversation snapshot appears once the pipeline stores <code>thread_snapshot</code>. ' +
-        "Until then, open the customer's thread from the draft below.</div>";
+      inner = '<div class="qc-empty-mini">' + tt("dash.threadEmpty") + "</div>";
     } else {
       inner = '<div class="qc-thread">' + msgs.map(function (m) {
         return '<div class="qc-msg ' + (m.outbound ? "out" : "in") + '">' +
-          '<div class="qc-msg-head"><span class="qc-msg-from">' + esc(m.from || (m.outbound ? "Hassan" : "Customer")) + "</span>" +
-            (m.date ? '<span class="qc-msg-date">' + esc(fmtDateTime(m.date)) + "</span>" : "") + "</div>" +
-          '<div class="qc-msg-body">' + nl2br(m.body) + "</div></div>";
+          '<div class="qc-msg-head"><span class="qc-msg-from" lang="en">' + esc(m.from || (m.outbound ? "Hassan" : tt("dash.customer"))) + "</span>" +
+            (m.date ? '<span class="qc-msg-date" lang="en">' + esc(fmtDateTime(m.date)) + "</span>" : "") + "</div>" +
+          '<div class="qc-msg-body" lang="en">' + nl2br(m.body) + "</div></div>";
       }).join("") + "</div>";
     }
-    return section("Conversation", msgs.length ? (msgs.length + " message" + (msgs.length > 1 ? "s" : "")) : "", inner);
+    return section(tt("dash.convo"), msgs.length ? (msgs.length === 1 ? tt("dash.msg1") : tt("dash.msgN", { n: msgs.length })) : "", inner);
   }
 
   // ── product-forward lines + resolution picker ────────────────────────────────
   function statusPill(status) {
-    return status === "priced" ? '<span class="pill sent">Priced</span>'
-      : status === "provisional" ? '<span class="pill provisional">Priced · confirm spec</span>'
-      : status === "pending_info" ? '<span class="pill pending">Needs info</span>'
-      : status === "pending_hassan" ? '<span class="pill info">Pending price</span>'
+    return status === "priced" ? '<span class="pill sent">' + esc(tt("dash.priced")) + '</span>'
+      : status === "provisional" ? '<span class="pill provisional">' + esc(tt("dash.provisional")) + '</span>'
+      : status === "pending_info" ? '<span class="pill pending">' + esc(tt("dash.needsInfo")) + '</span>'
+      : status === "pending_hassan" ? '<span class="pill info">' + esc(tt("dash.pendingPrice")) + '</span>'
       : "";
   }
   function candChip(id, ref, c) {
@@ -1362,11 +1660,11 @@
     var confTag = conf != null ? '<span class="qc-conf ' + confBand(conf) + '"><i></i>' + Math.round(conf) + "</span>" : "";
     var specs = [c.specs, c.colour || c.color].filter(Boolean).join(" · ");
     return '<button type="button" class="qc-cand" data-resolve="' + esc(id) + '" data-ref="' + esc(ref) + '" data-sku="' + esc(c.sku || "") + '">' +
-      '<span class="qc-cand-top"><span class="qc-cand-name">' + esc(c.name || c.urun_adi || c.sku || "Candidate") + "</span>" + price + "</span>" +
-      (specs ? '<span class="qc-cand-specs">' + esc(specs) + "</span>" : "") +
-      '<span class="qc-cand-foot">' + (c.sku ? '<span class="qc-cand-sku">' + esc(c.sku) + "</span>" : "") +
+      '<span class="qc-cand-top"><span class="qc-cand-name" lang="en">' + esc(c.name || c.urun_adi || c.sku || tt("dash.candidate")) + "</span>" + price + "</span>" +
+      (specs ? '<span class="qc-cand-specs" lang="en">' + esc(specs) + "</span>" : "") +
+      '<span class="qc-cand-foot">' + (c.sku ? '<span class="qc-cand-sku" lang="en">' + esc(c.sku) + "</span>" : "") +
         (c.reason ? '<span class="qc-cand-why">' + esc(c.reason) + "</span>" : "") + confTag + "</span>" +
-      '<span class="qc-cand-pick">Use this' +
+      '<span class="qc-cand-pick">' + esc(tt("dash.useThis")) +
         '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>' +
       "</button>";
   }
@@ -1383,10 +1681,10 @@
       '<div class="qc-line-head">' +
         '<div class="qc-line-id">' + esc(l.ref || "—") + "</div>" +
         '<div class="qc-line-main">' +
-          '<div class="qc-line-name">' + esc(l.name) + "</div>" +
-          (metaBits.length ? '<div class="qc-line-spec">' + metaBits.join(" · ") + "</div>" : "") +
+          '<div class="qc-line-name" lang="en">' + esc(l.name) + "</div>" +
+          (metaBits.length ? '<div class="qc-line-spec" lang="en">' + metaBits.join(" · ") + "</div>" : "") +
           '<div class="qc-line-tags">' +
-            (l.sku ? '<span class="qc-sku-tag">' + esc(l.sku) + "</span>" : '<span class="qc-sku-tag muted">unmatched</span>') +
+            (l.sku ? '<span class="qc-sku-tag" lang="en">' + esc(l.sku) + "</span>" : '<span class="qc-sku-tag muted">' + esc(tt("dash.unmatched")) + "</span>") +
             (l.conf != null ? confCell(l.conf) : "") +
           "</div>" +
         "</div>" +
@@ -1402,17 +1700,17 @@
     if (weak) {
       var chips = l.candidates.length
         ? '<div class="qc-cands">' + l.candidates.map(function (c) { return candChip(id, l.ref, c); }).join("") + "</div>"
-        : '<div class="qc-empty-mini">No ranked candidates were logged for this line. Search the catalogue below.</div>';
+        : '<div class="qc-empty-mini">' + esc(tt("dash.noCands")) + "</div>";
       resolver =
         '<div class="qc-resolve">' +
-          '<div class="qc-resolve-lead">Resolve this line — one tap prices it, regenerates the draft &amp; teaches the pipeline.</div>' +
+          '<div class="qc-resolve-lead">' + esc(tt("dash.resolveLead")) + "</div>" +
           chips +
           '<div class="qc-search-cat">' +
-            '<input type="text" class="qc-catsearch" data-ref="' + esc(l.ref) + '" placeholder="Search catalogue by name, SKU, colour or GSM…">' +
+            '<input type="text" class="qc-catsearch" data-ref="' + esc(l.ref) + '" placeholder="' + esc(tt("dash.catSearchPh")) + '">' +
             '<div class="qc-catresults" data-ref="' + esc(l.ref) + '"></div>' +
           "</div>" +
           '<div class="qc-line-actions">' +
-            '<button type="button" class="qc-mini-btn" data-clarify="' + esc(id) + '" data-ref="' + esc(l.ref) + '">Ask the customer for this spec</button>' +
+            '<button type="button" class="qc-mini-btn" data-clarify="' + esc(id) + '" data-ref="' + esc(l.ref) + '">' + esc(tt("dash.askSpec")) + "</button>" +
           "</div>" +
         "</div>";
     }
@@ -1423,32 +1721,33 @@
     var weakN = lines.map(normLine).filter(lineWeak).length;
     var inner;
     if (!lines.length) {
-      inner = '<div class="qc-empty-mini">No line-by-line detail was logged with this quote.</div>';
+      inner = '<div class="qc-empty-mini">' + esc(tt("dash.noLineDetail")) + "</div>";
     } else {
       inner = '<div class="qc-lines-list">' + lines.map(function (raw) { return lineCard(q, id, raw); }).join("") + "</div>";
     }
-    var sub = lines.length ? (lines.length + " line" + (lines.length > 1 ? "s" : "") + (weakN ? "  ·  " + weakN + " to resolve" : "  ·  all priced")) : "";
-    return section("Line items", sub, inner);
+    var lineCnt = lines.length === 1 ? tt("dash.line1") : tt("dash.lineN", { n: lines.length });
+    var sub = lines.length ? (lineCnt + (weakN ? "  ·  " + tt("dash.toResolve", { n: weakN }) : "  ·  " + tt("dash.allPriced"))) : "";
+    return section(tt("dash.lineItems"), sub, inner);
   }
 
   // ── draft + actions ──────────────────────────────────────────────────────────
   function draftPanel(q, id) {
     var txt = draftText(q);
     var body =
-      '<textarea class="qc-draft" id="draftBox" spellcheck="true" aria-label="Draft reply">' + esc(txt) + "</textarea>" +
+      '<textarea class="qc-draft" id="draftBox" spellcheck="true" aria-label="' + esc(tt("dash.draftReply")) + '" lang="en">' + esc(txt) + "</textarea>" +
       '<div class="qc-draft-actions">' +
         '<button type="button" class="btn btn-primary qc-send" data-send="' + esc(id) + '">' +
           '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>' +
-          'Approve &amp; send</button>' +
-        '<button type="button" class="btn btn-ghost qc-reply" data-reply="' + esc(id) + '">Send edited reply</button>' +
+          esc(tt("dash.approveSend")) + "</button>" +
+        '<button type="button" class="btn btn-ghost qc-reply" data-reply="' + esc(id) + '">' + esc(tt("dash.sendEdited")) + "</button>" +
         '<div class="qc-label-inline">' +
-          '<input type="text" class="qc-label-input" id="labelInput" placeholder="Label" maxlength="60">' +
-          '<button type="button" class="btn btn-ghost btn-sm qc-relabel" data-relabel="' + esc(id) + '" data-action="add">Add</button>' +
-          '<button type="button" class="btn btn-ghost btn-sm qc-relabel" data-relabel="' + esc(id) + '" data-action="remove">Remove</button>' +
+          '<input type="text" class="qc-label-input" id="labelInput" placeholder="' + esc(tt("dash.labelPh")) + '" maxlength="60">' +
+          '<button type="button" class="btn btn-ghost btn-sm qc-relabel" data-relabel="' + esc(id) + '" data-action="add">' + esc(tt("dash.add")) + "</button>" +
+          '<button type="button" class="btn btn-ghost btn-sm qc-relabel" data-relabel="' + esc(id) + '" data-action="remove">' + esc(tt("dash.remove")) + "</button>" +
         "</div>" +
       "</div>" +
-      '<p class="qc-gate-note">Sending emails the customer from the firm mailbox. Nothing leaves until you approve it here — this is the send gate.</p>';
-    return section("Draft reply", isDraft(q) ? "pending your send" : "sent", body);
+      '<p class="qc-gate-note">' + esc(tt("dash.gateNote")) + "</p>";
+    return section(tt("dash.draftReply"), isDraft(q) ? tt("dash.pendingSend") : tt("dash.sentLc"), body);
   }
 
   function section(title, sub, inner) {
@@ -1494,7 +1793,7 @@
     var host = catResultsEl(ref);
     if (!host) return;
     if (!term) { host.innerHTML = ""; return; }
-    host.innerHTML = '<div class="qc-cat-loading">Searching…</div>';
+    host.innerHTML = '<div class="qc-cat-loading">' + esc(tt("dash.searching")) + "</div>";
     var like = "%" + term.replace(/[%,]/g, " ") + "%";
     var digits = term.replace(/[^0-9]/g, "");
     var orExpr = "urun_adi.ilike." + like + ",sku.ilike." + like + ",color.ilike." + like + ",product_line.ilike." + like;
@@ -1504,23 +1803,23 @@
       .or(orExpr).limit(8)
       .then(function (res) {
         if (openId == null) return;
-        if (res.error) { host.innerHTML = '<div class="qc-empty-mini">Catalogue search failed: ' + esc(res.error.message) + "</div>"; return; }
+        if (res.error) { host.innerHTML = '<div class="qc-empty-mini">' + esc(tt("dash.catFail", { msg: res.error.message })) + "</div>"; return; }
         var rows = res.data || [];
-        if (!rows.length) { host.innerHTML = '<div class="qc-empty-mini">No catalogue products match “' + esc(term) + '”.</div>'; return; }
+        if (!rows.length) { host.innerHTML = '<div class="qc-empty-mini">' + esc(tt("dash.catNoMatch", { term: term })) + "</div>"; return; }
         host.innerHTML = rows.map(function (p) {
           var mf = String(p.is_microfiber) === "true";
           var price = mf ? (p.satis_usd != null ? money(p.satis_usd, "USD") + "/m²" : "") : (p.satis_eur != null ? money(p.satis_eur, "EUR") + "/m²" : "");
           var specs = [p.gsm ? p.gsm + " gsm" : "", p.color, p.product_line].filter(Boolean).join(" · ");
           return '<div class="qc-catrow">' +
-            '<div class="qc-catrow-main"><span class="qc-catrow-name">' + esc(p.urun_adi || p.sku) + "</span>" +
-              (specs ? '<span class="qc-catrow-specs">' + esc(specs) + "</span>" : "") +
-              '<span class="qc-sku-tag">' + esc(p.sku) + "</span></div>" +
-            '<div class="qc-catrow-right">' + (price ? '<span class="qc-catrow-price">' + esc(price) + "</span>" : "") +
-              '<button type="button" class="qc-mini-btn primary" data-usesku="' + esc(openId) + '" data-ref="' + esc(ref) + '" data-sku="' + esc(p.sku) + '">Use</button></div>' +
+            '<div class="qc-catrow-main"><span class="qc-catrow-name" lang="en">' + esc(p.urun_adi || p.sku) + "</span>" +
+              (specs ? '<span class="qc-catrow-specs" lang="en">' + esc(specs) + "</span>" : "") +
+              '<span class="qc-sku-tag" lang="en">' + esc(p.sku) + "</span></div>" +
+            '<div class="qc-catrow-right">' + (price ? '<span class="qc-catrow-price" lang="en">' + esc(price) + "</span>" : "") +
+              '<button type="button" class="qc-mini-btn primary" data-usesku="' + esc(openId) + '" data-ref="' + esc(ref) + '" data-sku="' + esc(p.sku) + '">' + esc(tt("dash.use")) + "</button></div>" +
           "</div>";
         }).join("");
       }, function () {
-        if (host) host.innerHTML = '<div class="qc-empty-mini">Catalogue search failed (network).</div>';
+        if (host) host.innerHTML = '<div class="qc-empty-mini">' + esc(tt("dash.catFailNet")) + "</div>";
       });
   }
 
@@ -1538,7 +1837,7 @@
       }
       render();
       if (openId === String(id)) renderDrawer();
-      toast("Line resolved — quote updated.");
+      toast(tt("dash.lineResolved"));
     }).catch(function (err) {
       if (card) card.classList.remove("is-resolving");
       if (btn) { btn.classList.remove("is-busy"); btn.disabled = false; }
@@ -1549,16 +1848,16 @@
   function doSend(id, btn) {
     var q = findQuote(id);
     if (!q) return;
-    confirmDialog("Send this quote?",
-      "This emails <strong>" + esc(q.customer || "the customer") + "</strong> the drafted quotation from the firm mailbox.",
-      "Send now").then(function (ok) {
+    confirmDialog(tt("dash.sendQTitle"),
+      tt("dash.sendQBody", { c: esc(q.customer || tt("dash.theCustomer")) }),
+      tt("dash.sendNow")).then(function (ok) {
       if (!ok) return;
       btn.disabled = true; btn.classList.add("is-busy");
       api("qw/send-quote", { quote_id: id }).then(function (r) {
         patchLocal(id, { status: (r && r.status) || "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
         render();
         if (openId === String(id)) renderDrawer();
-        toast("Quote sent to " + (q.customer || "customer") + ".");
+        toast(tt("dash.quoteSentTo", { c: q.customer || tt("dash.customer") }));
       }).catch(function (err) {
         btn.disabled = false; btn.classList.remove("is-busy");
         handleApiError(err);
@@ -1568,18 +1867,18 @@
   function doReply(id, btn) {
     var box = el("draftBox");
     var body = box ? box.value.trim() : "";
-    if (!body) { toast("Write a reply first.", true); if (box) box.focus(); return; }
+    if (!body) { toast(tt("dash.writeReplyFirst"), true); if (box) box.focus(); return; }
     var q = findQuote(id);
-    confirmDialog("Send edited reply?",
-      "This sends your edited message to <strong>" + esc((q && q.customer) || "the customer") + "</strong> on the existing thread.",
-      "Send reply").then(function (ok) {
+    confirmDialog(tt("dash.sendEditedTitle"),
+      tt("dash.sendEditedBody", { c: esc((q && q.customer) || tt("dash.theCustomer")) }),
+      tt("dash.sendReply")).then(function (ok) {
       if (!ok) return;
       btn.disabled = true; btn.classList.add("is-busy");
       api("qw/reply", { quote_id: id, body: body }).then(function () {
         patchLocal(id, { status: "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
         render();
         if (openId === String(id)) renderDrawer();
-        toast("Reply sent.");
+        toast(tt("dash.replySent"));
       }).catch(function (err) {
         btn.disabled = false; btn.classList.remove("is-busy");
         handleApiError(err);
@@ -1590,7 +1889,7 @@
     btn.disabled = true; btn.classList.add("is-busy");
     api("qw/clarify", { quote_id: id, line_ref: ref }).then(function () {
       btn.disabled = false; btn.classList.remove("is-busy");
-      toast("Clarification email sent to the customer.");
+      toast(tt("dash.clarifySent"));
     }).catch(function (err) {
       btn.disabled = false; btn.classList.remove("is-busy");
       handleApiError(err);
@@ -1599,11 +1898,11 @@
   function doRelabel(id, action, btn) {
     var inp = el("labelInput");
     var label = inp ? inp.value.trim() : "";
-    if (!label) { toast("Type a label name first.", true); if (inp) inp.focus(); return; }
+    if (!label) { toast(tt("dash.typeLabelFirst"), true); if (inp) inp.focus(); return; }
     btn.disabled = true; btn.classList.add("is-busy");
     api("qw/relabel", { quote_id: id, label: label, action: action }).then(function () {
       btn.disabled = false; btn.classList.remove("is-busy");
-      toast((action === "remove" ? "Removed" : "Applied") + " label “" + label + "”.");
+      toast(action === "remove" ? tt("dash.labelRemoved", { l: label }) : tt("dash.labelApplied", { l: label }));
     }).catch(function (err) {
       btn.disabled = false; btn.classList.remove("is-busy");
       handleApiError(err);
@@ -1613,18 +1912,18 @@
   // ── bulk actions ─────────────────────────────────────────────────────────────
   function bulkSend() {
     var drafts = selectedQuotes().filter(isDraft);
-    if (!drafts.length) { toast("No drafts selected.", true); return; }
-    confirmDialog("Send " + drafts.length + " quote" + (drafts.length > 1 ? "s" : "") + "?",
-      "This emails " + drafts.length + " customer" + (drafts.length > 1 ? "s" : "") + " their drafted quotation. This can't be undone.",
-      "Send all", true).then(function (ok) {
+    if (!drafts.length) { toast(tt("dash.noDraftsSel"), true); return; }
+    confirmDialog(drafts.length === 1 ? tt("dash.bulkSendTitle1") : tt("dash.bulkSendTitleN", { n: drafts.length }),
+      drafts.length === 1 ? tt("dash.bulkSendBody1") : tt("dash.bulkSendBodyN", { n: drafts.length }),
+      tt("dash.sendAll"), true).then(function (ok) {
       if (!ok) return;
       var btn = el("bulkSend");
-      if (btn) { btn.disabled = true; btn.textContent = "Sending…"; }
+      if (btn) { btn.disabled = true; btn.textContent = tt("dash.sending"); }
       var done = 0, failed = 0;
       var next = function (i) {
         if (i >= drafts.length) {
           render(); renderBulk();
-          toast("Sent " + done + (failed ? " · " + failed + " failed" : "") + ".", failed > 0);
+          toast(tt("dash.sentN", { n: done }) + (failed ? tt("dash.failedN", { n: failed }) : "") + ".", failed > 0);
           return;
         }
         var qid = String(drafts[i].id);
@@ -1640,17 +1939,17 @@
   function bulkLabel() {
     var inp = el("bulkLabelInput");
     var label = inp ? inp.value.trim() : "";
-    if (!label) { toast("Type a label name.", true); if (inp) inp.focus(); return; }
+    if (!label) { toast(tt("dash.typeLabelName"), true); if (inp) inp.focus(); return; }
     var list = selectedQuotes();
-    confirmDialog("Label " + list.length + " quote" + (list.length > 1 ? "s" : "") + "?",
-      "Applies the Gmail label “<strong>" + esc(label) + "</strong>” to " + list.length + " thread" + (list.length > 1 ? "s" : "") + ".",
-      "Apply label").then(function (ok) {
+    confirmDialog(list.length === 1 ? tt("dash.bulkLabelTitle1") : tt("dash.bulkLabelTitleN", { n: list.length }),
+      list.length === 1 ? tt("dash.bulkLabelBody1", { l: esc(label) }) : tt("dash.bulkLabelBodyN", { l: esc(label), n: list.length }),
+      tt("dash.applyLabel")).then(function (ok) {
       if (!ok) return;
       var btn = el("bulkLabel");
-      if (btn) { btn.disabled = true; btn.textContent = "Applying…"; }
+      if (btn) { btn.disabled = true; btn.textContent = tt("dash.applying"); }
       var done = 0, failed = 0;
       var next = function (i) {
-        if (i >= list.length) { renderBulk(); toast("Labelled " + done + (failed ? " · " + failed + " failed" : "") + ".", failed > 0); return; }
+        if (i >= list.length) { renderBulk(); toast(tt("dash.labelledN", { n: done }) + (failed ? tt("dash.failedN", { n: failed }) : "") + ".", failed > 0); return; }
         api("qw/relabel", { quote_id: String(list[i].id), label: label, action: "add" })
           .then(function () { done++; next(i + 1); })
           .catch(function () { failed++; next(i + 1); });
@@ -1683,7 +1982,7 @@
       render(); if (openId != null) renderDrawer();
       return;
     }
-    if (!hasLoaded) renderSkeleton(); else el("rowCount").textContent = "Loading…";
+    if (!hasLoaded) renderSkeleton(); else el("rowCount").textContent = tt("common.loading");
     setRefreshing(true);
     var query = sb.from("quotes").select("*").order("created_at", { ascending: false }).limit(1000);
     // Members scope to their own tenant; admins see every tenant (RLS permits it).
@@ -1698,7 +1997,7 @@
       loadDigest().then(function () { render(); if (openId != null) renderDrawer(); });
     }, function (err) {
       setRefreshing(false);
-      showTableError((err && err.message) || "Network error — check your connection and try again.");
+      showTableError((err && err.message) || tt("dash.netErrConn"));
     });
   }
   // digest table is optional — degrade to client-side metrics if it's absent.
@@ -1710,4 +2009,16 @@
       digest = (!res.error && res.data && res.data.length) ? res.data[0] : null;
     }, function () { digest = null; });
   }
+
+  // ── live language switch — re-render JS-built views from cached data (no refetch) ──
+  window.addEventListener("qw:langchange", function () {
+    try { applyAuthText(); setSubmitLabel(); } catch (e) {}
+    try { if (loading) setRefreshing(true); } catch (e) {}
+    try {
+      if (el("dashView") && !el("dashView").hidden && hasLoaded) {
+        render();
+        if (openId != null) renderDrawer();
+      }
+    } catch (e) {}
+  });
 })();

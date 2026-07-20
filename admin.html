@@ -19,10 +19,10 @@
 
 <!-- Mobile top bar — shown only on narrow widths, once signed in -->
 <div class="qc-mobar">
-  <button class="qc-burger" id="navBurger" type="button" aria-label="Open navigation" aria-controls="subnav" aria-expanded="false">
+  <button class="qc-burger" id="navBurger" type="button" data-i18n-attr="aria-label:nav.openAria" aria-label="Open navigation" aria-controls="subnav" aria-expanded="false">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
   </button>
-  <a class="qc-mobar-brand" href="dashboard.html" aria-label="Quotewright quote console">
+  <a class="qc-mobar-brand" href="dashboard.html" lang="en" data-i18n-attr="aria-label:nav.brandAria" aria-label="Quotewright quote console">
     <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#111"/><path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/></svg>
     Quotewright <span class="qc-tag">Copilot</span>
   </a>
@@ -31,22 +31,22 @@
 <div class="qc-nav-scrim" id="navScrim" aria-hidden="true"></div>
 
 <!-- Liquid-glass left navigation. #subnav is revealed on auth (replaces the old top bars). -->
-<aside class="qc-sidebar" id="subnav" aria-label="Console navigation" hidden>
-  <nav class="qc-side-nav" id="sideNav" aria-label="Console sections">
-    <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span>Quotes</span></a>
-    <a href="insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg><span>Insights</span></a>
-    <a href="customers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg><span>Customers</span></a>
-    <a href="gaps.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><span>Catalogue gaps</span></a>
-    <a href="activity.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Activity</span></a>
-    <a href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M18 6h2M4 12h2M11 12h9M4 18h9M18 18h2"/><circle cx="15.5" cy="6" r="2"/><circle cx="8.5" cy="12" r="2"/><circle cx="15.5" cy="18" r="2"/></svg><span>Settings</span></a>
-    <a href="admin.html" id="adminNav" class="qc-nav-admin" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Admin</span></a>
+<aside class="qc-sidebar" id="subnav" data-i18n-attr="aria-label:nav.aria" aria-label="Console navigation" hidden>
+  <nav class="qc-side-nav" id="sideNav" data-i18n-attr="aria-label:nav.sectionsAria" aria-label="Console sections">
+    <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span data-i18n="nav.quotes">Quotes</span></a>
+    <a href="insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg><span data-i18n="nav.insights">Insights</span></a>
+    <a href="customers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg><span data-i18n="nav.customers">Customers</span></a>
+    <a href="gaps.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><span data-i18n="nav.gaps">Catalogue gaps</span></a>
+    <a href="activity.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="nav.activity">Activity</span></a>
+    <a href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M18 6h2M4 12h2M11 12h9M4 18h9M18 18h2"/><circle cx="15.5" cy="6" r="2"/><circle cx="8.5" cy="12" r="2"/><circle cx="15.5" cy="18" r="2"/></svg><span data-i18n="nav.settings">Settings</span></a>
+    <a href="admin.html" id="adminNav" class="qc-nav-admin" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span data-i18n="nav.admin">Admin</span></a>
   </nav>
 
   <div class="qc-side-foot">
     <div class="qc-side-user">
       <span class="qc-side-avatar" id="userAvatar" aria-hidden="true"></span>
-      <span id="whoami" class="qc-who"></span>
-      <button id="logoutBtn" class="qc-signout" hidden>Sign out</button>
+      <span id="whoami" class="qc-who" lang="en"></span>
+      <button id="logoutBtn" class="qc-signout" data-i18n="common.signOut" hidden>Sign out</button>
     </div>
   </div>
 </aside>
@@ -56,10 +56,10 @@
   <!-- Not signed in -->
   <section id="gateView" class="qc-login" hidden>
     <div class="qc-login-card">
-      <div class="kicker">Admin</div>
-      <h1>Sign in required</h1>
-      <p class="sub">This page manages who can access Quotewright. Sign in to the console first, then come back.</p>
-      <a class="btn btn-primary" href="dashboard.html">Go to sign in</a>
+      <div class="kicker" data-i18n="adm.gate.kicker">Admin</div>
+      <h1 data-i18n="adm.gate.title">Sign in required</h1>
+      <p class="sub" data-i18n="adm.gate.sub">This page manages who can access Quotewright. Sign in to the console first, then come back.</p>
+      <a class="btn btn-primary" href="dashboard.html" data-i18n="adm.gate.cta">Go to sign in</a>
     </div>
   </section>
 
@@ -69,10 +69,10 @@
       <div class="qc-pending-ico" aria-hidden="true">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
       </div>
-      <div class="kicker">Restricted</div>
-      <h1>Admin access only</h1>
-      <p class="sub">You’re signed in as <b id="deniedEmail"></b>, but this page is for administrators. Head back to your quote console.</p>
-      <a class="btn btn-ghost btn-sm" href="dashboard.html">Back to the console</a>
+      <div class="kicker" data-i18n="adm.denied.kicker">Restricted</div>
+      <h1 data-i18n="adm.denied.title">Admin access only</h1>
+      <p class="sub"><span data-i18n="adm.denied.sub1">You’re signed in as</span> <b id="deniedEmail" lang="en"></b><span data-i18n="adm.denied.sub2">, but this page is for administrators. Head back to your quote console.</span></p>
+      <a class="btn btn-ghost btn-sm" href="dashboard.html" data-i18n="adm.denied.cta">Back to the console</a>
     </div>
   </section>
 
@@ -80,34 +80,34 @@
   <section id="adminView" class="wrap" hidden>
     <div class="qc-head">
       <div>
-        <div class="kicker">Accounts</div>
-        <h1 class="qc-h1">Approve &amp; assign</h1>
-        <p class="ad-lede">Every new sign-up arrives <b>pending</b>. Connect it to a company, set its role, then activate — that’s what unlocks their console. Nothing is visible to an account until you do.</p>
+        <div class="kicker" data-i18n="adm.kicker">Accounts</div>
+        <h1 class="qc-h1" data-i18n="adm.h1">Approve &amp; assign</h1>
+        <p class="ad-lede" data-i18n-html="adm.lede">Every new sign-up arrives <b>pending</b>. Connect it to a company, set its role, then activate — that’s what unlocks their console. Nothing is visible to an account until you do.</p>
       </div>
-      <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
+      <button id="refreshBtn" class="btn btn-ghost btn-sm" data-i18n="common.refresh">Refresh</button>
     </div>
 
     <div class="ad-toolbar">
       <div class="ad-counts" id="adCounts"></div>
-      <button type="button" class="btn btn-ghost btn-sm" id="newTenantBtn">+ New tenant</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="newTenantBtn" data-i18n="adm.newTenant">+ New tenant</button>
     </div>
 
     <!-- inline new-tenant creator -->
     <form id="newTenantForm" class="ad-newtenant" hidden>
       <div class="ad-newtenant-fields">
         <div class="ad-field">
-          <label for="ntName">Company name</label>
-          <input id="ntName" type="text" placeholder="e.g. Acme Textiles" autocomplete="off">
+          <label for="ntName" data-i18n="adm.nt.name">Company name</label>
+          <input id="ntName" type="text" placeholder="e.g. Acme Textiles" autocomplete="off" data-i18n-attr="placeholder:adm.nt.namePh">
         </div>
         <div class="ad-field">
-          <label for="ntKey">Tenant key</label>
+          <label for="ntKey" data-i18n="adm.nt.key">Tenant key</label>
           <input id="ntKey" type="text" placeholder="acmetextiles" autocomplete="off" spellcheck="false">
-          <p class="ad-hint">Lowercase, no spaces. This is the <code>owner</code> the pipeline writes with.</p>
+          <p class="ad-hint" data-i18n-html="adm.nt.keyHint">Lowercase, no spaces. This is the <code lang="en">owner</code> the pipeline writes with.</p>
         </div>
       </div>
       <div class="ad-newtenant-acts">
-        <button type="button" class="btn btn-ghost btn-sm" id="ntCancel">Cancel</button>
-        <button type="submit" class="btn btn-primary btn-sm" id="ntSave">Create tenant</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="ntCancel" data-i18n="common.cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="ntSave" data-i18n="adm.nt.create">Create tenant</button>
       </div>
       <div class="qc-error" id="ntError" role="alert"></div>
     </form>
@@ -116,11 +116,11 @@
       <table class="qc-table ad-table" id="acctTable">
         <thead>
           <tr>
-            <th>Account</th>
-            <th>Tenant</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th class="ad-col-act">Action</th>
+            <th data-i18n="adm.col.account">Account</th>
+            <th data-i18n="adm.col.tenant">Tenant</th>
+            <th data-i18n="adm.col.role">Role</th>
+            <th data-i18n="adm.col.status">Status</th>
+            <th class="ad-col-act" data-i18n="adm.col.action">Action</th>
           </tr>
         </thead>
         <tbody id="acctBody"></tbody>
@@ -135,6 +135,7 @@
 
 <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
 
+<script src="console-i18n.js"></script>
 <script src="vendor/supabase.js"></script>
 <script src="dashboard-config.js"></script>
 <script src="console-tenancy.js"></script>

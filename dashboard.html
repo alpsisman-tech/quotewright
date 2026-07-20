@@ -20,10 +20,10 @@
 
 <!-- Mobile top bar — shown only on narrow widths, once signed in -->
 <div class="qc-mobar">
-  <button class="qc-burger" id="navBurger" type="button" aria-label="Open navigation" aria-controls="subnav" aria-expanded="false">
+  <button class="qc-burger" id="navBurger" type="button" data-i18n-attr="aria-label:nav.openAria" aria-label="Open navigation" aria-controls="subnav" aria-expanded="false">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
   </button>
-  <a class="qc-mobar-brand" href="dashboard.html" aria-label="Quotewright quote console">
+  <a class="qc-mobar-brand" href="dashboard.html" lang="en" data-i18n-attr="aria-label:nav.brandAria" aria-label="Quotewright quote console">
     <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#111"/><path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/></svg>
     Quotewright <span class="qc-tag">Copilot</span>
   </a>
@@ -32,22 +32,22 @@
 <div class="qc-nav-scrim" id="navScrim" aria-hidden="true"></div>
 
 <!-- Liquid-glass left navigation. #subnav is revealed on auth (replaces the old top bars). -->
-<aside class="qc-sidebar" id="subnav" aria-label="Console navigation" hidden>
-  <nav class="qc-side-nav" id="sideNav" aria-label="Console sections">
-    <a href="dashboard.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span>Quotes</span></a>
-    <a href="insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg><span>Insights</span></a>
-    <a href="customers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg><span>Customers</span></a>
-    <a href="gaps.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><span>Catalogue gaps</span></a>
-    <a href="activity.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Activity</span></a>
-    <a href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M18 6h2M4 12h2M11 12h9M4 18h9M18 18h2"/><circle cx="15.5" cy="6" r="2"/><circle cx="8.5" cy="12" r="2"/><circle cx="15.5" cy="18" r="2"/></svg><span>Settings</span></a>
-    <a href="admin.html" id="adminNav" class="qc-nav-admin" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Admin</span></a>
+<aside class="qc-sidebar" id="subnav" data-i18n-attr="aria-label:nav.aria" aria-label="Console navigation" hidden>
+  <nav class="qc-side-nav" id="sideNav" data-i18n-attr="aria-label:nav.sectionsAria" aria-label="Console sections">
+    <a href="dashboard.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span data-i18n="nav.quotes">Quotes</span></a>
+    <a href="insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg><span data-i18n="nav.insights">Insights</span></a>
+    <a href="customers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg><span data-i18n="nav.customers">Customers</span></a>
+    <a href="gaps.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><span data-i18n="nav.gaps">Catalogue gaps</span></a>
+    <a href="activity.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="nav.activity">Activity</span></a>
+    <a href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M18 6h2M4 12h2M11 12h9M4 18h9M18 18h2"/><circle cx="15.5" cy="6" r="2"/><circle cx="8.5" cy="12" r="2"/><circle cx="15.5" cy="18" r="2"/></svg><span data-i18n="nav.settings">Settings</span></a>
+    <a href="admin.html" id="adminNav" class="qc-nav-admin" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span data-i18n="nav.admin">Admin</span></a>
   </nav>
 
   <div class="qc-side-foot">
     <div class="qc-side-user">
       <span class="qc-side-avatar" id="userAvatar" aria-hidden="true"></span>
-      <span id="whoami" class="qc-who"></span>
-      <button id="logoutBtn" class="qc-signout" hidden>Sign out</button>
+      <span id="whoami" class="qc-who" lang="en"></span>
+      <button id="logoutBtn" class="qc-signout" data-i18n="common.signOut" hidden>Sign out</button>
     </div>
   </div>
 </aside>
@@ -57,32 +57,32 @@
   <!-- Login / sign-up -->
   <section id="loginView" class="qc-login" hidden>
     <div class="qc-login-card">
-      <div class="kicker" id="authKicker">Sign in</div>
-      <h1 id="authTitle">Quote console</h1>
-      <p class="sub" id="authSub">Review, resolve and send quotes drafted by the RFQ pipeline — without leaving this page.</p>
+      <div class="kicker" id="authKicker" data-i18n="auth.kickerSignin">Sign in</div>
+      <h1 id="authTitle" data-i18n="auth.titleSignin">Quote console</h1>
+      <p class="sub" id="authSub" data-i18n="auth.subSignin">Review, resolve and send quotes drafted by the RFQ pipeline — without leaving this page.</p>
 
       <div class="qc-authtabs" role="tablist" aria-label="Sign in or create an account">
-        <button type="button" class="qc-authtab" id="tabSignin" role="tab" aria-selected="true">Sign in</button>
-        <button type="button" class="qc-authtab" id="tabSignup" role="tab" aria-selected="false">Create account</button>
+        <button type="button" class="qc-authtab" id="tabSignin" role="tab" aria-selected="true" data-i18n="common.signIn">Sign in</button>
+        <button type="button" class="qc-authtab" id="tabSignup" role="tab" aria-selected="false" data-i18n="auth.createAccount">Create account</button>
         <span class="qc-authtab-ind" id="authInd" aria-hidden="true"></span>
       </div>
 
       <form id="loginForm" novalidate>
         <div class="field">
-          <label for="email">Email</label>
-          <input id="email" type="email" autocomplete="username" required placeholder="you@company.com">
+          <label for="email" data-i18n="common.email">Email</label>
+          <input id="email" type="email" autocomplete="username" required data-i18n-attr="placeholder:common.emailPh" placeholder="you@company.com">
         </div>
         <div class="field">
-          <label for="password">Password</label>
+          <label for="password" data-i18n="common.password">Password</label>
           <input id="password" type="password" autocomplete="current-password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
           <ul class="qc-pwrules" id="pwRules" hidden>
-            <li data-rule="len"><span class="qc-pwtick" aria-hidden="true"></span>At least 8 characters</li>
-            <li data-rule="letter"><span class="qc-pwtick" aria-hidden="true"></span>A letter</li>
-            <li data-rule="num"><span class="qc-pwtick" aria-hidden="true"></span>A number</li>
+            <li data-rule="len"><span class="qc-pwtick" aria-hidden="true"></span><span data-i18n="auth.rule8">At least 8 characters</span></li>
+            <li data-rule="letter"><span class="qc-pwtick" aria-hidden="true"></span><span data-i18n="auth.ruleLetter">A letter</span></li>
+            <li data-rule="num"><span class="qc-pwtick" aria-hidden="true"></span><span data-i18n="auth.ruleNumber">A number</span></li>
           </ul>
         </div>
-        <button type="submit" class="btn btn-primary" id="loginBtn">Sign in</button>
-        <div class="qc-or"><span>or</span></div>
+        <button type="submit" class="btn btn-primary" id="loginBtn" data-i18n="common.signIn">Sign in</button>
+        <div class="qc-or"><span data-i18n="auth.or">or</span></div>
         <button type="button" class="btn btn-ghost qc-google" id="googleBtn">
           <svg class="qc-google-g" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
             <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/>
@@ -90,7 +90,7 @@
             <path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/>
             <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.46 3.44 1.35l2.58-2.58C13.47.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
           </svg>
-          <span>Continue with Google</span>
+          <span data-i18n="auth.continueGoogle">Continue with Google</span>
         </button>
         <div id="loginError" class="qc-error" role="alert"></div>
       </form>
@@ -100,9 +100,9 @@
         <div class="qc-authnotice-ico" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>
         </div>
-        <h2>Check your email</h2>
-        <p id="authNoticeBody">We’ve sent a confirmation link to <b id="noticeEmail"></b>. Confirm it, then a manager activates your account before the console opens.</p>
-        <button type="button" class="btn btn-ghost btn-sm" id="noticeBack">Back to sign in</button>
+        <h2 data-i18n="auth.checkEmail">Check your email</h2>
+        <p id="authNoticeBody"><span data-i18n="auth.noticeBody1">We’ve sent a confirmation link to</span> <b id="noticeEmail" lang="en"></b><span data-i18n="auth.noticeBody2">. Confirm it, then a manager activates your account before the console opens.</span></p>
+        <button type="button" class="btn btn-ghost btn-sm" id="noticeBack" data-i18n="auth.backToSignin">Back to sign in</button>
       </div>
     </div>
   </section>
@@ -113,13 +113,13 @@
       <div class="qc-pending-ico" aria-hidden="true">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
       </div>
-      <div class="kicker">Almost there</div>
-      <h1>Your account is awaiting activation</h1>
-      <p class="sub">You’re signed in as <b id="pendingEmail"></b>. A manager needs to approve your account and connect it to your company before the quote console opens. You’ll get access as soon as that’s done — no need to sign up again.</p>
-      <p class="qc-pending-note">This usually takes a short while. If it’s urgent, let your Quotewright administrator know you’re waiting.</p>
+      <div class="kicker" data-i18n="pending.kicker">Almost there</div>
+      <h1 data-i18n="pending.title">Your account is awaiting activation</h1>
+      <p class="sub"><span data-i18n="pending.body1">You’re signed in as</span> <b id="pendingEmail" lang="en"></b><span data-i18n="pending.body2">. A manager needs to approve your account and connect it to your company before the quote console opens. You’ll get access as soon as that’s done — no need to sign up again.</span></p>
+      <p class="qc-pending-note" data-i18n="pending.note">This usually takes a short while. If it’s urgent, let your Quotewright administrator know you’re waiting.</p>
       <div class="qc-pending-acts">
-        <button type="button" class="btn btn-ghost btn-sm" id="pendingRefresh">Check again</button>
-        <button type="button" class="btn btn-ghost btn-sm" id="pendingLogout">Sign out</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="pendingRefresh" data-i18n="common.checkAgain">Check again</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="pendingLogout" data-i18n="common.signOut">Sign out</button>
       </div>
     </div>
   </section>
@@ -131,7 +131,7 @@
     <div class="qc-toolbar">
       <button id="refreshBtn" class="btn btn-ghost btn-sm qc-refresh" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        <span>Refresh</span>
+        <span data-i18n="common.refresh">Refresh</span>
       </button>
     </div>
 
@@ -142,10 +142,10 @@
 
     <div class="qc-chart" id="chartCard">
       <div class="qc-chart-head">
-        <h3>Quotes over time</h3>
+        <h3 data-i18n="dash.chartTitle">Quotes over time</h3>
         <div class="qc-legend">
-          <span><i style="background:var(--lime-2)"></i>Won</span>
-          <span><i style="background:var(--line-strong)"></i>Other</span>
+          <span><i style="background:var(--lime-2)"></i><span data-i18n="dash.legendWon">Won</span></span>
+          <span><i style="background:var(--line-strong)"></i><span data-i18n="dash.legendOther">Other</span></span>
         </div>
       </div>
       <div id="chart"></div>
@@ -155,10 +155,10 @@
     <div class="qc-viewtabs" role="tablist" aria-label="Quote views">
       <button type="button" class="qc-viewtab" id="tabNeedsYou" role="tab" aria-selected="true">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 3-1.5 4.5-2 5.5h18c-.5-1-2-2.5-2-5.5a7 7 0 0 0-7-7z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg>
-        Needs you <span class="qc-viewtab-n" id="needsYouN" hidden></span>
+        <span data-i18n="dash.needsYou">Needs you</span> <span class="qc-viewtab-n" id="needsYouN" hidden></span>
       </button>
       <button type="button" class="qc-viewtab" id="tabAll" role="tab" aria-selected="false">
-        All quotes <span class="qc-viewtab-n muted" id="allN" hidden></span>
+        <span data-i18n="dash.allQuotes">All quotes</span> <span class="qc-viewtab-n muted" id="allN" hidden></span>
       </button>
       <span class="qc-viewtab-ind" id="viewInd" aria-hidden="true"></span>
     </div>
@@ -171,33 +171,33 @@
     <!-- Full ledger -->
     <section id="allView" role="tabpanel" aria-label="All quotes" hidden>
       <div class="qc-controls">
-        <input id="search" type="search" placeholder="Search customer, product or SKU&hellip;" class="qc-search">
-        <select id="sortBy" class="qc-select" aria-label="Sort">
-          <option value="attention">Sort: Needs attention first</option>
-          <option value="newest">Sort: Newest first</option>
-          <option value="oldest">Sort: Oldest first</option>
-          <option value="value">Sort: Highest value</option>
-          <option value="margin">Sort: Lowest margin</option>
+        <input id="search" type="search" data-i18n-attr="placeholder:dash.searchPh" placeholder="Search customer, product or SKU&hellip;" class="qc-search">
+        <select id="sortBy" class="qc-select" data-i18n-attr="aria-label:dash.ariaSort" aria-label="Sort">
+          <option value="attention" data-i18n="dash.sortAttention">Sort: Needs attention first</option>
+          <option value="newest" data-i18n="dash.sortNewest">Sort: Newest first</option>
+          <option value="oldest" data-i18n="dash.sortOldest">Sort: Oldest first</option>
+          <option value="value" data-i18n="dash.sortValue">Sort: Highest value</option>
+          <option value="margin" data-i18n="dash.sortMargin">Sort: Lowest margin</option>
         </select>
-        <select id="statusFilter" class="qc-select" aria-label="Send state">
-          <option value="all">All send states</option>
-          <option value="draft">Draft (pending send)</option>
-          <option value="sent">Sent</option>
+        <select id="statusFilter" class="qc-select" data-i18n-attr="aria-label:dash.ariaSend" aria-label="Send state">
+          <option value="all" data-i18n="dash.sfAll">All send states</option>
+          <option value="draft" data-i18n="dash.sfDraft">Draft (pending send)</option>
+          <option value="sent" data-i18n="dash.sfSent">Sent</option>
         </select>
-        <select id="tierFilter" class="qc-select" aria-label="Autonomy tier">
-          <option value="all">All tiers</option>
-          <option value="green">Green — ready</option>
-          <option value="amber">Amber — review</option>
-          <option value="red">Red — needs work</option>
+        <select id="tierFilter" class="qc-select" data-i18n-attr="aria-label:dash.ariaTier" aria-label="Autonomy tier">
+          <option value="all" data-i18n="dash.tfAll">All tiers</option>
+          <option value="green" data-i18n="dash.tfGreen">Green — ready</option>
+          <option value="amber" data-i18n="dash.tfAmber">Amber — review</option>
+          <option value="red" data-i18n="dash.tfRed">Red — needs work</option>
         </select>
-        <select id="outcomeFilter" class="qc-select" aria-label="Outcome">
-          <option value="all">All outcomes</option>
-          <option value="pending">Pending decision</option>
-          <option value="won">Won</option>
-          <option value="lost">Lost</option>
+        <select id="outcomeFilter" class="qc-select" data-i18n-attr="aria-label:dash.ariaOutcome" aria-label="Outcome">
+          <option value="all" data-i18n="dash.ofAll">All outcomes</option>
+          <option value="pending" data-i18n="dash.ofPending">Pending decision</option>
+          <option value="won" data-i18n="dash.ofWon">Won</option>
+          <option value="lost" data-i18n="dash.ofLost">Lost</option>
         </select>
         <button id="approvalFilter" class="qc-chip" type="button" aria-pressed="false">
-          Needs approval <span id="approvalChipN" class="qc-chip-n" hidden></span>
+          <span data-i18n="dash.needsApproval">Needs approval</span> <span id="approvalChipN" class="qc-chip-n" hidden></span>
         </button>
         <span id="rowCount" class="qc-count"></span>
       </div>
@@ -206,12 +206,12 @@
         <table class="qc-table" id="quotesTable">
           <thead>
             <tr>
-              <th class="qc-col-sel"><input type="checkbox" id="selectAll" aria-label="Select all"></th>
-              <th class="qc-col-tier" aria-label="Tier"></th>
-              <th>Date</th><th>Customer &amp; products</th><th class="num">Total</th>
-              <th class="num">Margin</th><th>Confidence</th>
-              <th>Send</th><th>Approval</th><th>Outcome</th>
-              <th class="qc-col-open" aria-label="Open"></th>
+              <th class="qc-col-sel"><input type="checkbox" id="selectAll" data-i18n-attr="aria-label:dash.selectAll" aria-label="Select all"></th>
+              <th class="qc-col-tier" data-i18n-attr="aria-label:dash.thTier" aria-label="Tier"></th>
+              <th data-i18n="dash.thDate">Date</th><th data-i18n="dash.thCust">Customer &amp; products</th><th class="num" data-i18n="dash.thTotal">Total</th>
+              <th class="num" data-i18n="dash.thMargin">Margin</th><th data-i18n="dash.thConf">Confidence</th>
+              <th data-i18n="dash.thSend">Send</th><th data-i18n="dash.thApproval">Approval</th><th data-i18n="dash.thOutcome">Outcome</th>
+              <th class="qc-col-open" data-i18n-attr="aria-label:dash.thOpen" aria-label="Open"></th>
             </tr>
           </thead>
           <tbody id="quotesBody"></tbody>
@@ -229,28 +229,29 @@
 <!-- Overlay layer — OUTSIDE <main> (which is z-index:1); the fixed scrim/drawer/bulk
      bar must escape that stacking context to sit above the sticky page header. -->
 <!-- Bulk action bar -->
-<div id="bulkBar" class="qc-bulkbar" role="region" aria-label="Bulk actions" hidden></div>
+<div id="bulkBar" class="qc-bulkbar" role="region" data-i18n-attr="aria-label:dash.bulkAria" aria-label="Bulk actions" hidden></div>
 
 <!-- Quote workspace drawer -->
 <div id="drawerScrim" class="qc-scrim" hidden></div>
-<aside id="drawer" class="qc-drawer" role="dialog" aria-modal="true" aria-label="Quote workspace" aria-hidden="true" hidden>
+<aside id="drawer" class="qc-drawer" role="dialog" aria-modal="true" data-i18n-attr="aria-label:dash.drawerAria" aria-label="Quote workspace" aria-hidden="true" hidden>
   <div class="qc-drawer-inner" id="drawerInner"></div>
 </aside>
 
 <!-- Confirm dialog (uses the top layer, so stacking context is irrelevant) -->
 <dialog id="confirmDialog" class="qc-confirm">
   <form method="dialog" class="qc-confirm-card">
-    <h3 id="confirmTitle">Confirm</h3>
+    <h3 id="confirmTitle" data-i18n="common.confirm">Confirm</h3>
     <p id="confirmBody"></p>
     <div class="qc-confirm-acts">
-      <button value="cancel" class="btn btn-ghost btn-sm" formnovalidate>Cancel</button>
-      <button value="ok" class="btn btn-primary btn-sm" id="confirmOk" formnovalidate>Confirm</button>
+      <button value="cancel" class="btn btn-ghost btn-sm" formnovalidate data-i18n="common.cancel">Cancel</button>
+      <button value="ok" class="btn btn-primary btn-sm" id="confirmOk" formnovalidate data-i18n="common.confirm">Confirm</button>
     </div>
   </form>
 </dialog>
 
 <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
 
+<script src="console-i18n.js"></script>
 <script src="vendor/supabase.js"></script>
 <script src="dashboard-config.js"></script>
 <script src="console-tenancy.js"></script>

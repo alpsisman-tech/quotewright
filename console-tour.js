@@ -18,6 +18,160 @@
 (function () {
   "use strict";
 
+  // ── i18n: register the tour's strings (EN + TR) and a safe translate helper ──
+  // Steps are keyed by their index (tour.step<i>.kick/.title/.body); nav chrome is
+  // tour.*. tt() falls back to the English literal if a key is somehow missing.
+  if (window.QWI18n && QWI18n.add) QWI18n.add({
+    en: {
+      "tour.aria": "Guided tour",
+      "tour.skip": "Skip tour",
+      "tour.close": "Close",
+      "tour.back": "Back",
+      "tour.next": "Next",
+      "tour.finish": "Finish",
+
+      "tour.step0.kick": "Welcome",
+      "tour.step0.title": "Your whole console, one rail",
+      "tour.step0.body": "Everything lives on this glass rail — it sits as a slim icon strip and opens on hover. <b>Quotes</b> is home base, with Insights, Customers, Catalogue gaps, Activity and Settings a click away. Let's walk through what each one does.",
+
+      "tour.step1.kick": "Daily brief",
+      "tour.step1.title": "What's waiting on you today",
+      "tour.step1.body": "Your copilot brief. Each chip — ready to send, need input, thin-margin approvals, new replies — jumps you straight to those quotes. It's the fastest read on your morning.",
+
+      "tour.step2.kick": "Triage",
+      "tour.step2.title": "Start with “Needs you”",
+      "tour.step2.body": "The pipeline drafts quotes on its own; this queue surfaces only the ones that actually need a human — an approval, a missing spec, or a customer reply. Clear this and you're done for the day.",
+
+      "tour.step3.kick": "Triage",
+      "tour.step3.title": "Grouped by what to do",
+      "tour.step3.body": "Ready-to-send drafts, thin-margin approvals, lines missing a detail, and new replies — each grouped so you can act in a batch. Every card opens the full quote.",
+
+      "tour.step4.kick": "The ledger",
+      "tour.step4.title": "Every quote, findable",
+      "tour.step4.body": "Switch to <b>All quotes</b> for the full record. Combined search (customer, product or SKU), sort by attention / value / margin, and filters for send-state, tier and outcome. It paginates once you pass 25.",
+
+      "tour.step5.kick": "The ledger",
+      "tour.step5.title": "Read a quote at a glance",
+      "tour.step5.body": "Each row shows the autonomy <b>tier</b> (green ready / amber review / red needs work), the <b>margin</b> and match <b>confidence</b>, plus inline <b>Approve</b> and <b>Won / Lost</b> so you can act without opening it.",
+
+      "tour.step6.kick": "Workspace",
+      "tour.step6.title": "Open the workspace",
+      "tour.step6.body": "Click any quote to open its workspace: the full email <b>thread</b>, the <b>line items</b> the pipeline matched, and the ready-to-edit <b>draft</b> — all in one panel, no tab-hopping.",
+
+      "tour.step7.kick": "Workspace",
+      "tour.step7.title": "Resolve a weak line",
+      "tour.step7.body": "When a line is ambiguous, you get ranked candidates. One tap prices it, regenerates the draft, <b>and</b> teaches the pipeline your choice — so next time it's automatic. It never invents a price.",
+
+      "tour.step8.kick": "The send gate",
+      "tour.step8.title": "Approve &amp; send — you're the gate",
+      "tour.step8.body": "Nothing reaches a customer until you send it here. Edit the draft, <b>Approve &amp; send</b>, ask the customer for a missing spec, or label the thread. This is the human sign-off.",
+
+      "tour.step9.kick": "Efficiency",
+      "tour.step9.title": "Work in bulk",
+      "tour.step9.body": "Tick the boxes to select several quotes at once, then send or label them all from the bar that appears. Handy when a batch of green-tier drafts is ready to go.",
+
+      "tour.step10.kick": "Reporting",
+      "tour.step10.title": "Insights that add up",
+      "tour.step10.body": "Real reporting on your book: win-rate, volume over time, margin distribution, response time, top customers and gap trends — all computed from your quotes, with a time-range switch up top.",
+
+      "tour.step11.kick": "Audit trail",
+      "tour.step11.title": "One timeline of everything",
+      "tour.step11.body": "Every draft, approval, send, resolution and outcome on a single reverse-chronological feed — from real timestamps, nothing fabricated. Your team's paper trail, searchable and filterable.",
+
+      "tour.step12.kick": "Memory",
+      "tour.step12.title": "The pipeline remembers customers",
+      "tour.step12.body": "As RFQs arrive, senders are remembered here — quote and order counts, currency and colour preferences, when you last spoke. It's how repeat quotes get faster and more accurate.",
+
+      "tour.step13.kick": "Demand signal",
+      "tour.step13.title": "See what you don't stock — yet",
+      "tour.step13.body": "Every time a customer asks for something not in the catalogue, it's logged and ranked here. A live demand signal for what to source next, straight from real requests.",
+
+      "tour.step14.kick": "Control",
+      "tour.step14.title": "Dial in your autonomy",
+      "tour.step14.body": "Decide how much runs on its own: <b>auto-fill</b> repeat lines, <b>auto-send</b> green-tier quotes (off by default — you stay the gate), and automatic <b>follow-ups</b> when a customer goes quiet. Loosen it as you learn to trust the drafts.",
+
+      "tour.step15.kick": "That's the tour",
+      "tour.step15.title": "You're all set",
+      "tour.step15.body": "That's the whole console. This walkthrough ran on <b>sample data</b> — your real account starts clean, and nothing here was saved. Re-run this any time with <b>Take the tour</b> in the header."
+    },
+    tr: {
+      "tour.aria": "Rehberli tur",
+      "tour.skip": "Turu atla",
+      "tour.close": "Kapat",
+      "tour.back": "Geri",
+      "tour.next": "İleri",
+      "tour.finish": "Bitir",
+
+      "tour.step0.kick": "Hoş geldiniz",
+      "tour.step0.title": "Tüm konsolunuz, tek bir çubukta",
+      "tour.step0.body": "Her şey bu cam çubukta durur — ince bir simge şeridi olarak bekler ve üzerine gelince açılır. <b>Teklifler</b> ana üssünüzdür; Analizler, Müşteriler, Katalog boşlukları, Etkinlik ve Ayarlar bir tık uzağınızdadır. Hadi her birinin ne yaptığını birlikte gezelim.",
+
+      "tour.step1.kick": "Günlük özet",
+      "tour.step1.title": "Bugün sizi bekleyenler",
+      "tour.step1.body": "<span lang=\"en\">Copilot</span> brifinginiz. Her etiket — gönderime hazır, girdi gerekli, düşük marjlı onaylar, yeni yanıtlar — sizi doğrudan ilgili tekliflere götürür. Sabahınızın en hızlı özetidir.",
+
+      "tour.step2.kick": "Önceliklendirme",
+      "tour.step2.title": "“Sizi bekliyor” ile başlayın",
+      "tour.step2.body": "Akış teklifleri kendi başına hazırlar; bu kuyruk yalnızca gerçekten bir insana ihtiyaç duyanları öne çıkarır — bir onay, eksik bir teknik özellik ya da bir müşteri yanıtı. Bunu temizleyin, o günkü işiniz biter.",
+
+      "tour.step3.kick": "Önceliklendirme",
+      "tour.step3.title": "Yapılacak işe göre gruplanmış",
+      "tour.step3.body": "Gönderime hazır taslaklar, düşük marjlı onaylar, ayrıntısı eksik satırlar ve yeni yanıtlar — toplu işlem yapabilmeniz için her biri gruplanmıştır. Her kart teklifin tamamını açar.",
+
+      "tour.step4.kick": "Kayıt defteri",
+      "tour.step4.title": "Her teklif, bulunabilir",
+      "tour.step4.body": "Tüm kayıt için <b>Tüm teklifler</b>'e geçin. Birleşik arama (müşteri, ürün veya <span lang=\"en\">SKU</span>), önem / değer / marj sıralaması ve gönderim durumu, kademe ve sonuç filtreleri. 25'i geçtiğinizde sayfalara ayrılır.",
+
+      "tour.step5.kick": "Kayıt defteri",
+      "tour.step5.title": "Bir teklifi bir bakışta okuyun",
+      "tour.step5.body": "Her satır özerklik <b>kademesini</b> (yeşil hazır / sarı incele / kırmızı çalışma gerekir), <b>marjı</b> ve eşleşme <b>güvenini</b> gösterir; ayrıca satır içi <b>Onayla</b> ve <b>Kazanıldı / Kaybedildi</b> ile teklifi açmadan işlem yapabilirsiniz.",
+
+      "tour.step6.kick": "Çalışma alanı",
+      "tour.step6.title": "Çalışma alanını açın",
+      "tour.step6.body": "Çalışma alanını açmak için herhangi bir teklife tıklayın: tam e-posta <b>yazışması</b>, akışın eşleştirdiği <b>satır kalemleri</b> ve düzenlemeye hazır <b>taslak</b> — hepsi tek bir panelde, sekmeler arası gezinme olmadan.",
+
+      "tour.step7.kick": "Çalışma alanı",
+      "tour.step7.title": "Zayıf bir satırı çözün",
+      "tour.step7.body": "Bir satır belirsiz olduğunda, sıralanmış adaylar alırsınız. Tek dokunuş onu fiyatlandırır, taslağı yeniden oluşturur <b>ve</b> seçiminizi akışa öğretir — böylece bir dahaki sefere otomatik olur. Asla bir fiyat uydurmaz.",
+
+      "tour.step8.kick": "Gönderim kapısı",
+      "tour.step8.title": "Onayla ve gönder — kapı sizsiniz",
+      "tour.step8.body": "Siz buradan göndermeden hiçbir şey müşteriye ulaşmaz. Taslağı düzenleyin, <b>Onayla ve gönder</b>, müşteriden eksik bir teknik özellik isteyin ya da yazışmayı etiketleyin. Bu, insan onayıdır.",
+
+      "tour.step9.kick": "Verimlilik",
+      "tour.step9.title": "Toplu çalışın",
+      "tour.step9.body": "Aynı anda birden fazla teklif seçmek için kutuları işaretleyin, ardından beliren çubuktan hepsini gönderin veya etiketleyin. Bir grup yeşil kademe taslağı gönderime hazır olduğunda kullanışlıdır.",
+
+      "tour.step10.kick": "Raporlama",
+      "tour.step10.title": "Anlamlı analizler",
+      "tour.step10.body": "İşleriniz üzerine gerçek raporlama: kazanma oranı, zaman içindeki hacim, marj dağılımı, yanıt süresi, en iyi müşteriler ve boşluk eğilimleri — hepsi tekliflerinizden hesaplanır, üstte bir zaman aralığı anahtarıyla.",
+
+      "tour.step11.kick": "Denetim izi",
+      "tour.step11.title": "Her şeyin tek zaman çizelgesi",
+      "tour.step11.body": "Her taslak, onay, gönderim, çözüm ve sonuç tek bir ters kronolojik akışta — gerçek zaman damgalarından, hiçbir şey uydurulmadan. Ekibinizin aranabilir ve filtrelenebilir kayıt izi.",
+
+      "tour.step12.kick": "Bellek",
+      "tour.step12.title": "Akış müşterileri hatırlar",
+      "tour.step12.body": "<span lang=\"en\">RFQ</span>'lar geldikçe, gönderenler burada hatırlanır — teklif ve sipariş sayıları, para birimi ve renk tercihleri, en son ne zaman görüştüğünüz. Tekrarlayan teklifler böyle daha hızlı ve daha doğru olur.",
+
+      "tour.step13.kick": "Talep sinyali",
+      "tour.step13.title": "Henüz stoklamadığınızı görün",
+      "tour.step13.body": "Bir müşteri katalogda olmayan bir şey istediğinde, burada kaydedilir ve sıralanır. Bir sonraki neyi tedarik edeceğinize dair canlı bir talep sinyali, doğrudan gerçek taleplerden.",
+
+      "tour.step14.kick": "Kontrol",
+      "tour.step14.title": "Özerkliğinizi ayarlayın",
+      "tour.step14.body": "Ne kadarının kendi başına çalışacağına karar verin: tekrarlayan satırları <b>otomatik doldur</b>, yeşil kademe tekliflerini <b>otomatik gönder</b> (varsayılan olarak kapalı — kapı siz kalırsınız) ve bir müşteri sessizleştiğinde otomatik <b>takipler</b>. Taslaklara güvenmeyi öğrendikçe gevşetin.",
+
+      "tour.step15.kick": "Tur bu kadar",
+      "tour.step15.title": "Her şey hazır",
+      "tour.step15.body": "Konsolun tamamı bu kadar. Bu tanıtım <b>örnek verilerle</b> çalıştı — gerçek hesabınız tertemiz başlar ve burada hiçbir şey kaydedilmedi. Bunu başlıktaki <b>Turu başlat</b> ile istediğiniz zaman yeniden çalıştırın."
+    }
+  });
+  function tt(key, fallback) {
+    if (window.QWI18n && QWI18n.t) { var v = QWI18n.t(key); if (v !== key) return v; }
+    return fallback;
+  }
+
   var SKEY = "qw_tour";                 // sessionStorage: { active, idx }
   var sbRef = null;
   var started = false;                  // guard against double auto-start within a page
@@ -111,7 +265,7 @@
     tip.className = "qw-tour-tip";
     tip.setAttribute("role", "dialog");
     tip.setAttribute("aria-live", "polite");
-    tip.setAttribute("aria-label", "Guided tour");
+    tip.setAttribute("aria-label", tt("tour.aria", "Guided tour"));
     document.body.appendChild(spot);
     document.body.appendChild(tip);
 
@@ -276,16 +430,19 @@
       ? '<div class="qw-tour-finale-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>'
       : "";
     tip.className = "qw-tour-tip" + (s.finale ? " finale" : "");
+    var kick = tt("tour.step" + i + ".kick", s.kick);
+    var title = tt("tour.step" + i + ".title", s.title);
+    var body = tt("tour.step" + i + ".body", s.body);
     tip.innerHTML =
-      '<button type="button" class="qw-tour-skip" data-tour="skip">' + (last ? "Close" : "Skip tour") + '</button>' +
+      '<button type="button" class="qw-tour-skip" data-tour="skip">' + (last ? tt("tour.close", "Close") : tt("tour.skip", "Skip tour")) + '</button>' +
       finaleIco +
-      '<div class="qw-tour-kick">' + s.kick + "</div>" +
-      "<h3>" + s.title + "</h3>" +
-      "<p>" + s.body + "</p>" +
+      '<div class="qw-tour-kick">' + kick + "</div>" +
+      "<h3>" + title + "</h3>" +
+      "<p>" + body + "</p>" +
       '<div class="qw-tour-foot">' +
         '<div class="qw-tour-dots">' + dots + "</div>" +
-        (i > 0 ? '<button type="button" class="qw-tour-btn back" data-tour="back">Back</button>' : "") +
-        '<button type="button" class="qw-tour-btn next" data-tour="next">' + (last ? "Finish" : "Next") + "</button>" +
+        (i > 0 ? '<button type="button" class="qw-tour-btn back" data-tour="back">' + tt("tour.back", "Back") + '</button>' : "") +
+        '<button type="button" class="qw-tour-btn next" data-tour="next">' + (last ? tt("tour.finish", "Finish") : tt("tour.next", "Next")) + "</button>" +
       "</div>";
     // focus the primary action for keyboard users
     var nextBtn = tip.querySelector(".qw-tour-btn.next");
@@ -381,6 +538,15 @@
     if (isActive()) { resume(); return; }
     maybeAutoStart(sb);
   }
+
+  // Live language switch: if the tour is open, re-render the current step (kicker,
+  // title, body, nav buttons) in the new language and re-place the tip. No reload.
+  window.addEventListener("qw:langchange", function () {
+    if (isActive() && curIdx >= 0 && curStep && tip) {
+      renderTip(curStep, curIdx);
+      reposition();
+    }
+  });
 
   window.QWTour = {
     onConsoleReady: onConsoleReady,

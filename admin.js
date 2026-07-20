@@ -16,6 +16,123 @@
   var tenants = [];    // [{owner, name}]
   var profiles = [];   // [{user_id, email, created_at, owner, role, status}]
 
+  // ── i18n ──────────────────────────────────────────────────────────────────
+  var I = window.QWI18n;
+  function t(k, v) { return (I && I.t) ? I.t(k, v) : k; }
+  if (I && I.add) I.add({
+    en: {
+      "adm.boot.notConfigured": "Not configured: set SUPABASE_ANON_KEY in dashboard-config.js.",
+      "adm.boot.noClient": "Could not load the Supabase client library (vendor/supabase.js).",
+      "adm.gate.kicker": "Admin",
+      "adm.gate.title": "Sign in required",
+      "adm.gate.sub": "This page manages who can access Quotewright. Sign in to the console first, then come back.",
+      "adm.gate.cta": "Go to sign in",
+      "adm.denied.kicker": "Restricted",
+      "adm.denied.title": "Admin access only",
+      "adm.denied.sub1": "You’re signed in as",
+      "adm.denied.sub2": ", but this page is for administrators. Head back to your quote console.",
+      "adm.denied.cta": "Back to the console",
+      "adm.kicker": "Accounts",
+      "adm.h1": "Approve & assign",
+      "adm.lede": "Every new sign-up arrives <b>pending</b>. Connect it to a company, set its role, then activate — that’s what unlocks their console. Nothing is visible to an account until you do.",
+      "adm.newTenant": "+ New tenant",
+      "adm.nt.name": "Company name",
+      "adm.nt.namePh": "e.g. Acme Textiles",
+      "adm.nt.key": "Tenant key",
+      "adm.nt.keyHint": "Lowercase, no spaces. This is the <code lang=\"en\">owner</code> the pipeline writes with.",
+      "adm.nt.create": "Create tenant",
+      "adm.nt.creating": "Creating…",
+      "adm.nt.errName": "Give the company a name.",
+      "adm.nt.errKey": "Tenant key: lowercase letters/numbers, no spaces (2–41 chars).",
+      "adm.nt.errExists": "That tenant key already exists.",
+      "adm.nt.created": "Tenant “{name}” created.",
+      "adm.col.account": "Account",
+      "adm.col.tenant": "Tenant",
+      "adm.col.role": "Role",
+      "adm.col.status": "Status",
+      "adm.col.action": "Action",
+      "adm.status.pending": "Pending",
+      "adm.status.active": "Active",
+      "adm.status.suspended": "Suspended",
+      "adm.role.member": "Member",
+      "adm.role.admin": "Admin",
+      "adm.unassigned": "— Unassigned —",
+      "adm.suspend": "Suspend",
+      "adm.activate": "Activate",
+      "adm.saving": "Saving…",
+      "adm.joined": "Joined {date}",
+      "adm.needTenant": "Assign a tenant before activating this account.",
+      "adm.notSaved": "That change wasn’t saved — you may not have admin rights.",
+      "adm.activated": "Account activated.",
+      "adm.suspendedMsg": "Account suspended.",
+      "adm.saved": "Changes saved.",
+      "adm.netRetry": "Network error — try again.",
+      "adm.empty.migTitle": "Multi-tenant admin isn’t enabled yet",
+      "adm.empty.migBody": "Run <code lang=\"en\">quotewright-tenancy.sql</code> in the Supabase SQL editor to create the accounts &amp; tenants tables, then reload this page.",
+      "adm.empty.noneTitle": "No accounts yet",
+      "adm.empty.noneBody": "When someone signs up on the console, they’ll appear here for approval.",
+      "adm.err.generic": "Something went wrong.",
+      "adm.err.network": "Network error."
+    },
+    tr: {
+      "adm.boot.notConfigured": "Yapılandırılmadı: dashboard-config.js içinde SUPABASE_ANON_KEY değerini ayarlayın.",
+      "adm.boot.noClient": "Supabase istemci kütüphanesi yüklenemedi (vendor/supabase.js).",
+      "adm.gate.kicker": "Yönetim",
+      "adm.gate.title": "Giriş gerekli",
+      "adm.gate.sub": "Bu sayfa Quotewright'a kimlerin erişebileceğini yönetir. Önce konsola giriş yapın, sonra buraya dönün.",
+      "adm.gate.cta": "Girişe git",
+      "adm.denied.kicker": "Kısıtlı",
+      "adm.denied.title": "Yalnızca yönetici erişimi",
+      "adm.denied.sub1": "",
+      "adm.denied.sub2": " olarak giriş yaptınız; ancak bu sayfa yöneticiler içindir. Teklif konsolunuza geri dönün.",
+      "adm.denied.cta": "Konsola geri dön",
+      "adm.kicker": "Hesaplar",
+      "adm.h1": "Onayla ve ata",
+      "adm.lede": "Her yeni kayıt <b>beklemede</b> olarak gelir. Bir şirkete bağlayın, rolünü belirleyin, ardından etkinleştirin — konsollarını açan budur. Siz yapana kadar bir hesaba hiçbir şey görünmez.",
+      "adm.newTenant": "+ Yeni kiracı",
+      "adm.nt.name": "Şirket adı",
+      "adm.nt.namePh": "örn. Acme Textiles",
+      "adm.nt.key": "Kiracı anahtarı",
+      "adm.nt.keyHint": "Küçük harf, boşluksuz. Akışın yazarken kullandığı <code lang=\"en\">owner</code> değeridir.",
+      "adm.nt.create": "Kiracı oluştur",
+      "adm.nt.creating": "Oluşturuluyor…",
+      "adm.nt.errName": "Şirkete bir ad verin.",
+      "adm.nt.errKey": "Kiracı anahtarı: küçük harf/rakam, boşluksuz (2–41 karakter).",
+      "adm.nt.errExists": "Bu kiracı anahtarı zaten mevcut.",
+      "adm.nt.created": "“{name}” kiracısı oluşturuldu.",
+      "adm.col.account": "Hesap",
+      "adm.col.tenant": "Kiracı",
+      "adm.col.role": "Rol",
+      "adm.col.status": "Durum",
+      "adm.col.action": "İşlem",
+      "adm.status.pending": "Beklemede",
+      "adm.status.active": "Etkin",
+      "adm.status.suspended": "Askıda",
+      "adm.role.member": "Üye",
+      "adm.role.admin": "Yönetici",
+      "adm.unassigned": "— Atanmamış —",
+      "adm.suspend": "Askıya al",
+      "adm.activate": "Etkinleştir",
+      "adm.saving": "Kaydediliyor…",
+      "adm.joined": "Katıldı: {date}",
+      "adm.needTenant": "Bu hesabı etkinleştirmeden önce bir kiracı atayın.",
+      "adm.notSaved": "Bu değişiklik kaydedilmedi — yönetici yetkiniz olmayabilir.",
+      "adm.activated": "Hesap etkinleştirildi.",
+      "adm.suspendedMsg": "Hesap askıya alındı.",
+      "adm.saved": "Değişiklikler kaydedildi.",
+      "adm.netRetry": "Ağ hatası — tekrar deneyin.",
+      "adm.empty.migTitle": "Çok kiracılı yönetim henüz etkin değil",
+      "adm.empty.migBody": "Hesap ve kiracı tablolarını oluşturmak için Supabase SQL düzenleyicisinde <code lang=\"en\">quotewright-tenancy.sql</code> dosyasını çalıştırın, ardından bu sayfayı yeniden yükleyin.",
+      "adm.empty.noneTitle": "Henüz hesap yok",
+      "adm.empty.noneBody": "Biri konsola kaydolduğunda, onay için burada görünür.",
+      "adm.err.generic": "Bir şeyler ters gitti.",
+      "adm.err.network": "Ağ hatası."
+    }
+  });
+  function statusLabel(s) { var k = "adm.status." + s; var v = t(k); return v === k ? cap(s) : v; }
+  function roleLabel(r) { var k = "adm.role." + r; var v = t(k); return v === k ? cap(r) : v; }
+  function cap(s) { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); }
+
   function esc(s) {
     return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
@@ -23,6 +140,7 @@
   }
   function fmtDate(s) {
     if (!s) return "—";
+    if (I && I.date) return I.date(s);
     var d = new Date(s);
     return isNaN(d) ? "—" : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   }
@@ -38,15 +156,16 @@
   var boot = el("bootError");
   var configured = cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && cfg.SUPABASE_ANON_KEY.indexOf("PASTE_") !== 0;
   if (!configured) {
-    if (boot) { boot.hidden = false; boot.textContent = "Not configured: set SUPABASE_ANON_KEY in dashboard-config.js."; }
+    if (boot) { boot.hidden = false; boot.textContent = t("adm.boot.notConfigured"); }
     return;
   }
   if (!window.supabase || !window.supabase.createClient) {
-    if (boot) { boot.hidden = false; boot.textContent = "Could not load the Supabase client library (vendor/supabase.js)."; }
+    if (boot) { boot.hidden = false; boot.textContent = t("adm.boot.noClient"); }
     return;
   }
 
   sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  if (I && I.setClient) I.setClient(sb);
 
   el("logoutBtn").addEventListener("click", function () { sb.auth.signOut().then(showGate, showGate); });
   el("refreshBtn").addEventListener("click", load);
@@ -84,6 +203,7 @@
 
   function route(session) {
     var email = (session.user && session.user.email) || "";
+    if (I && I.reconcileUser) I.reconcileUser(session.user);
     QWTenancy.resolve(sb).then(function (p) {
       if (p.anon) { showGate(); return; }
       if (p.degraded) { showAdmin(email); load(); return; } // will show the "run SQL" empty state
@@ -117,15 +237,14 @@
       var tRes = r[0], pRes = r[1];
       if ((tRes.error && QWTenancy.isMissingTable(tRes.error)) ||
           (pRes.error && QWTenancy.isMissingTable(pRes.error))) {
-        emptyState("Multi-tenant admin isn’t enabled yet",
-          "Run <code>quotewright-tenancy.sql</code> in the Supabase SQL editor to create the accounts &amp; tenants tables, then reload this page.");
+        emptyState(t("adm.empty.migTitle"), t("adm.empty.migBody"));
         return;
       }
       if (pRes.error) { showErr(pRes.error.message); return; }
       tenants = (tRes && !tRes.error && tRes.data) ? tRes.data : [];
       profiles = pRes.data || [];
       render();
-    }, function (err) { showErr((err && err.message) || "Network error."); });
+    }, function (err) { showErr((err && err.message) || t("adm.err.network")); });
   }
 
   var STATUS_RANK = { pending: 0, suspended: 1, active: 2 };
@@ -133,13 +252,13 @@
     var counts = { pending: 0, active: 0, suspended: 0 };
     profiles.forEach(function (p) { if (counts[p.status] != null) counts[p.status]++; });
     el("adCounts").innerHTML =
-      chip(counts.pending, "pending", "Pending") +
-      chip(counts.active, "active", "Active") +
-      chip(counts.suspended, "suspended", "Suspended");
+      chip(counts.pending, "pending", t("adm.status.pending")) +
+      chip(counts.active, "active", t("adm.status.active")) +
+      chip(counts.suspended, "suspended", t("adm.status.suspended"));
 
     if (!profiles.length) {
       el("acctBody").innerHTML = "";
-      emptyState("No accounts yet", "When someone signs up on the console, they’ll appear here for approval.");
+      emptyState(t("adm.empty.noneTitle"), t("adm.empty.noneBody"));
       return;
     }
     el("adminEmpty").hidden = true;
@@ -159,7 +278,7 @@
   }
 
   function tenantOptions(selected) {
-    var opts = '<option value="">— Unassigned —</option>';
+    var opts = '<option value="">' + esc(t("adm.unassigned")) + '</option>';
     var found = false;
     tenants.forEach(function (t) {
       var sel = t.owner === selected;
@@ -174,23 +293,24 @@
   function roleOptions(role) {
     return ['member', 'admin'].map(function (r) {
       return '<option value="' + r + '"' + (r === role ? " selected" : "") + '>' +
-        (r === "admin" ? "Admin" : "Member") + '</option>';
+        esc(roleLabel(r)) + '</option>';
     }).join("");
   }
 
   function rowHtml(p) {
     var isActive = p.status === "active";
     var toggle = isActive
-      ? '<button type="button" class="btn btn-ghost btn-sm ad-suspend" data-toggle="suspend">Suspend</button>'
-      : '<button type="button" class="btn btn-primary btn-sm ad-activate" data-toggle="activate">Activate</button>';
+      ? '<button type="button" class="btn btn-ghost btn-sm ad-suspend" data-toggle="suspend">' + esc(t("adm.suspend")) + '</button>'
+      : '<button type="button" class="btn btn-primary btn-sm ad-activate" data-toggle="activate">' + esc(t("adm.activate")) + '</button>';
+    // data-label values feed CSS ::before on mobile (uppercased) → localise them too.
     return '<tr data-uid="' + esc(p.user_id) + '" data-owner="' + esc(p.owner || "") + '" data-role="' + esc(p.role || "member") + '">' +
-      '<td data-label="Account"><div class="ad-acct"><span class="ad-email">' + esc(p.email || "—") + '</span>' +
-        '<span class="ad-created">Joined ' + esc(fmtDate(p.created_at)) + '</span></div></td>' +
-      '<td data-label="Tenant"><select class="qc-select ad-tenant" aria-label="Tenant">' + tenantOptions(p.owner) + '</select></td>' +
-      '<td data-label="Role"><select class="qc-select ad-role" aria-label="Role">' + roleOptions(p.role || "member") + '</select></td>' +
-      '<td data-label="Status"><span class="pill ad-pill ad-pill-' + esc(p.status) + '">' + esc(p.status) + '</span></td>' +
-      '<td class="ad-col-act" data-label="Action"><div class="ad-acts">' +
-        '<button type="button" class="btn btn-ghost btn-sm ad-save" data-save disabled>Save</button>' +
+      '<td data-label="' + esc(t("adm.col.account")) + '"><div class="ad-acct"><span class="ad-email" lang="en">' + esc(p.email || "—") + '</span>' +
+        '<span class="ad-created">' + esc(t("adm.joined", { date: fmtDate(p.created_at) })) + '</span></div></td>' +
+      '<td data-label="' + esc(t("adm.col.tenant")) + '"><select class="qc-select ad-tenant" aria-label="' + esc(t("adm.col.tenant")) + '">' + tenantOptions(p.owner) + '</select></td>' +
+      '<td data-label="' + esc(t("adm.col.role")) + '"><select class="qc-select ad-role" aria-label="' + esc(t("adm.col.role")) + '">' + roleOptions(p.role || "member") + '</select></td>' +
+      '<td data-label="' + esc(t("adm.col.status")) + '"><span class="pill ad-pill ad-pill-' + esc(p.status) + '">' + esc(statusLabel(p.status)) + '</span></td>' +
+      '<td class="ad-col-act" data-label="' + esc(t("adm.col.action")) + '"><div class="ad-acts">' +
+        '<button type="button" class="btn btn-ghost btn-sm ad-save" data-save disabled>' + esc(t("common.save")) + '</button>' +
         toggle +
       '</div></td>' +
     '</tr>';
@@ -214,14 +334,14 @@
     var newStatus = status || (prof ? prof.status : "pending");
 
     if (newStatus === "active" && !owner) {
-      toast("Assign a tenant before activating this account.", true);
+      toast(t("adm.needTenant"), true);
       return;
     }
 
     var acts = tr.querySelectorAll("button");
     Array.prototype.forEach.call(acts, function (b) { b.disabled = true; });
     var label = btn ? btn.textContent : "";
-    if (btn) btn.textContent = "Saving…";
+    if (btn) btn.textContent = t("adm.saving");
 
     sb.from("account_profiles")
       .update({ owner: owner, role: role, status: newStatus, updated_at: new Date().toISOString() })
@@ -232,17 +352,17 @@
         if (res.error) { toast(res.error.message, true); reenable(tr); return; }
         if (!res.data || !res.data.length) {
           // RLS returned no row → the write wasn't allowed (not admin / policy off).
-          toast("That change wasn’t saved — you may not have admin rights.", true);
+          toast(t("adm.notSaved"), true);
           reenable(tr); return;
         }
         // update local model + re-render this row cleanly
         if (prof) { prof.owner = owner; prof.role = role; prof.status = newStatus; }
         else profiles.push(res.data[0]);
-        toast(newStatus === "active" ? "Account activated." : newStatus === "suspended" ? "Account suspended." : "Changes saved.");
+        toast(newStatus === "active" ? t("adm.activated") : newStatus === "suspended" ? t("adm.suspendedMsg") : t("adm.saved"));
         render();
       }, function () {
         if (btn) btn.textContent = label;
-        toast("Network error — try again.", true);
+        toast(t("adm.netRetry"), true);
         reenable(tr);
       });
   }
@@ -271,20 +391,20 @@
     var err = el("ntError"); err.textContent = "";
     var name = el("ntName").value.trim();
     var key = el("ntKey").value.trim();
-    if (!name) { err.textContent = "Give the company a name."; return; }
-    if (!/^[a-z0-9][a-z0-9_-]{1,40}$/.test(key)) { err.textContent = "Tenant key: lowercase letters/numbers, no spaces (2–41 chars)."; return; }
-    if (tenants.some(function (t) { return t.owner === key; })) { err.textContent = "That tenant key already exists."; return; }
-    var btn = el("ntSave"); btn.disabled = true; btn.textContent = "Creating…";
+    if (!name) { err.textContent = t("adm.nt.errName"); return; }
+    if (!/^[a-z0-9][a-z0-9_-]{1,40}$/.test(key)) { err.textContent = t("adm.nt.errKey"); return; }
+    if (tenants.some(function (tt) { return tt.owner === key; })) { err.textContent = t("adm.nt.errExists"); return; }
+    var btn = el("ntSave"); btn.disabled = true; btn.textContent = t("adm.nt.creating");
     sb.from("tenants").insert({ owner: key, name: name }).select().then(function (res) {
-      btn.disabled = false; btn.textContent = "Create tenant";
+      btn.disabled = false; btn.textContent = t("adm.nt.create");
       if (res.error) { err.textContent = res.error.message; return; }
       var row = (res.data && res.data[0]) || { owner: key, name: name };
       tenants.push(row);
       tenants.sort(function (a, b) { return (a.name || a.owner).localeCompare(b.name || b.owner); });
       toggleNewTenant(false);
-      toast("Tenant “" + name + "” created.");
+      toast(t("adm.nt.created", { name: name }));
       render(); // refresh every row's dropdown
-    }, function () { btn.disabled = false; btn.textContent = "Create tenant"; err.textContent = "Network error."; });
+    }, function () { btn.disabled = false; btn.textContent = t("adm.nt.create"); err.textContent = t("adm.err.network"); });
   }
 
   // ── empty / error ────────────────────────────────────────────────────────────
@@ -293,6 +413,11 @@
     e.hidden = false;
     e.innerHTML = '<div class="ad-empty-inner"><h3>' + esc(title) + '</h3><p>' + body + '</p></div>';
   }
-  function showErr(msg) { var e = el("adminError"); e.hidden = false; e.textContent = msg || "Something went wrong."; }
+  function showErr(msg) { var e = el("adminError"); e.hidden = false; e.textContent = msg || t("adm.err.generic"); }
   function hideErr() { el("adminError").hidden = true; }
+
+  // Re-render the account table in the new language without refetching.
+  window.addEventListener("qw:langchange", function () {
+    if (profiles && profiles.length) render();
+  });
 })();
