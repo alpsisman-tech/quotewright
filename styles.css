@@ -258,10 +258,12 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
    THE LOOM — signature demo (RFQ email → finished quote)
    IDs/classes kept stable for app.js.
    ============================================================ */
-.loom-wrap{padding:var(--s6) 0 var(--s3)}
-/* still, clean two-panel demo — no tilt, no parallax, no hover tint */
-.loom{position:relative;display:grid;grid-template-columns:1fr 72px 1fr;background:#fff;border:1px solid var(--hair);border-radius:var(--r-lg);box-shadow:var(--e4);overflow:hidden;text-align:left}
-.loom-panel{padding:28px;min-height:432px;display:flex;flex-direction:column}
+.loom-wrap{padding:var(--s7) 0 var(--s5)}
+/* two separate floating cards — the liquid field shows between & around them (no shared container, no connector) */
+.loom{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.4vw,26px);background:transparent;border:0;box-shadow:none;overflow:visible;text-align:left;align-items:stretch}
+.loom-panel{padding:26px;min-height:432px;display:flex;flex-direction:column}
+/* each panel is now its own card floating over the liquid */
+.loom-card{background:#fff;border:1px solid var(--hair);border-radius:var(--r-lg);box-shadow:var(--e4);overflow:hidden}
 .loom-panel h3{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:16px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .loom-panel h3 .tag{font-size:10px;padding:4px 10px;border-radius:var(--r-pill);letter-spacing:.03em;font-weight:600;text-transform:none}
 .tag-in{background:var(--row);color:var(--soft);border:1px solid var(--hair)}
@@ -271,11 +273,6 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 .email-meta{color:var(--soft);font-family:var(--font);font-size:12px;border-bottom:1px dashed var(--line-strong);padding-bottom:10px;margin-bottom:12px;letter-spacing:0}
 .caret{display:inline-block;width:2px;height:16px;background:var(--ink);vertical-align:-2px;margin-left:1px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-/* calm connector — a single hairline and one small arrow chip (no stripes, no animation) */
-.loom-shuttle{position:relative;display:grid;place-items:center;border-left:1px solid var(--hair);border-right:1px solid var(--hair);background:var(--bg)}
-.loom-shuttle::before{content:'';position:absolute;top:34px;bottom:34px;left:50%;width:1px;background:var(--hair)}
-.loom-arrow{position:relative;z-index:1;width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid var(--hair);display:grid;place-items:center;color:var(--soft);box-shadow:var(--e1)}
-.loom-arrow svg{stroke:currentColor}
 /* quote card — clean, finished document (Inter numbers, no mono) */
 .quote-card{background:var(--row);border:1px solid var(--hair);border-radius:var(--r-sm);padding:20px;flex:1;font-family:var(--font);font-size:13.5px;line-height:1.65;overflow:hidden}
 /* finished, fail-safe: rows are visible by default (no loading/skeleton state) */
@@ -294,8 +291,10 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 .q-approve{margin-top:15px;display:flex;align-items:center;gap:9px;font-size:12px;color:var(--soft);flex-wrap:wrap}
 .q-approve .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--hair);padding:7px 13px;border-radius:var(--r-pill);font-weight:500;color:var(--ink)}
 .q-approve .chip.ok{background:var(--lime);border-color:var(--lime);color:#111}
-.loom-bar{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 24px;border-top:1px solid var(--hair);background:var(--row);font-size:12.5px;color:var(--soft)}
-.loom-bar .steps{display:flex;gap:20px;flex-wrap:wrap}
+/* caption under the pair — a floating translucent pill (glass material), centred over the liquid */
+.loom-bar{grid-column:1/-1;justify-self:center;display:inline-flex;justify-content:center;align-items:center;gap:16px;margin-top:8px;padding:10px 8px 10px 18px;border:1px solid rgba(255,255,255,.6);border-radius:var(--r-pill);background:rgba(255,255,255,.66);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%);box-shadow:var(--e2);font-size:12.5px;color:var(--soft);flex-wrap:wrap;max-width:100%}
+@media (prefers-reduced-transparency:reduce){.loom-bar{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}}
+.loom-bar .steps{display:flex;gap:18px;flex-wrap:wrap}
 .loom-bar .step{display:flex;align-items:center;gap:7px;transition:color .25s;font-weight:500}
 .loom-bar .step i{width:7px;height:7px;border-radius:50%;background:var(--line-strong);transition:background .25s,box-shadow .25s}
 .loom-bar .step.on{color:var(--ink)}
@@ -309,15 +308,36 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 /* ============================================================
    TICKER — languages / trade-terms marquee
    ============================================================ */
-.ticker{border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:16px 0;overflow:hidden;background:var(--row);margin-top:var(--s8);position:relative}
-.ticker::before,.ticker::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
-.ticker::before{left:0;background:linear-gradient(90deg,var(--row),transparent)}
-.ticker::after{right:0;background:linear-gradient(270deg,var(--row),transparent)}
-.ticker-track{display:flex;gap:0;width:max-content;animation:tick 40s linear infinite;font-size:13px;letter-spacing:.01em;color:var(--soft);font-weight:500}
+.ticker{border-top:1px solid rgba(19,19,19,.10);border-bottom:1px solid rgba(19,19,19,.10);padding:16px 0;overflow:hidden;background:transparent;margin-top:var(--s8);position:relative}
+.ticker::before,.ticker::after{content:'';position:absolute;top:0;bottom:0;width:72px;z-index:2;pointer-events:none}
+.ticker::before{left:0;background:linear-gradient(90deg,rgba(247,246,239,.92),transparent)}
+.ticker::after{right:0;background:linear-gradient(270deg,rgba(247,246,239,.92),transparent)}
+.ticker-track{display:flex;gap:0;width:max-content;animation:tick 40s linear infinite;font-size:13px;letter-spacing:.01em;color:#33363c;font-weight:500}
 .ticker:hover .ticker-track{animation-play-state:paused}
 @keyframes tick{to{transform:translateX(-50%)}}
 .ticker-track span{padding:0 26px;white-space:nowrap;display:flex;align-items:center;gap:26px}
 .ticker-track span::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--lime)}
+
+/* ============================================================
+   HERO LIQUID FIELD — animated WebGL warp behind hero+loom+ticker
+   One continuous field; page returns to white below the ticker.
+   Canvas is same-origin (qw-liquid.js) — CSP-safe, no libraries.
+   ============================================================ */
+.hero-liquid{position:relative;isolation:isolate;overflow:hidden;
+  /* fallback / no-WebGL2 look: a calm greige→pale-tint wash so the region still reads as designed */
+  background:linear-gradient(180deg,#F4F2EA 0%,#EEF1EA 42%,#F3F4F2 74%,#FBFBFA 100%)}
+.hero-liquid-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block;pointer-events:none}
+/* every real child rides above the canvas */
+.hero-liquid > *:not(.hero-liquid-canvas){position:relative;z-index:1}
+/* soft top veil — guarantees hero-heading contrast over the field without a heavy scrim */
+.hero-liquid::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(130% 62% at 50% 16%,rgba(255,255,255,.55),rgba(255,255,255,0) 58%)}
+/* the standalone lime aura is redundant now the field supplies the colour */
+.hero-liquid .hero::before{display:none}
+.hero-liquid .hero{overflow:visible}
+@media (prefers-reduced-transparency:reduce){
+  .hero-liquid::after{background:radial-gradient(130% 62% at 50% 16%,rgba(255,255,255,.78),rgba(255,255,255,0) 58%)}
+}
 
 /* ============================================================
    SECTION HEADERS  (reusable)
@@ -611,8 +631,7 @@ footer .foot-desc{font-size:13.5px;max-width:34ch;line-height:1.65;margin-top:14
   .nav-links a{font-size:16px}
   .menu-toggle{display:block}
   .nav-cta{display:none}
-  .loom{grid-template-columns:1fr}
-  .loom-shuttle{display:none}
+  .loom{grid-template-columns:1fr;gap:18px}
   .loom-panel{min-height:0}
   .grid-2,.grid-3{grid-template-columns:1fr}
 }

@@ -33,6 +33,10 @@
 </nav>
 
 <main>
+<!-- ============ LIQUID FIELD: hero + loom + ticker share one animated WebGL background ============ -->
+<section class="hero-liquid">
+<canvas class="hero-liquid-canvas" id="heroLiquid" aria-hidden="true"></canvas>
+
 <!-- ============ HERO ============ -->
 <header class="hero">
   <div class="wrap">
@@ -57,18 +61,13 @@
 <div class="loom-wrap">
   <div class="wrap">
     <div class="loom rv" id="loom" aria-label="Live demonstration: an RFQ email becomes a finished quote">
-      <div class="loom-panel">
+      <div class="loom-panel loom-card">
         <h3>Incoming RFQ <span class="tag tag-in">customer email</span></h3>
         <div class="email-card">
           <div class="email-meta">From: purchasing@customer-example.com<br>Subject: Fiyat talebi — mikrofiber bez</div><span id="typed"></span><span class="caret" id="caret"></span>
         </div>
       </div>
-      <div class="loom-shuttle" aria-hidden="true">
-        <span class="loom-arrow">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </span>
-      </div>
-      <div class="loom-panel">
+      <div class="loom-panel loom-card">
         <h3>Finished quote <span class="tag tag-out">draft, awaiting your approval</span></h3>
         <div class="quote-card">
           <div class="q-row q-head"><span>Microfibre cloth · 40×40 cm · overlock</span><span class="sku">SKU 2102271</span></div>
@@ -116,6 +115,8 @@
     <span>Fiyat talebi</span><span>Request for quotation</span><span>Preisanfrage</span><span>Заявка за оферта</span><span>Demande de devis</span><span>gsm · size · colour · packaging</span><span>Peşin / Vadeli</span><span>EXW · FOB · CIF</span><span>per m² · per pack · per box</span><span>drafted, never auto-sent</span>
   </div>
 </div>
+</section>
+<!-- ============ /LIQUID FIELD ============ -->
 
 <!-- ============ HOW IT WORKS ============ -->
 <section>
@@ -322,6 +323,7 @@
   </div>
 </footer>
 
+<script src="qw-liquid.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
