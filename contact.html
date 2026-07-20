@@ -4,12 +4,63 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact — Quotewright</title>
-<meta name="description" content="Book a Quotewright pilot: tell us your products and RFQ volume, and see your first machine-drafted quote on your own mailbox within days.">
+<meta name="description" content="Book a Quotewright pilot: send us one real RFQ and see your first catalogue-accurate, machine-drafted quote land on a mailbox you choose — within days. Draft-first, nothing sends without you.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23131313'/><circle cx='15' cy='15' r='7' fill='none' stroke='%23D2FF37' stroke-width='2.6'/><path d='M18 18l4 4' stroke='%23D2FF37' stroke-width='2.6' stroke-linecap='round'/></svg>">
+<style>
+/* ---- contact page: scoped premium polish (no styles.css / app.js changes) ---- */
+.contact-page{position:relative}
+.contact-page .c-sec{padding-top:clamp(40px,6vw,72px)}
+.contact-page .contact-grid{align-items:start}
+
+/* left column rhythm */
+.contact-page .c-copy h1{max-width:15ch}
+.contact-page .c-copy .sub{max-width:52ch}
+
+/* the form is the object — give it a real, elevated surface (Apple: interactive layer catches the light) */
+.contact-page .form-card{
+  position:relative;background:#fff;border:1px solid var(--hair);
+  border-radius:var(--r-lg);padding:clamp(24px,3.2vw,38px);
+  box-shadow:var(--e3);
+  transition:box-shadow .5s var(--expo),transform .5s var(--expo);
+}
+.contact-page .form-card:focus-within{box-shadow:var(--e4)}
+/* one lime moment for the panel — a soft top hairline, echoing the site's cards */
+.contact-page .form-card::before{
+  content:'';position:absolute;left:0;right:0;top:0;height:2px;
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  background:linear-gradient(90deg,var(--lime),color-mix(in srgb,var(--lime) 30%,transparent) 60%,transparent);
+}
+.contact-page .fc-head{margin-bottom:var(--s5)}
+.contact-page .fc-head h2{font-size:var(--fs-h3);letter-spacing:var(--tr-tight)}
+.contact-page .fc-head p{color:var(--soft);font-size:var(--fs-small);margin-top:7px;line-height:1.55;max-width:38ch}
+/* two fields side by side where they belong; collapses on narrow */
+.contact-page .field-row{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.contact-page .field-row .field{margin-bottom:19px}
+.contact-page .form-card .btn-primary{width:100%;justify-content:center}
+.contact-page .form-foot{margin-top:var(--s4)}
+.contact-page .form-foot small{flex:1;min-width:0}
+
+/* quiet reassurance line under the form */
+.contact-page .fine{display:flex;align-items:flex-start;gap:9px;margin-top:var(--s5);
+  padding-top:var(--s5);border-top:1px solid var(--hair);
+  font-size:var(--fs-caption);color:var(--grey);line-height:1.5}
+.contact-page .fine .lock{flex:none;stroke:var(--grey);margin-top:1px}
+.contact-page .fine span{flex:1;min-width:0}
+.contact-page .fine a{color:var(--soft);text-decoration:underline;text-underline-offset:2px}
+
+@media (max-width:1020px){
+  .contact-page .form-card{margin-top:var(--s2)}
+}
+@media (max-width:480px){
+  .contact-page .field-row{grid-template-columns:1fr;gap:0}
+  .contact-page .form-foot{flex-direction:column;align-items:stretch}
+  .contact-page .form-foot small{text-align:center}
+}
+</style>
 </head>
 <body>
 
@@ -17,14 +68,7 @@
 
 <nav id="nav">
   <div class="nav-inner">
-    <a class="logo" href="index.html" aria-label="Quotewright home">
-      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect width="32" height="32" rx="7" fill="#111"/>
-        <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
-      </svg>
-      Quotewright
-    </a>
+    <a class="logo" href="index.html" aria-label="Quotewright home">Quotewright</a>
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Home</a></li>
       <li><a href="product.html">Product</a></li>
@@ -39,22 +83,22 @@
   </div>
 </nav>
 
-<main>
-<section style="padding-top:70px">
+<main class="contact-page">
+<section class="c-sec">
   <div class="wrap">
     <div class="contact-grid" style="margin-top:0">
-      <div>
+      <div class="c-copy">
         <div class="kicker rv">Book a pilot</div>
-        <h1 class="rv rv-d1" style="font-size:clamp(36px,4.6vw,58px)">Send us one real RFQ. We'll send back the quote.</h1>
-        <p class="sub rv rv-d2">The best demo is your own inbox. Tell us a little about your products and volume, and we'll set up a pilot on a mailbox you choose — you'll see your first machine-drafted quote within days.</p>
+        <h1 class="rv rv-d1">Send us one real RFQ. We'll send back the <span class="woven">quote</span>.</h1>
+        <p class="sub rv rv-d2">The best demo is your own inbox. Tell us what you make and roughly how much RFQ email you handle — we'll set up a pilot on a mailbox you choose, and you'll see your first catalogue-accurate quote drafted within days. Draft-first, always: nothing reaches a customer until you approve it.</p>
         <div class="cpoints">
           <div class="cpoint rv rv-d2">
             <div class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
-            <div><h5>Pilot window</h5><p>We're onboarding our first factories as pilots — priority setup and hands-on support, in exchange for honest feedback.</p></div>
+            <div><h5>Pilot onboarding is open</h5><p>We're setting up our first factories as pilots — priority setup and hands-on support, in exchange for honest feedback.</p></div>
           </div>
           <div class="cpoint rv rv-d3">
             <div class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-5-2-8-5.5-8-10V5.5L12 3l8 2.5V11c0 4.5-3 8-8 10z"/></svg></div>
-            <div><h5>Your data stays yours</h5><p>Your catalog is stored isolated per client and never shared. Cancel any time; we delete on request.</p></div>
+            <div><h5>Your data stays yours</h5><p>Your catalogue is stored isolated per company and never shared. Cancel any time; we delete on request.</p></div>
           </div>
           <div class="cpoint rv rv-d4">
             <div class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5l2.2 2.2L15.5 9"/><path d="M12 21c-5-2-8-5.5-8-10V5.5L12 3l8 2.5V11c0 4.5-3 8-8 10z"/></svg></div>
@@ -64,20 +108,27 @@
         <div class="next-steps rv rv-d4">
           <h5>What happens after you write</h5>
           <div class="nstep"><span class="nn">1</span><span><b>We reply within one business day</b> with a short call slot or a few questions by email — your choice.</span></div>
-          <div class="nstep"><span class="nn">2</span><span><b>You share a price file and a mailbox.</b> We extract your catalog and show it to you for approval.</span></div>
+          <div class="nstep"><span class="nn">2</span><span><b>You share a price file and a mailbox.</b> We extract your catalogue and show it to you for approval.</span></div>
           <div class="nstep"><span class="nn">3</span><span><b>First real quotes within days</b> — drafted, never auto-sent, until you say otherwise.</span></div>
         </div>
       </div>
-      <form id="pilotForm" name="pilot" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+
+      <form id="pilotForm" name="pilot" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate class="form-card rv rv-d2">
         <input type="hidden" name="form-name" value="pilot">
         <p class="hp"><label>Don't fill this out: <input name="bot-field"></label></p>
-        <div class="field">
-          <label for="fName">Your name</label>
-          <input id="fName" name="name" type="text" autocomplete="name" required placeholder="Full name">
+        <div class="fc-head">
+          <h2>Request your pilot</h2>
+          <p>Five short fields. A real person replies within one business day — no sales call unless you want one.</p>
         </div>
-        <div class="field">
-          <label for="fCompany">Company</label>
-          <input id="fCompany" name="company" type="text" autocomplete="organization" required placeholder="Company name">
+        <div class="field-row">
+          <div class="field">
+            <label for="fName">Your name</label>
+            <input id="fName" name="name" type="text" autocomplete="name" required placeholder="Full name">
+          </div>
+          <div class="field">
+            <label for="fCompany">Company</label>
+            <input id="fCompany" name="company" type="text" autocomplete="organization" required placeholder="Company name">
+          </div>
         </div>
         <div class="field">
           <label for="fEmail">Work email</label>
@@ -104,6 +155,10 @@
           <small>We reply within one business day.</small>
         </div>
         <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
+        <p class="fine">
+          <svg class="lock" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+          <span>Your details go straight to our team — never sold, never shared. See our <a href="privacy.html">privacy policy</a>.</span>
+        </p>
       </form>
     </div>
   </div>
@@ -114,14 +169,7 @@
   <div class="wrap">
     <div class="foot-inner">
       <div>
-        <a class="logo" href="index.html" aria-label="Quotewright home">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <rect width="32" height="32" rx="7" fill="#D2FF37"/>
-            <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
-          </svg>
-          Quotewright
-        </a>
+        <a class="logo" href="index.html" aria-label="Quotewright home">Quotewright</a>
         <p class="foot-desc">RFQ emails in, finished quotes out. Built on the floor of a working textile factory, for every made-to-order manufacturer drowning in requests for quotation.</p>
       </div>
       <div class="foot-links">
@@ -131,6 +179,7 @@
             <li><a href="product.html">How it works</a></li>
             <li><a href="onboarding.html">Onboarding</a></li>
             <li><a href="product.html#integrity">Pricing integrity</a></li>
+            <li><a href="product.html#features">Features</a></li>
           </ul>
         </div>
         <div>
