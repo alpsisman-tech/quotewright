@@ -84,7 +84,7 @@
   /* spacing scale (4px base) */
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
   --s7:48px; --s8:64px; --s9:96px; --s10:128px;
-  --section:clamp(76px,10vw,128px);          /* vertical rhythm between sections */
+  --section:clamp(60px,7.5vw,100px);         /* vertical rhythm between sections (tightened, Apple-like) */
   --gutter:clamp(20px,4vw,48px);             /* page side gutter */
 
   /* radii (extends --r-lg/md/sm) */
@@ -139,8 +139,12 @@ h2{font-size:var(--fs-h2);line-height:1.08;letter-spacing:-.035em;max-width:20ch
 h3{font-size:var(--fs-h3)}
 h4{font-size:var(--fs-h4);letter-spacing:var(--tr-tight)}
 h5{font-size:var(--fs-h5);letter-spacing:var(--tr-tight)}
-h1 em,h2 em,h3 em,.hl-em{font-family:var(--doc);font-style:italic;font-weight:500;color:var(--ink);letter-spacing:-.01em}
-.center h2 em,.band h2 em,.cta-band h2 em{}  /* em colour handled per-context below */
+/* heading emphasis — NON-italic, stays in the heading's own sans face.
+   Light sections: ink text + a short lime underline (readable, lime as seasoning).
+   Dark sections (.band/.cta-band/.bigquote): lime text, no underline. Never serif italic. */
+h1 em,h2 em,h3 em,.hl-em{font-family:inherit;font-style:normal;font-weight:600;color:var(--ink);letter-spacing:inherit;
+  background:linear-gradient(var(--lime),var(--lime)) left 92%/100% .14em no-repeat;padding-bottom:.04em;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
 
 /* lead / body paragraph */
 .sub,.lead{font-family:var(--font);font-size:var(--fs-lead);color:var(--soft);max-width:60ch;margin-top:var(--s5);line-height:1.62;font-weight:400;text-wrap:pretty}
@@ -254,15 +258,9 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
    THE LOOM — signature demo (RFQ email → finished quote)
    IDs/classes kept stable for app.js.
    ============================================================ */
-.loom-wrap{padding:var(--s6) 0 var(--s3);perspective:1600px}
-.loom{position:relative;display:grid;grid-template-columns:1fr 84px 1fr;background:#fff;border:1px solid var(--hair);border-radius:var(--r-lg);box-shadow:var(--e4);overflow:hidden;text-align:left;
-  transform:perspective(1600px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transform-style:preserve-3d;
-  transition:transform var(--d-slow) var(--expo),box-shadow var(--d-slow) var(--expo)}
-.loom.tilting{transition:transform .12s linear,box-shadow .4s var(--expo);box-shadow:var(--shadow-hover)}
-.loom::after{content:'';position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity var(--d-slow) var(--ease);
-  background:radial-gradient(340px 340px at var(--mx,50%) var(--my,0%),var(--lime-edge),transparent 70%)}
-.loom.tilting::after{opacity:1}
-@media (prefers-reduced-motion:reduce){.loom{transform:none!important}.loom::after{display:none}}
+.loom-wrap{padding:var(--s6) 0 var(--s3)}
+/* still, clean two-panel demo — no tilt, no parallax, no hover tint */
+.loom{position:relative;display:grid;grid-template-columns:1fr 72px 1fr;background:#fff;border:1px solid var(--hair);border-radius:var(--r-lg);box-shadow:var(--e4);overflow:hidden;text-align:left}
 .loom-panel{padding:28px;min-height:432px;display:flex;flex-direction:column}
 .loom-panel h3{font-family:var(--font);font-size:var(--fs-eyebrow);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:16px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .loom-panel h3 .tag{font-size:10px;padding:4px 10px;border-radius:var(--r-pill);letter-spacing:.03em;font-weight:600;text-transform:none}
@@ -273,24 +271,15 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 .email-meta{color:var(--soft);font-family:var(--font);font-size:12px;border-bottom:1px dashed var(--line-strong);padding-bottom:10px;margin-bottom:12px;letter-spacing:0}
 .caret{display:inline-block;width:2px;height:16px;background:var(--ink);vertical-align:-2px;margin-left:1px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.loom-shuttle{position:relative;background:repeating-linear-gradient(180deg,transparent 0 15px,var(--hair) 15px 16px);border-left:1px solid var(--hair);border-right:1px solid var(--hair)}
-.threadline{position:absolute;left:0;width:100%;height:3px;border-radius:2px;opacity:0;transform:scaleX(0);transform-origin:left}
-.threadline.t1{top:33%;background:var(--lime)}
-.threadline.t2{top:50%;background:var(--ink)}
-.threadline.t3{top:67%;background:var(--lime)}
-.loom.weaving .threadline{animation:weave .8s var(--ease) forwards}
-.loom.weaving .t2{animation-delay:.18s}
-.loom.weaving .t3{animation-delay:.36s}
-@keyframes weave{0%{opacity:0;transform:scaleX(0)}20%{opacity:1}100%{opacity:1;transform:scaleX(1)}}
-.shuttle{position:absolute;top:calc(50% - 12px);left:calc(50% - 12px);width:24px;height:24px;border-radius:8px;background:var(--lime);display:grid;place-items:center;opacity:0;transition:opacity .3s}
-.shuttle svg{animation:spin 1.5s linear infinite;stroke:#111}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loom.weaving .shuttle{opacity:1}
-/* quote card — clean document look (Inter numbers, no mono) */
+/* calm connector — a single hairline and one small arrow chip (no stripes, no animation) */
+.loom-shuttle{position:relative;display:grid;place-items:center;border-left:1px solid var(--hair);border-right:1px solid var(--hair);background:var(--bg)}
+.loom-shuttle::before{content:'';position:absolute;top:34px;bottom:34px;left:50%;width:1px;background:var(--hair)}
+.loom-arrow{position:relative;z-index:1;width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid var(--hair);display:grid;place-items:center;color:var(--soft);box-shadow:var(--e1)}
+.loom-arrow svg{stroke:currentColor}
+/* quote card — clean, finished document (Inter numbers, no mono) */
 .quote-card{background:var(--row);border:1px solid var(--hair);border-radius:var(--r-sm);padding:20px;flex:1;font-family:var(--font);font-size:13.5px;line-height:1.65;overflow:hidden}
-.q-row{opacity:0;transform:translateY(8px)}
-.q-row.show{animation:rise .5s var(--ease) forwards}
-@keyframes rise{to{opacity:1;transform:none}}
+/* finished, fail-safe: rows are visible by default (no loading/skeleton state) */
+.q-row{opacity:1;transform:none}
 .q-head{font-weight:600;border-bottom:1px dashed var(--line-strong);padding-bottom:11px;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .q-head .sku{color:var(--soft);font-weight:500;white-space:nowrap;font-size:12px;font-variant-numeric:tabular-nums}
 .q-line{display:flex;justify-content:space-between;gap:16px;padding:3px 0}
@@ -356,7 +345,7 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 .band .kicker{color:rgba(255,255,255,.6)}
 .band .kicker::before{background:var(--lime)}
 .band h2,.band h3{color:#fff}
-.band h2 em,.band h3 em{color:var(--lime)}
+.band h2 em,.band h3 em,.cta-band h2 em{color:var(--lime);background:none;padding:0}
 .band .sub{color:var(--on-ink-muted)}
 .band-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(40px,6vw,72px);align-items:center}
 
@@ -373,7 +362,7 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 /* ============================================================
    FEATURE CARDS
    ============================================================ */
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:var(--s8)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:var(--s7)}
 .card{background:#fff;border:1px solid var(--hair);border-radius:var(--r-md);padding:32px 30px;position:relative;overflow:hidden;box-shadow:var(--e1);transition:transform .38s var(--expo), box-shadow .38s var(--expo), border-color var(--d-mid)}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--lime);transform:scaleX(0);transform-origin:left;transition:transform var(--d-slow) var(--expo)}
 .card:hover{transform:translateY(-6px);box-shadow:var(--e3);border-color:var(--line-strong)}
@@ -394,7 +383,7 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 /* ============================================================
    HOW-IT-WORKS  (numbered sequence — legit ordered flow)
    ============================================================ */
-.flow{margin-top:var(--s8);display:grid;grid-template-columns:repeat(5,1fr);gap:20px;position:relative}
+.flow{margin-top:var(--s7);display:grid;grid-template-columns:repeat(5,1fr);gap:28px;position:relative}
 .flow::before{content:'';position:absolute;top:29px;left:6%;right:6%;height:2px;z-index:0;background:repeating-linear-gradient(90deg,var(--line-strong) 0 7px,transparent 7px 15px)}
 .flow-thread{position:absolute;top:28px;left:6%;height:4px;border-radius:2px;z-index:1;width:0;background:var(--lime);transition:width 1.7s var(--ease)}
 .flow.in .flow-thread{width:88%}
@@ -403,14 +392,14 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 .fstep .node svg{stroke:var(--ink);transition:stroke .3s}
 .fstep:hover .node{border-color:var(--lime);background:var(--lime);transform:translateY(-3px);box-shadow:var(--e2)}
 .fstep .fn{font-size:11px;color:var(--grey);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:8px;font-weight:600}
-.fstep h4{font-family:var(--font);font-size:var(--fs-h5);font-weight:600;letter-spacing:-.025em;margin-bottom:8px}
-.fstep p{font-size:var(--fs-small);color:var(--soft);line-height:1.58}
+.fstep h4{font-family:var(--font);font-size:var(--fs-h5);font-weight:600;letter-spacing:-.025em;margin-bottom:10px}
+.fstep p{font-size:var(--fs-small);color:var(--soft);line-height:1.64}
 
 /* ============================================================
    GUARANTEE — bold statement inside a band
    ============================================================ */
 .bigquote{margin:var(--s6) auto 0;max-width:20ch;font-family:var(--font);font-size:clamp(28px,4.4vw,52px);line-height:1.1;font-weight:600;letter-spacing:-.04em;color:#fff}
-.bigquote em{font-family:var(--doc);font-style:italic;font-weight:500;color:var(--lime)}
+.bigquote em{font-family:inherit;font-style:normal;font-weight:600;color:var(--lime);background:none;padding:0}
 .guarantee-note{margin:var(--s5) auto 0;max-width:52ch;color:var(--on-ink-muted);font-size:var(--fs-lead);line-height:1.6}
 .rules{margin-top:var(--s7);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:left}
 .rule{border:1px solid var(--on-ink-line);border-radius:var(--r-md);padding:26px;background:rgba(255,255,255,.03);transition:background .3s,border-color .3s}
@@ -471,11 +460,9 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
   background-size:420px, cover, cover, cover;background-blend-mode:overlay,screen,soft-light,normal;
   border:1px solid rgba(255,255,255,.07);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.10), var(--shadow-lg)}
-.cta-band::after{content:'';position:absolute;left:-10%;right:-10%;top:52%;height:2px;opacity:.5;background:linear-gradient(90deg,transparent,var(--lime),transparent);transform:translateY(-50%) rotate(-1.4deg)}
 .cta-band .wrap{position:relative;z-index:1}
 .cta-band .kicker{color:rgba(255,255,255,.6)}
 .cta-band h2{color:#fff;margin:0 auto}
-.cta-band h2 em{color:var(--lime)}
 .cta-band .sub{color:var(--on-ink-muted);margin-left:auto;margin-right:auto}
 .cta-band .hero-ctas{margin-top:var(--s6)}
 .btn-ghost.on-dark{color:#fff;border-color:var(--on-ink-line)}
