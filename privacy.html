@@ -7,30 +7,19 @@
 <meta name="description" content="How Seam Studio handles data across Quotewright and the Seam sites.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23111'/><path d='M8 21.5L13 9l3.5 8L20 9l4 12.5' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/><path d='M6 25h20' stroke='%23D2FF37' stroke-width='2.4' stroke-linecap='round'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23131313'/><circle cx='15' cy='15' r='7' fill='none' stroke='%23D2FF37' stroke-width='2.6'/><path d='M18 18l4 4' stroke='%23D2FF37' stroke-width='2.6' stroke-linecap='round'/></svg>">
 <style>
-/* Legal pages (Privacy / Cookies) — generated, native to this site's theme */
-.legal-section{padding:118px 0 92px}
-.legal-wrap{max-width:820px;margin:0 auto;padding:0 28px}
-.legal-wrap h1{font-size:clamp(30px,4.4vw,46px);line-height:1.08;margin:0 0 6px}
-.legal-updated{font-size:14px;opacity:.68;margin:0 0 32px}
-.legal-wrap h2{font-size:21px;margin:42px 0 12px;padding-top:20px;border-top:1px solid rgba(0,0,0,.1)}
-.legal-wrap h3{font-size:16.5px;margin:26px 0 8px}
-.legal-wrap p{line-height:1.72;margin:0 0 14px;font-size:15.5px}
-.legal-wrap ul,.legal-wrap ol{line-height:1.72;margin:0 0 16px;padding-left:22px;font-size:15.5px}
-.legal-wrap li{margin:0 0 7px}
-.legal-wrap a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--lime);text-underline-offset:3px;text-decoration-thickness:2px;font-weight:500;transition:color .2s}
-.legal-wrap a:hover{color:#000}
-.legal-toc{margin:0 0 18px}
-.legal-tablewrap{overflow-x:auto;margin:2px 0 18px;border-radius:8px}
-.legal-table{border-collapse:collapse;width:100%;min-width:580px;font-size:13.5px;line-height:1.55}
-.legal-table th,.legal-table td{border:1px solid rgba(0,0,0,.14);padding:9px 11px;text-align:left;vertical-align:top}
-.legal-table th{background:rgba(0,0,0,.045);font-weight:600}
-.legal-table td:last-child,.legal-table th:last-child{text-align:center;white-space:nowrap}
-.legal-table td:last-child{font-weight:700}
-.legal-backlinks{margin-top:40px;padding-top:20px;border-top:1px solid rgba(0,0,0,.1);font-size:14.5px;opacity:.8}
+/* Legal document — page-specific elements layered on the shared .legal-body */
+.legal-updated{color:var(--grey);font-size:var(--fs-small);margin:var(--s3) 0 0}
+.legal-body .legal-toc{margin:0 0 var(--s5);color:var(--soft)}
+.legal-tablewrap{overflow-x:auto;margin:var(--s5) 0;border:1px solid var(--hair);border-radius:var(--r-sm)}
+.legal-table{border-collapse:collapse;width:100%;min-width:560px;font-size:var(--fs-small);line-height:1.55}
+.legal-table th,.legal-table td{border-bottom:1px solid var(--hair);padding:10px 14px;text-align:left;vertical-align:top}
+.legal-table thead th{background:var(--row);font-weight:600;color:var(--ink);border-bottom:1px solid var(--line-strong)}
+.legal-table tbody tr:last-child td{border-bottom:0}
+.legal-backlinks{margin-top:var(--s7);padding-top:var(--s5);border-top:1px solid var(--hair);font-size:var(--fs-small);color:var(--soft)}
 </style>
 </head>
 <body>
@@ -39,17 +28,11 @@
 
 <nav id="nav">
   <div class="nav-inner">
-    <a class="logo" href="index.html" aria-label="Quotewright home">
-      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect width="32" height="32" rx="7" fill="#111"/>
-        <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
-      </svg>
-      Quotewright
-    </a>
+    <a class="logo" href="index.html" aria-label="Quotewright home">Quotewright</a>
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Home</a></li>
       <li><a href="product.html">Product</a></li>
+      <li><a href="onboarding.html">Onboarding</a></li>
       <li><a href="contact.html">Contact</a></li>
       <li><a href="dashboard.html">Log in</a></li>
     </ul>
@@ -61,9 +44,17 @@
 </nav>
 
 <main id="main">
-<section class="legal-section"><div class="legal-wrap">
-<h1>Privacy Policy</h1>
-<p class="legal-updated">Last updated <strong>July 09, 2026</strong></p>
+<header class="page-hero">
+  <div class="wrap">
+    <h1>Privacy Policy</h1>
+    <p class="sub">How Seam Studio handles your data across Quotewright and the Seam sites. Last updated <strong>July&nbsp;09,&nbsp;2026</strong>.</p>
+  </div>
+</header>
+
+<section class="sec-tight">
+  <div class="wrap">
+    <div class="legal">
+      <div class="legal-body">
 
 <p>This Privacy Notice for <strong>Seam Studio</strong> ("<strong>we</strong>", "<strong>us</strong>", or "<strong>our</strong>") describes how and why we might access, collect, store, use, and/or share ("<strong>process</strong>") your personal information when you use our services ("<strong>Services</strong>"), including when you:</p>
 <ul>
@@ -317,21 +308,17 @@
 <p>Based on the applicable laws of your country or state of residence in the US, you may have the right to request access to the personal information we collect from you, details about how we have processed it, correct inaccuracies, or delete your personal information. You may also have the right to withdraw your consent to our processing of your personal information. These rights may be limited in some circumstances by applicable law. To request to review, update, or delete your personal information, please fill out and submit a <a href="https://app.termly.io/dsar/46282d3b-2f06-4fba-983e-20ead54d0cbc" target="_blank" rel="noopener noreferrer">data subject access request</a>.</p>
 
 <p class="legal-backlinks">See also our <a href="cookies.html">Cookie Policy</a>.</p>
-</div></section>
+      </div>
+    </div>
+  </div>
+</section>
 </main>
 
 <footer>
   <div class="wrap">
     <div class="foot-inner">
       <div>
-        <a class="logo" href="index.html" aria-label="Quotewright home">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <rect width="32" height="32" rx="7" fill="#D2FF37"/>
-            <path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/>
-          </svg>
-          Quotewright
-        </a>
+        <a class="logo" href="index.html" aria-label="Quotewright home">Quotewright</a>
         <p class="foot-desc">RFQ emails in, finished quotes out. Built on the floor of a working textile factory, for every made-to-order manufacturer drowning in requests for quotation.</p>
       </div>
       <div class="foot-links">
@@ -339,7 +326,9 @@
           <h6>Product</h6>
           <ul>
             <li><a href="product.html">How it works</a></li>
+            <li><a href="onboarding.html">Onboarding</a></li>
             <li><a href="product.html#integrity">Pricing integrity</a></li>
+            <li><a href="product.html#features">Features</a></li>
           </ul>
         </div>
         <div>
