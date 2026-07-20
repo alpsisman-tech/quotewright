@@ -1,34 +1,18 @@
 /* ============================================================
-   QUOTEWRIGHT — hero liquid field
+   QUOTEWRIGHT — liquid field
    A same-origin (CSP-safe) reproduction of the paper-design / Framer
-   "warp" WebGL shader, mounted behind the hero → loom → ticker region.
+   "warp" WebGL shader. Mounts behind the hero (light palette) AND
+   behind every dark section — .band / .cta-band — via a dark palette
+   preset (canvas flagged data-liquid="dark").
    No external scripts, no libraries. WebGL2 only; graceful fallback
-   to the CSS gradient on .hero-liquid when WebGL2 is unavailable.
-   Performance/a11y: DPR capped at 2, RAF paused offscreen
-   (IntersectionObserver) and on document.hidden, single static frame
-   under prefers-reduced-motion.
+   to the CSS background when WebGL2 is unavailable.
+   Perf/a11y: DPR capped at 2; each canvas pauses its RAF when
+   scrolled offscreen (IntersectionObserver) and on document.hidden —
+   so only in-view sections spend a frame; a single static frame under
+   prefers-reduced-motion; clean recovery from WebGL context loss.
    ============================================================ */
 (function () {
   'use strict';
-
-  var canvas = document.getElementById('heroLiquid');
-  if (!canvas) return;
-  var section = canvas.closest('.hero-liquid') || canvas.parentElement;
-
-  var gl = null;
-  try {
-    gl = canvas.getContext('webgl2', {
-      antialias: false,
-      alpha: true,
-      premultipliedAlpha: false,
-      depth: false,
-      stencil: false,
-      powerPreference: 'low-power'
-    });
-  } catch (e) { gl = null; }
-
-  // No WebGL2 → leave the .hero-liquid CSS gradient in place.
-  if (!gl) { canvas.style.display = 'none'; return; }
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -101,45 +85,6 @@
     '  fragColor=vec4(color_mix.rgb,color_mix.a);\n' +
     '}';
 
-  function compile(type, src) {
-    var s = gl.createShader(type);
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-      console.warn('[qw-liquid] shader compile failed:', gl.getShaderInfoLog(s));
-      gl.deleteShader(s);
-      return null;
-    }
-    return s;
-  }
-
-  function fail() { canvas.style.display = 'none'; }
-
-  var vs = compile(gl.VERTEX_SHADER, VERT);
-  var fs = compile(gl.FRAGMENT_SHADER, FRAG);
-  if (!vs || !fs) { fail(); return; }
-
-  var prog = gl.createProgram();
-  gl.attachShader(prog, vs);
-  gl.attachShader(prog, fs);
-  gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-    console.warn('[qw-liquid] program link failed:', gl.getProgramInfoLog(prog));
-    fail();
-    return;
-  }
-  gl.useProgram(prog);
-
-  // A VAO is required to draw in a WebGL2 core context.
-  var vao = gl.createVertexArray();
-  gl.bindVertexArray(vao);
-
-  var U = {};
-  ['u_time', 'u_pixelRatio', 'u_resolution', 'u_scale', 'u_rotation',
-   'u_color1', 'u_color2', 'u_color3', 'u_proportion', 'u_softness',
-   'u_shape', 'u_shapeScale', 'u_distortion', 'u_swirl', 'u_swirlIterations'
-  ].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
-
   function hex(h) {
     h = h.replace('#', '');
     return [
@@ -149,115 +94,201 @@
     ];
   }
 
-  // ── Palette: Seam Studio light theme, greige + lime only (no cool blue).
-  //    A light greige, a present on-brand lime that carries real coverage,
-  //    and a warm sage-greige for depth — all kept light so dark ink text
-  //    stays readable, but bold enough that the field visibly spans the page. ──
-  var c1 = hex('F2F1E6');  // light greige (lightest)
-  var c2 = hex('CBEB4E');  // present on-brand lime (the star, near full presence)
-  var c3 = hex('DEE6C2');  // warm sage-greige for depth (replaces the cool tint)
-  gl.uniform4f(U.u_color1, c1[0], c1[1], c1[2], 1.0);
-  gl.uniform4f(U.u_color2, c2[0], c2[1], c2[2], 1.0);
-  gl.uniform4f(U.u_color3, c3[0], c3[1], c3[2], 1.0);
-
-  // ── Look uniforms — bolder, page-spanning flow. Larger features (u_scale),
-  //    more visible drift (u_swirl/u_distortion), biased toward lime
-  //    (u_proportion), still smooth and premium (no hard edges). ──
-  gl.uniform1f(U.u_scale, 1.05);
-  gl.uniform1f(U.u_rotation, 0.0);
-  gl.uniform1f(U.u_proportion, 0.44);
-  gl.uniform1f(U.u_softness, 0.80);
-  gl.uniform1f(U.u_shape, 2.0);          // halves — smooth, no hard edges
-  gl.uniform1f(U.u_shapeScale, 0.50);
-  gl.uniform1f(U.u_distortion, 0.30);
-  gl.uniform1f(U.u_swirl, 0.85);
-  gl.uniform1f(U.u_swirlIterations, 8.0);
-
-  var t0 = performance.now();
-  var raf = 0;
-  var running = false;
-  var visible = true;
-
-  function resize() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);   // cap DPR ≤ 2
-    var r = canvas.getBoundingClientRect();
-    var cssW = Math.max(1, Math.round(r.width));
-    var cssH = Math.max(1, Math.round(r.height));
-    var w = Math.max(1, Math.round(cssW * dpr));
-    var h = Math.max(1, Math.round(cssH * dpr));
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width = w;
-      canvas.height = h;
+  // ── Palette + look presets ──────────────────────────────────────
+  // LIGHT (hero): greige + present lime, kept light so dark ink text
+  //   stays readable across the whole hero region.
+  // DARK (bands/cta): mostly deep charcoal with calm on-brand lime
+  //   wisps in the thin transition seam — over it the WHITE headings,
+  //   sub copy and inner cards stay clearly readable.
+  var PRESETS = {
+    light: {
+      colors: ['F2F1E6', 'CBEB4E', 'DEE6C2'],
+      scale: 1.05, rotation: 0.0, proportion: 0.44, softness: 0.80,
+      shape: 2.0, shapeScale: 0.50, distortion: 0.30, swirl: 0.85,
+      swirlIterations: 8.0, speed: 0.00015, staticPhase: 6.0
+    },
+    dark: {
+      // c1 deep charcoal · c2 brand lime (thin seam = low presence) · c3 mid charcoal.
+      // proportion pushed low so most of the field stays charcoal and the lime
+      // reads as calm wisps rather than broad neon ribbons; a dark scrim in CSS
+      // (.band::before) further protects the white copy sitting over it.
+      colors: ['0B0B0B', 'D2FF37', '202020'],
+      scale: 0.92, rotation: 0.0, proportion: 0.37, softness: 0.62,
+      shape: 2.0, shapeScale: 0.5, distortion: 0.20, swirl: 0.55,
+      swirlIterations: 8.0, speed: 0.00010, staticPhase: 6.0
     }
-    gl.viewport(0, 0, w, h);
-    gl.uniform2f(U.u_resolution, w, h);
-    gl.uniform1f(U.u_pixelRatio, dpr);
-  }
+  };
 
-  function draw(uTime) {
-    gl.uniform1f(U.u_time, uTime);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-  }
+  // ── Mount one warp field on one canvas ──────────────────────────
+  function mount(canvas, preset) {
+    if (!canvas) return;
+    var section = canvas.closest('.hero-liquid, .band, .cta-band') || canvas.parentElement;
 
-  function frame(now) {
-    raf = 0;
-    // Slow, premium drift: ~0.15 shader-time units per second.
-    draw((now - t0) * 0.00015);
-    if (running) raf = requestAnimationFrame(frame);
-  }
-
-  function start() {
-    if (running || reduce) return;
-    running = true;
-    raf = requestAnimationFrame(frame);
-  }
-
-  function stop() {
-    running = false;
-    if (raf) { cancelAnimationFrame(raf); raf = 0; }
-  }
-
-  // A single static frame (fixed phase) for reduced-motion or when paused.
-  function drawStatic() { draw(6.0); }
-
-  resize();
-
-  if (reduce) {
-    drawStatic();
-  } else {
-    start();
-  }
-
-  // Redraw on layout change (loom stacks on mobile, ticker reflows, etc.).
-  function onResize() {
-    resize();
-    if (reduce) { drawStatic(); }
-    else if (!running) { drawStatic(); }  // running loop repaints on its own
-  }
-  window.addEventListener('resize', onResize, { passive: true });
-  if ('ResizeObserver' in window) {
-    try { new ResizeObserver(onResize).observe(section); } catch (e) {}
-  }
-
-  // Pause when the field is scrolled offscreen.
-  if ('IntersectionObserver' in window && !reduce) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        visible = en.isIntersecting;
-        if (visible && !document.hidden) start();
-        else stop();
+    var gl = null;
+    try {
+      gl = canvas.getContext('webgl2', {
+        antialias: false,
+        alpha: true,
+        premultipliedAlpha: false,
+        depth: false,
+        stencil: false,
+        powerPreference: 'low-power'
       });
-    }, { threshold: 0 });
-    io.observe(section);
+    } catch (e) { gl = null; }
+
+    // No WebGL2 → leave the CSS fallback background in place.
+    if (!gl) { canvas.style.display = 'none'; return; }
+
+    function compile(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.warn('[qw-liquid] shader compile failed:', gl.getShaderInfoLog(s));
+        gl.deleteShader(s);
+        return null;
+      }
+      return s;
+    }
+
+    function fail() { canvas.style.display = 'none'; }
+
+    var vs = compile(gl.VERTEX_SHADER, VERT);
+    var fs = compile(gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) { fail(); return; }
+
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      console.warn('[qw-liquid] program link failed:', gl.getProgramInfoLog(prog));
+      fail();
+      return;
+    }
+    gl.useProgram(prog);
+
+    // A VAO is required to draw in a WebGL2 core context.
+    var vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    var U = {};
+    ['u_time', 'u_pixelRatio', 'u_resolution', 'u_scale', 'u_rotation',
+     'u_color1', 'u_color2', 'u_color3', 'u_proportion', 'u_softness',
+     'u_shape', 'u_shapeScale', 'u_distortion', 'u_swirl', 'u_swirlIterations'
+    ].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+
+    var c1 = hex(preset.colors[0]);
+    var c2 = hex(preset.colors[1]);
+    var c3 = hex(preset.colors[2]);
+    gl.uniform4f(U.u_color1, c1[0], c1[1], c1[2], 1.0);
+    gl.uniform4f(U.u_color2, c2[0], c2[1], c2[2], 1.0);
+    gl.uniform4f(U.u_color3, c3[0], c3[1], c3[2], 1.0);
+
+    gl.uniform1f(U.u_scale, preset.scale);
+    gl.uniform1f(U.u_rotation, preset.rotation);
+    gl.uniform1f(U.u_proportion, preset.proportion);
+    gl.uniform1f(U.u_softness, preset.softness);
+    gl.uniform1f(U.u_shape, preset.shape);
+    gl.uniform1f(U.u_shapeScale, preset.shapeScale);
+    gl.uniform1f(U.u_distortion, preset.distortion);
+    gl.uniform1f(U.u_swirl, preset.swirl);
+    gl.uniform1f(U.u_swirlIterations, preset.swirlIterations);
+
+    var t0 = performance.now();
+    var raf = 0;
+    var running = false;
+    var visible = true;
+    var speed = preset.speed;
+
+    function resize() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);   // cap DPR ≤ 2
+      var r = canvas.getBoundingClientRect();
+      var cssW = Math.max(1, Math.round(r.width));
+      var cssH = Math.max(1, Math.round(r.height));
+      var w = Math.max(1, Math.round(cssW * dpr));
+      var h = Math.max(1, Math.round(cssH * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+      gl.viewport(0, 0, w, h);
+      gl.uniform2f(U.u_resolution, w, h);
+      gl.uniform1f(U.u_pixelRatio, dpr);
+    }
+
+    function draw(uTime) {
+      gl.uniform1f(U.u_time, uTime);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    function frame(now) {
+      raf = 0;
+      // Slow, premium drift.
+      draw((now - t0) * speed);
+      if (running) raf = requestAnimationFrame(frame);
+    }
+
+    function start() {
+      if (running || reduce) return;
+      running = true;
+      raf = requestAnimationFrame(frame);
+    }
+
+    function stop() {
+      running = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    }
+
+    // A single static frame (fixed phase) for reduced-motion or when paused.
+    function drawStatic() { draw(preset.staticPhase); }
+
+    resize();
+
+    if (reduce) {
+      drawStatic();
+    } else {
+      start();
+    }
+
+    // Redraw on layout change (loom stacks on mobile, cards reflow, etc.).
+    function onResize() {
+      resize();
+      if (reduce) { drawStatic(); }
+      else if (!running) { drawStatic(); }  // running loop repaints on its own
+    }
+    window.addEventListener('resize', onResize, { passive: true });
+    if ('ResizeObserver' in window) {
+      try { new ResizeObserver(onResize).observe(section); } catch (e) {}
+    }
+
+    // Pause when this field is scrolled offscreen — only in-view sections
+    // spend a frame, so several canvases never animate at once.
+    if ('IntersectionObserver' in window && !reduce) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          visible = en.isIntersecting;
+          if (visible && !document.hidden) start();
+          else stop();
+        });
+      }, { threshold: 0 });
+      io.observe(section);
+    }
+
+    // Pause when the tab is hidden.
+    document.addEventListener('visibilitychange', function () {
+      if (reduce) return;
+      if (document.hidden) stop();
+      else if (visible) start();
+    });
+
+    // Recover cleanly from a lost GL context.
+    canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); stop(); }, false);
   }
 
-  // Pause when the tab is hidden.
-  document.addEventListener('visibilitychange', function () {
-    if (reduce) return;
-    if (document.hidden) stop();
-    else if (visible) start();
-  });
+  // ── Boot: hero (light) + every flagged dark section canvas ──────
+  mount(document.getElementById('heroLiquid'), PRESETS.light);
 
-  // Recover cleanly from a lost GL context.
-  canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); stop(); }, false);
+  var dark = document.querySelectorAll('canvas[data-liquid="dark"]');
+  for (var i = 0; i < dark.length; i++) mount(dark[i], PRESETS.dark);
 })();

@@ -340,19 +340,27 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 /* ============================================================
    DARK INSET PANEL (band) — used sparingly for punch
    ============================================================ */
-.band{position:relative;overflow:hidden;margin:0 var(--inset);border-radius:var(--r-lg);color:#fff;
-  background:
-    var(--grain),
-    radial-gradient(90% 70% at 72% 20%, rgba(255,255,255,.12), transparent 55%),
-    radial-gradient(70% 60% at 18% 82%, rgba(255,255,255,.07), transparent 58%),
-    var(--noise),
-    radial-gradient(120% 90% at 50% 45%, #262626 0%, #0C0C0C 72%);
-  background-size:420px, cover, cover, cover, cover;background-blend-mode:overlay,screen,screen,soft-light,normal;
+.band{position:relative;isolation:isolate;overflow:hidden;margin:0 var(--inset);border-radius:var(--r-lg);color:#fff;
+  /* fallback / no-WebGL2 base: a solid deep charcoal with a faint centre lift,
+     so the panel still reads as an intentional dark section without the liquid */
+  background:radial-gradient(120% 90% at 50% 30%, #191919 0%, #0C0C0C 72%);
   border:1px solid rgba(255,255,255,.07);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.10), var(--shadow-lg)}
-.band::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:radial-gradient(120% 60% at 50% -8%, rgba(255,255,255,.10), transparent 60%)}
-.band > .wrap{position:relative;z-index:1}
+.band::before{content:'';position:absolute;inset:0;z-index:1;border-radius:inherit;pointer-events:none;
+  /* top sheen + a soft dark scrim that mutes the liquid under the copy (keeps white text readable) */
+  background:
+    radial-gradient(120% 60% at 50% -8%, rgba(255,255,255,.08), transparent 60%),
+    radial-gradient(118% 130% at 50% 50%, rgba(9,9,9,.42) 0%, rgba(9,9,9,.18) 52%, transparent 84%),
+    linear-gradient(rgba(9,9,9,.30), rgba(9,9,9,.30))}
+.band > .wrap{position:relative;z-index:2}
+
+/* Animated liquid field behind dark sections (qw-liquid.js, dark preset).
+   Sits above the solid fallback base, below the top sheen + content. */
+.band-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block;pointer-events:none;border-radius:inherit}
+
+/* Stacked dark panels must not touch: give consecutive dark bands a
+   comfortable vertical gap (they carry no vertical margin of their own). */
+.band + .band,.band + .cta-band,.cta-band + .band,.cta-band + .cta-band{margin-top:clamp(20px,3.4vw,48px)}
 .band .kicker{color:rgba(255,255,255,.6)}
 .band .kicker::before{background:var(--lime)}
 .band h2,.band h3{color:#fff}
@@ -361,7 +369,9 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 .band-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(40px,6vw,72px);align-items:center}
 
 /* fact list (on dark) */
-.fact-list{display:grid;gap:0;border-top:1px solid var(--on-ink-line)}
+.fact-list{display:grid;gap:0;border-top:1px solid var(--on-ink-line);
+  /* dark bed over the liquid so the dense key/value text always clears contrast */
+  background:rgba(11,11,11,.42);border-radius:14px;padding:2px 14px;backdrop-filter:blur(2px)}
 .fact{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:17px 12px 17px 4px;border-bottom:1px solid var(--on-ink-line);border-radius:10px;position:relative;transition:background .3s var(--ease),padding-left .35s var(--expo)}
 .fact::before{content:'';position:absolute;left:0;top:50%;width:0;height:0;border-radius:50%;background:var(--lime);transform:translateY(-50%);transition:width .35s var(--spring),height .35s var(--spring),left .35s var(--expo)}
 .fact:hover{background:rgba(255,255,255,.04);padding-left:20px}
@@ -413,8 +423,8 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 .bigquote em{font-family:inherit;font-style:normal;font-weight:600;color:var(--lime);background:none;padding:0}
 .guarantee-note{margin:var(--s5) auto 0;max-width:52ch;color:var(--on-ink-muted);font-size:var(--fs-lead);line-height:1.6}
 .rules{margin-top:var(--s7);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:left}
-.rule{border:1px solid var(--on-ink-line);border-radius:var(--r-md);padding:26px;background:rgba(255,255,255,.03);transition:background .3s,border-color .3s}
-.rule:hover{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.2)}
+.rule{border:1px solid var(--on-ink-line);border-radius:var(--r-md);padding:26px;background:rgba(11,11,11,.44);backdrop-filter:blur(2px);transition:background .3s,border-color .3s}
+.rule:hover{background:rgba(11,11,11,.58);border-color:rgba(255,255,255,.2)}
 .rule .rn{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin-bottom:12px;font-weight:600;display:block}
 .rule h5{color:#fff;margin-bottom:8px;font-weight:600}
 .rule p{font-size:var(--fs-small);color:var(--on-ink-muted);line-height:1.6}
@@ -462,16 +472,17 @@ nav.scrolled{border-bottom-color:var(--hair);background:rgba(255,255,255,.82)}
 /* ============================================================
    CTA (dark inset panel)
    ============================================================ */
-.cta-band{position:relative;overflow:hidden;margin:0 var(--inset);border-radius:var(--r-lg);color:#fff;text-align:center;
-  background:
-    var(--grain),
-    radial-gradient(80% 70% at 50% 10%, rgba(255,255,255,.12), transparent 55%),
-    var(--noise),
-    radial-gradient(120% 100% at 50% 0%, #262626 0%, #0C0C0C 72%);
-  background-size:420px, cover, cover, cover;background-blend-mode:overlay,screen,soft-light,normal;
+.cta-band{position:relative;isolation:isolate;overflow:hidden;margin:0 var(--inset);border-radius:var(--r-lg);color:#fff;text-align:center;
+  /* fallback / no-WebGL2 base: solid deep charcoal (see .band) */
+  background:radial-gradient(120% 100% at 50% 0%, #191919 0%, #0C0C0C 72%);
   border:1px solid rgba(255,255,255,.07);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.10), var(--shadow-lg)}
-.cta-band .wrap{position:relative;z-index:1}
+.cta-band::before{content:'';position:absolute;inset:0;z-index:1;border-radius:inherit;pointer-events:none;
+  background:
+    radial-gradient(120% 60% at 50% -8%, rgba(255,255,255,.07), transparent 60%),
+    radial-gradient(118% 130% at 50% 50%, rgba(9,9,9,.40) 0%, rgba(9,9,9,.16) 52%, transparent 84%),
+    linear-gradient(rgba(9,9,9,.28), rgba(9,9,9,.28))}
+.cta-band .wrap{position:relative;z-index:2}
 .cta-band .kicker{color:rgba(255,255,255,.6)}
 .cta-band h2{color:#fff;margin:0 auto}
 .cta-band .sub{color:var(--on-ink-muted);margin-left:auto;margin-right:auto}
