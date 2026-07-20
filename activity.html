@@ -20,10 +20,10 @@
 
 <!-- Mobile top bar — shown only on narrow widths, once signed in -->
 <div class="qc-mobar">
-  <button class="qc-burger" id="navBurger" type="button" aria-label="Open navigation" aria-controls="subnav" aria-expanded="false">
+  <button class="qc-burger" id="navBurger" type="button" data-i18n-attr="aria-label:nav.openAria" aria-label="Open navigation" aria-controls="subnav" aria-expanded="false">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
   </button>
-  <a class="qc-mobar-brand" href="dashboard.html" aria-label="Quotewright quote console">
+  <a class="qc-mobar-brand" href="dashboard.html" lang="en" data-i18n-attr="aria-label:nav.brandAria" aria-label="Quotewright quote console">
     <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#111"/><path d="M8 21.5L13 9l3.5 8L20 9l4 12.5" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 25h20" stroke="#D2FF37" stroke-width="2.4" stroke-linecap="round"/></svg>
     Quotewright <span class="qc-tag">Copilot</span>
   </a>
@@ -32,22 +32,22 @@
 <div class="qc-nav-scrim" id="navScrim" aria-hidden="true"></div>
 
 <!-- Liquid-glass left navigation. #subnav is revealed on auth (replaces the old top bars). -->
-<aside class="qc-sidebar" id="subnav" aria-label="Console navigation" hidden>
-  <nav class="qc-side-nav" id="sideNav" aria-label="Console sections">
-    <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span>Quotes</span></a>
-    <a href="insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg><span>Insights</span></a>
-    <a href="customers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg><span>Customers</span></a>
-    <a href="gaps.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><span>Catalogue gaps</span></a>
-    <a href="activity.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Activity</span></a>
-    <a href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M18 6h2M4 12h2M11 12h9M4 18h9M18 18h2"/><circle cx="15.5" cy="6" r="2"/><circle cx="8.5" cy="12" r="2"/><circle cx="15.5" cy="18" r="2"/></svg><span>Settings</span></a>
-    <a href="admin.html" id="adminNav" class="qc-nav-admin" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Admin</span></a>
+<aside class="qc-sidebar" id="subnav" data-i18n-attr="aria-label:nav.aria" aria-label="Console navigation" hidden>
+  <nav class="qc-side-nav" id="sideNav" data-i18n-attr="aria-label:nav.sectionsAria" aria-label="Console sections">
+    <a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span data-i18n="nav.quotes">Quotes</span></a>
+    <a href="insights.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg><span data-i18n="nav.insights">Insights</span></a>
+    <a href="customers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg><span data-i18n="nav.customers">Customers</span></a>
+    <a href="gaps.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><span data-i18n="nav.gaps">Catalogue gaps</span></a>
+    <a href="activity.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="nav.activity">Activity</span></a>
+    <a href="settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M18 6h2M4 12h2M11 12h9M4 18h9M18 18h2"/><circle cx="15.5" cy="6" r="2"/><circle cx="8.5" cy="12" r="2"/><circle cx="15.5" cy="18" r="2"/></svg><span data-i18n="nav.settings">Settings</span></a>
+    <a href="admin.html" id="adminNav" class="qc-nav-admin" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span data-i18n="nav.admin">Admin</span></a>
   </nav>
 
   <div class="qc-side-foot">
     <div class="qc-side-user">
       <span class="qc-side-avatar" id="userAvatar" aria-hidden="true"></span>
-      <span id="whoami" class="qc-who"></span>
-      <button id="logoutBtn" class="qc-signout" hidden>Sign out</button>
+      <span id="whoami" class="qc-who" lang="en"></span>
+      <button id="logoutBtn" class="qc-signout" data-i18n="common.signOut" hidden>Sign out</button>
     </div>
   </div>
 </aside>
@@ -57,19 +57,19 @@
   <!-- Login -->
   <section id="loginView" class="qc-login" hidden>
     <div class="qc-login-card">
-      <div class="kicker">Internal access</div>
-      <h1>Activity feed</h1>
-      <p class="sub">Sign in to see a live timeline of everything the RFQ pipeline and your team have done.</p>
+      <div class="kicker" data-i18n="common.internalAccess">Internal access</div>
+      <h1 data-i18n="login.title.activity">Activity feed</h1>
+      <p class="sub" data-i18n="login.sub.activity">Sign in to see a live timeline of everything the RFQ pipeline and your team have done.</p>
       <form id="loginForm" novalidate>
         <div class="field">
-          <label for="email">Email</label>
-          <input id="email" type="email" autocomplete="username" required placeholder="you@company.com">
+          <label for="email" data-i18n="common.email">Email</label>
+          <input id="email" type="email" autocomplete="username" required data-i18n-attr="placeholder:common.emailPh" placeholder="you@company.com">
         </div>
         <div class="field">
-          <label for="password">Password</label>
+          <label for="password" data-i18n="common.password">Password</label>
           <input id="password" type="password" autocomplete="current-password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
         </div>
-        <button type="submit" class="btn btn-primary" id="loginBtn">Sign in</button>
+        <button type="submit" class="btn btn-primary" id="loginBtn" data-i18n="common.signIn">Sign in</button>
         <div id="loginError" class="qc-error" role="alert"></div>
       </form>
     </div>
@@ -79,37 +79,37 @@
   <section id="appView" class="wrap qc-view" hidden>
     <a class="qc-back" href="dashboard.html">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-      Console
+      <span data-i18n="common.backToConsole">Console</span>
     </a>
 
     <div class="qc-head">
       <div>
-        <div class="kicker">Activity</div>
-        <h1 class="qc-h1">Recent activity</h1>
-        <p class="qc-lede">Everything that happened, newest first — drafts written by the pipeline, quotes sent, deals won and lost, approvals, follow-ups, catalogue resolutions and gaps. One honest timeline, built from real timestamps.</p>
+        <div class="kicker" data-i18n="act.kicker">Activity</div>
+        <h1 class="qc-h1" data-i18n="act.h1">Recent activity</h1>
+        <p class="qc-lede" data-i18n="act.lede">Everything that happened, newest first — drafts written by the pipeline, quotes sent, deals won and lost, approvals, follow-ups, catalogue resolutions and gaps. One honest timeline, built from real timestamps.</p>
       </div>
-      <button id="refreshBtn" class="btn btn-ghost btn-sm">Refresh</button>
+      <button id="refreshBtn" class="btn btn-ghost btn-sm" data-i18n="common.refresh">Refresh</button>
     </div>
 
     <div class="qc-tiles" id="tiles"></div>
 
     <div class="qc-controls">
-      <input id="search" type="search" placeholder="Search customer, product or SKU&hellip;" class="qc-search" aria-label="Search activity">
-      <select id="typeSel" class="qc-select" aria-label="Filter by event type">
-        <option value="all">All activity</option>
-        <option value="draft">Quotes drafted</option>
-        <option value="sent">Quotes sent</option>
-        <option value="outcome">Outcomes (won / lost)</option>
-        <option value="approval">Approvals</option>
-        <option value="followup">Follow-ups</option>
-        <option value="resolution">Catalogue resolutions</option>
-        <option value="gap">Catalogue gaps</option>
+      <input id="search" type="search" placeholder="Search customer, product or SKU&hellip;" class="qc-search" aria-label="Search activity" data-i18n-attr="placeholder:act.searchPh;aria-label:act.searchAria">
+      <select id="typeSel" class="qc-select" aria-label="Filter by event type" data-i18n-attr="aria-label:act.typeAria">
+        <option value="all" data-i18n="act.type.all">All activity</option>
+        <option value="draft" data-i18n="act.type.draft">Quotes drafted</option>
+        <option value="sent" data-i18n="act.type.sent">Quotes sent</option>
+        <option value="outcome" data-i18n="act.type.outcome">Outcomes (won / lost)</option>
+        <option value="approval" data-i18n="act.type.approval">Approvals</option>
+        <option value="followup" data-i18n="act.type.followup">Follow-ups</option>
+        <option value="resolution" data-i18n="act.type.resolution">Catalogue resolutions</option>
+        <option value="gap" data-i18n="act.type.gap">Catalogue gaps</option>
       </select>
-      <select id="rangeSel" class="qc-select" aria-label="Filter by date range">
-        <option value="all">All time</option>
-        <option value="today">Today</option>
-        <option value="7">Last 7 days</option>
-        <option value="30">Last 30 days</option>
+      <select id="rangeSel" class="qc-select" aria-label="Filter by date range" data-i18n-attr="aria-label:act.rangeAria">
+        <option value="all" data-i18n="act.range.all">All time</option>
+        <option value="today" data-i18n="act.range.today">Today</option>
+        <option value="7" data-i18n="act.range.7">Last 7 days</option>
+        <option value="30" data-i18n="act.range.30">Last 30 days</option>
       </select>
       <span id="rowCount" class="qc-count"></span>
     </div>
@@ -123,6 +123,7 @@
   <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
 </main>
 
+<script src="console-i18n.js"></script>
 <script src="vendor/supabase.js"></script>
 <script src="dashboard-config.js"></script>
 <script src="console-tenancy.js"></script>

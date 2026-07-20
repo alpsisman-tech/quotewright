@@ -14,8 +14,135 @@
 (function () {
   "use strict";
   var Q = window.QWConsole;
-  var el = Q.el, esc = Q.esc, money = Q.money, num = Q.numOrNull,
-      relTime = Q.relTime, fmtDateTime = Q.fmtDateTime, toast = Q.toast;
+  var el = Q.el, esc = Q.esc, money = Q.money, num = Q.numOrNull, toast = Q.toast;
+  // Locale-aware time comes from the i18n engine (falls back to console-views).
+  var I = window.QWI18n;
+  function t(k, v) { return (I && I.t) ? I.t(k, v) : k; }
+  function relTime(s) { return (I && I.rel) ? I.rel(s) : Q.relTime(s); }
+  function fmtDateTime(s) { return (I && I.dateTime) ? I.dateTime(s) : Q.fmtDateTime(s); }
+
+  if (I && I.add) I.add({
+    en: {
+      "act.kicker": "Activity",
+      "act.h1": "Recent activity",
+      "act.lede": "Everything that happened, newest first — drafts written by the pipeline, quotes sent, deals won and lost, approvals, follow-ups, catalogue resolutions and gaps. One honest timeline, built from real timestamps.",
+      "act.searchPh": "Search customer, product or SKU…",
+      "act.searchAria": "Search activity",
+      "act.typeAria": "Filter by event type",
+      "act.type.all": "All activity",
+      "act.type.draft": "Quotes drafted",
+      "act.type.sent": "Quotes sent",
+      "act.type.outcome": "Outcomes (won / lost)",
+      "act.type.approval": "Approvals",
+      "act.type.followup": "Follow-ups",
+      "act.type.resolution": "Catalogue resolutions",
+      "act.type.gap": "Catalogue gaps",
+      "act.rangeAria": "Filter by date range",
+      "act.range.all": "All time",
+      "act.range.today": "Today",
+      "act.range.7": "Last 7 days",
+      "act.range.30": "Last 30 days",
+      "act.ev.draft": "Quote drafted",
+      "act.ev.approval_flag": "Flagged for approval",
+      "act.ev.approved": "Approval cleared",
+      "act.ev.sent": "Quote sent",
+      "act.ev.followup": "Follow-up sent",
+      "act.ev.won": "Marked won",
+      "act.ev.lost": "Marked lost",
+      "act.ev.resolution": "Catalogue line resolved",
+      "act.ev.gap": "Catalogue gap requested",
+      "act.count.one": "{n} event",
+      "act.count.many": "{n} events",
+      "act.unknownCustomer": "Unknown customer",
+      "act.awaitingSignoff": "Awaiting a human sign-off",
+      "act.by": "by {name}",
+      "act.followupsTotal": "{n} follow-ups total",
+      "act.forSig": "for “{sig}”",
+      "act.requestOne": "{n} request",
+      "act.requestMany": "{n} requests",
+      "act.uncataloguedRequest": "Uncatalogued request",
+      "act.tier.green": "Green",
+      "act.tier.amber": "Amber",
+      "act.tier.red": "Red",
+      "act.tile.today": "Events today",
+      "act.tile.week": "Last 7 days",
+      "act.tile.sent": "Quotes sent",
+      "act.tile.latest": "Latest activity",
+      "act.empty.offTitle": "Activity tracking isn't switched on yet",
+      "act.empty.offBody": "The console tables don't exist yet. Run <code lang=\"en\">quote-analytics.sql</code> and <code lang=\"en\">quotewright-intelligence.sql</code> in the Supabase SQL editor, and this timeline fills as the pipeline drafts, sends and resolves quotes.",
+      "act.empty.noneTitle": "No activity yet",
+      "act.empty.noneBody": "Nothing has happened here yet. The moment the RFQ pipeline drafts its first quote — or you send, resolve or mark one — it lands at the top of this feed.",
+      "act.empty.filterTitle": "Nothing in this view",
+      "act.empty.filterBody": "No events match those filters. Try “All activity”, widen the date range, or clear the search.",
+      "act.err.title": "Couldn’t load the activity feed",
+      "act.err.tryAgain": "Try again",
+      "act.err.fatalQuotes": "Something went wrong reaching the quote store.",
+      "act.err.network": "Network error — check your connection and try again."
+    },
+    tr: {
+      "act.kicker": "Etkinlik",
+      "act.h1": "Son etkinlikler",
+      "act.lede": "Olan biten her şey, en yenisi en üstte — akışın hazırladığı taslaklar, gönderilen teklifler, kazanılan ve kaybedilen anlaşmalar, onaylar, takipler, katalog çözümleri ve boşluklar. Gerçek zaman damgalarından oluşan tek ve dürüst bir zaman çizelgesi.",
+      "act.searchPh": "Müşteri, ürün veya SKU ara…",
+      "act.searchAria": "Etkinlikte ara",
+      "act.typeAria": "Etkinlik türüne göre filtrele",
+      "act.type.all": "Tüm etkinlikler",
+      "act.type.draft": "Hazırlanan teklifler",
+      "act.type.sent": "Gönderilen teklifler",
+      "act.type.outcome": "Sonuçlar (kazanılan / kaybedilen)",
+      "act.type.approval": "Onaylar",
+      "act.type.followup": "Takipler",
+      "act.type.resolution": "Katalog çözümleri",
+      "act.type.gap": "Katalog boşlukları",
+      "act.rangeAria": "Tarih aralığına göre filtrele",
+      "act.range.all": "Tüm zamanlar",
+      "act.range.today": "Bugün",
+      "act.range.7": "Son 7 gün",
+      "act.range.30": "Son 30 gün",
+      "act.ev.draft": "Teklif hazırlandı",
+      "act.ev.approval_flag": "Onay için işaretlendi",
+      "act.ev.approved": "Onay verildi",
+      "act.ev.sent": "Teklif gönderildi",
+      "act.ev.followup": "Takip gönderildi",
+      "act.ev.won": "Kazanıldı olarak işaretlendi",
+      "act.ev.lost": "Kaybedildi olarak işaretlendi",
+      "act.ev.resolution": "Katalog satırı çözüldü",
+      "act.ev.gap": "Katalog boşluğu talep edildi",
+      "act.count.one": "{n} etkinlik",
+      "act.count.many": "{n} etkinlik",
+      "act.unknownCustomer": "Bilinmeyen müşteri",
+      "act.awaitingSignoff": "Bir yetkilinin onayı bekleniyor",
+      "act.by": "{name} tarafından",
+      "act.followupsTotal": "toplam {n} takip",
+      "act.forSig": "“{sig}” için",
+      "act.requestOne": "{n} talep",
+      "act.requestMany": "{n} talep",
+      "act.uncataloguedRequest": "Katalog dışı talep",
+      "act.tier.green": "Yeşil",
+      "act.tier.amber": "Sarı",
+      "act.tier.red": "Kırmızı",
+      "act.tile.today": "Bugünkü etkinlikler",
+      "act.tile.week": "Son 7 gün",
+      "act.tile.sent": "Gönderilen teklifler",
+      "act.tile.latest": "Son etkinlik",
+      "act.empty.offTitle": "Etkinlik takibi henüz açık değil",
+      "act.empty.offBody": "Konsol tabloları henüz mevcut değil. Supabase SQL düzenleyicisinde <code lang=\"en\">quote-analytics.sql</code> ve <code lang=\"en\">quotewright-intelligence.sql</code> dosyalarını çalıştırın; akış teklif hazırladıkça, gönderdikçe ve çözdükçe bu zaman çizelgesi dolar.",
+      "act.empty.noneTitle": "Henüz etkinlik yok",
+      "act.empty.noneBody": "Burada henüz bir şey olmadı. RFQ akışı ilk teklifini hazırladığı anda — ya da siz bir teklif gönderdiğinizde, çözdüğünüzde veya işaretlediğinizde — bu akışın en üstünde belirir.",
+      "act.empty.filterTitle": "Bu görünümde bir şey yok",
+      "act.empty.filterBody": "Bu filtrelere uyan etkinlik yok. “Tüm etkinlikler” seçeneğini deneyin, tarih aralığını genişletin veya aramayı temizleyin.",
+      "act.err.title": "Etkinlik akışı yüklenemedi",
+      "act.err.tryAgain": "Tekrar dene",
+      "act.err.fatalQuotes": "Teklif deposuna erişilirken bir hata oluştu.",
+      "act.err.network": "Ağ hatası — bağlantınızı kontrol edip tekrar deneyin."
+    }
+  });
+
+  function tierLabel(tier) {
+    var k = "act.tier." + String(tier || "").toLowerCase();
+    var v = t(k);
+    return (v === k) ? cap(tier) : v;   // fall back to Capitalised raw tier
+  }
 
   var sb = null;
   var events = [];
@@ -93,8 +220,8 @@
     }
     loading = true;
     el("tableError").hidden = true;
-    if (!loaded) skeleton(); else el("rowCount").textContent = "Loading…";
-    var rb = el("refreshBtn"); if (rb) { rb.classList.add("is-loading"); rb.textContent = "Refreshing…"; }
+    if (!loaded) skeleton(); else el("rowCount").textContent = t("common.loading");
+    var rb = el("refreshBtn"); if (rb) { rb.classList.add("is-loading"); rb.textContent = t("common.refreshing"); }
     srcState = { quotes: "?", resolutions: "?", gaps: "?" };
 
     var pQuotes = fetchTable("quotes",
@@ -107,11 +234,11 @@
 
     Promise.all([pQuotes, pRes, pGaps]).then(function (r) {
       loading = false;
-      if (rb) { rb.classList.remove("is-loading"); rb.textContent = "Refresh"; }
+      if (rb) { rb.classList.remove("is-loading"); rb.textContent = t("common.refresh"); }
 
       // The quotes table is the primary source — a hard (non-missing) error there is fatal.
       if (r[0] && r[0].__err) {
-        showTableError((r[0].__err.message) || "Something went wrong reaching the quote store.");
+        showTableError((r[0].__err.message) || t("act.err.fatalQuotes"));
         return;
       }
       var quotes = Array.isArray(r[0]) ? r[0] : [];
@@ -123,8 +250,8 @@
       render();
     }, function (err) {
       loading = false;
-      if (rb) { rb.classList.remove("is-loading"); rb.textContent = "Refresh"; }
-      showTableError((err && err.message) || "Network error — check your connection and try again.");
+      if (rb) { rb.classList.remove("is-loading"); rb.textContent = t("common.refresh"); }
+      showTableError((err && err.message) || t("act.err.network"));
     });
   }
 
@@ -168,7 +295,7 @@
   // ── filtering ────────────────────────────────────────────────────────────────
   function haystack(e) {
     var d = e.d || {};
-    return ((d.customer || "") + " " + (d.sku || "") + " " + (d.desc || "") + " " + (d.sig || "") + " " + (META[e.type] ? META[e.type].label : "")).toLowerCase();
+    return ((d.customer || "") + " " + (d.sku || "") + " " + (d.desc || "") + " " + (d.sig || "") + " " + (META[e.type] ? t("act.ev." + e.type) : "")).toLowerCase();
   }
   function filtered() {
     var type = el("typeSel").value;
@@ -191,7 +318,7 @@
     if (!loaded) return;
     renderTiles();
     var list = filtered();
-    el("rowCount").textContent = list.length + (list.length === 1 ? " event" : " events");
+    el("rowCount").textContent = t(list.length === 1 ? "act.count.one" : "act.count.many", { n: list.length });
 
     var feed = el("feed"), empty = el("emptyState");
     el("tableError").hidden = true;
@@ -201,14 +328,11 @@
       empty.hidden = false;
       var allMissing = srcState.quotes === "missing" && srcState.resolutions === "missing" && srcState.gaps === "missing";
       if (events.length === 0 && allMissing) {
-        empty.innerHTML = panel(ICON_CLOCK, "Activity tracking isn't switched on yet",
-          "The console tables don't exist yet. Run <code>quote-analytics.sql</code> and <code>quotewright-intelligence.sql</code> in the Supabase SQL editor, and this timeline fills as the pipeline drafts, sends and resolves quotes.");
+        empty.innerHTML = panel(ICON_CLOCK, t("act.empty.offTitle"), t("act.empty.offBody"));
       } else if (events.length === 0) {
-        empty.innerHTML = panel(ICON_CLOCK, "No activity yet",
-          "Nothing has happened here yet. The moment the RFQ pipeline drafts its first quote — or you send, resolve or mark one — it lands at the top of this feed.");
+        empty.innerHTML = panel(ICON_CLOCK, t("act.empty.noneTitle"), t("act.empty.noneBody"));
       } else {
-        empty.innerHTML = panel(ICON_FILTER, "Nothing in this view",
-          "No events match those filters. Try “All activity”, widen the date range, or clear the search.");
+        empty.innerHTML = panel(ICON_FILTER, t("act.empty.filterTitle"), t("act.empty.filterBody"));
       }
       return;
     }
@@ -230,7 +354,7 @@
           '<span class="qc-ev-dot tone-' + META[e.type].tone + '">' + svg(IC[e.type]) + '</span>' +
           '<div class="qc-ev-body">' +
             '<div class="qc-ev-line">' +
-              '<span class="qc-ev-title">' + esc(META[e.type].label) + '</span>' +
+              '<span class="qc-ev-title">' + esc(t("act.ev." + e.type)) + '</span>' +
               '<time class="qc-ev-time" title="' + esc(fmtDateTime(e.ts)) + '">' + esc(relTime(e.ts)) + '</time>' +
             '</div>' +
             '<div class="qc-ev-meta">' + describe(e) + '</div>' +
@@ -250,44 +374,47 @@
     function chip(txt, cls) { return '<span class="' + (cls || "") + '">' + esc(txt) + '</span>'; }
     function amount() { if (d.total != null && !isNaN(d.total)) out.push('<span class="qc-ev-amt">' + esc(money(d.total, d.currency)) + '</span>'); }
 
+    // Customer / product / SKU strings are DATA — never translated. Wrap data that
+    // could be uppercased (SKU) in lang="en" so a Turkish locale can't mangle it.
+    var unknown = t("act.unknownCustomer");
     switch (e.type) {
       case "draft":
-        out.push('<b>' + esc(d.customer || "Unknown customer") + '</b>'); amount();
-        if (d.tier) out.push('<span class="qc-ev-tier ' + esc(d.tier) + '">' + esc(cap(d.tier)) + '</span>');
+        out.push('<b>' + esc(d.customer || unknown) + '</b>'); amount();
+        if (d.tier) out.push('<span class="qc-ev-tier ' + esc(d.tier) + '">' + esc(tierLabel(d.tier)) + '</span>');
         break;
       case "approval_flag":
-        out.push('<b>' + esc(d.customer || "Unknown customer") + '</b>'); amount();
+        out.push('<b>' + esc(d.customer || unknown) + '</b>'); amount();
         if (d.reason) out.push(chip(clip(d.reason, 60), "qc-ev-note"));
-        else out.push(chip("Awaiting a human sign-off", "qc-ev-note"));
+        else out.push(chip(t("act.awaitingSignoff"), "qc-ev-note"));
         break;
       case "approved":
-        out.push('<b>' + esc(d.customer || "Unknown customer") + '</b>'); amount();
-        if (d.by) out.push(chip("by " + d.by, "qc-mut"));
+        out.push('<b>' + esc(d.customer || unknown) + '</b>'); amount();
+        if (d.by) out.push(chip(t("act.by", { name: d.by }), "qc-mut"));
         break;
       case "sent":
-        out.push('<b>' + esc(d.customer || "Unknown customer") + '</b>'); amount();
-        if (d.by) out.push(chip("by " + d.by, "qc-mut"));
+        out.push('<b>' + esc(d.customer || unknown) + '</b>'); amount();
+        if (d.by) out.push(chip(t("act.by", { name: d.by }), "qc-mut"));
         break;
       case "followup":
-        out.push('<b>' + esc(d.customer || "Unknown customer") + '</b>'); amount();
-        if (num(d.count) > 1) out.push(chip(d.count + " follow-ups total", "qc-mut"));
+        out.push('<b>' + esc(d.customer || unknown) + '</b>'); amount();
+        if (num(d.count) > 1) out.push(chip(t("act.followupsTotal", { n: d.count }), "qc-mut"));
         break;
       case "won":
-        out.push('<b>' + esc(d.customer || "Unknown customer") + '</b>'); amount();
+        out.push('<b>' + esc(d.customer || unknown) + '</b>'); amount();
         if (d.note) out.push(chip(clip(d.note, 60), "qc-ev-note"));
         break;
       case "lost":
-        out.push('<b>' + esc(d.customer || "Unknown customer") + '</b>'); amount();
+        out.push('<b>' + esc(d.customer || unknown) + '</b>'); amount();
         if (d.note) out.push(chip(clip(d.note, 60), "qc-ev-note"));
         break;
       case "resolution":
-        if (d.sku) out.push('<b class="qc-ev-sku">' + esc(d.sku) + '</b>');
-        if (d.sig) out.push(chip("for “" + clip(d.sig, 40) + "”", "qc-mut"));
-        if (d.by) out.push(chip("by " + d.by, "qc-mut"));
+        if (d.sku) out.push('<b class="qc-ev-sku" lang="en">' + esc(d.sku) + '</b>');
+        if (d.sig) out.push(chip(t("act.forSig", { sig: clip(d.sig, 40) }), "qc-mut"));
+        if (d.by) out.push(chip(t("act.by", { name: d.by }), "qc-mut"));
         break;
       case "gap":
-        out.push('<b>' + esc(d.desc || d.sig || "Uncatalogued request") + '</b>');
-        if (num(d.count) > 0) out.push(chip(d.count + (num(d.count) === 1 ? " request" : " requests"), "qc-ev-note"));
+        out.push('<b>' + esc(d.desc || d.sig || t("act.uncataloguedRequest")) + '</b>');
+        if (num(d.count) > 0) out.push(chip(t(num(d.count) === 1 ? "act.requestOne" : "act.requestMany", { n: d.count }), "qc-ev-note"));
         break;
     }
     return out.join('<span class="qc-ev-sep">·</span>');
@@ -305,10 +432,10 @@
     });
     var last = events.length ? relTime(events[0].ts) : "—";
     var tiles = [
-      { n: today, l: "Events today" },
-      { n: week, l: "Last 7 days" },
-      { n: sent, l: "Quotes sent" },
-      { n: last, l: "Latest activity", accent: events.length > 0, small: true }
+      { n: today, l: t("act.tile.today") },
+      { n: week, l: t("act.tile.week") },
+      { n: sent, l: t("act.tile.sent") },
+      { n: last, l: t("act.tile.latest"), accent: events.length > 0, small: true }
     ];
     el("tiles").innerHTML = tiles.map(function (t) {
       return '<div class="qc-tile' + (t.accent ? " accent" : "") + '">' +
@@ -319,13 +446,14 @@
 
   // ── helpers ──────────────────────────────────────────────────────────────────
   function dayKey(t) { var d = new Date(t); return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate(); }
-  function dayLabel(t) {
-    var d = new Date(t); d.setHours(0, 0, 0, 0);
+  function dayLabel(ts) {
+    var d = new Date(ts); d.setHours(0, 0, 0, 0);
     var today = new Date(); today.setHours(0, 0, 0, 0);
     var diff = Math.round((today - d) / 864e5);
-    if (diff === 0) return "Today";
-    if (diff === 1) return "Yesterday";
-    return new Date(t).toLocaleDateString("en-GB", { weekday: "long", day: "2-digit", month: "short", year: "numeric" });
+    if (diff === 0) return t("time.today");
+    if (diff === 1) return t("time.yesterday");
+    var loc = (I && I.locale) ? I.locale() : "en-GB";
+    return new Date(ts).toLocaleDateString(loc, { weekday: "long", day: "2-digit", month: "short", year: "numeric" });
   }
   function cap(s) { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); }
   function clip(s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
@@ -340,11 +468,16 @@
     el("emptyState").hidden = true;
   }
   function showTableError(msg) {
-    var t = el("tableError");
-    t.innerHTML = '<div class="ico">' + ICON_WARN + '</div><h4>Couldn’t load the activity feed</h4><p>' + esc(msg) + '</p>' +
-      '<button type="button" id="retryBtn" class="btn btn-primary btn-sm">Try again</button>';
-    t.hidden = false;
+    var box = el("tableError");
+    box.innerHTML = '<div class="ico">' + ICON_WARN + '</div><h4>' + esc(t("act.err.title")) + '</h4><p>' + esc(msg) + '</p>' +
+      '<button type="button" id="retryBtn" class="btn btn-primary btn-sm">' + esc(t("act.err.tryAgain")) + '</button>';
+    box.hidden = false;
     el("feed").innerHTML = ""; el("tiles").innerHTML = ""; el("emptyState").hidden = true; el("rowCount").textContent = "";
     var rb = el("retryBtn"); if (rb) rb.addEventListener("click", load);
   }
+
+  // Re-render the whole feed in the new language without refetching.
+  window.addEventListener("qw:langchange", function () {
+    if (loaded) render();
+  });
 })();

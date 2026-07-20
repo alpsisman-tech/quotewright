@@ -12,6 +12,22 @@
 
   var cfg = window.QW_CONFIG || {};
 
+  // i18n: register this module's strings; T() = safe translate with fallback.
+  if (window.QWI18n && QWI18n.add) QWI18n.add({
+    en: {
+      "views.notConfigured": "Not configured: set SUPABASE_ANON_KEY in dashboard-config.js (Supabase → Project Settings → API → anon public).",
+      "views.noClient": "Could not load the Supabase client library (vendor/supabase.js)."
+    },
+    tr: {
+      "views.notConfigured": "Yapılandırılmadı: dashboard-config.js içinde SUPABASE_ANON_KEY değerini ayarlayın (Supabase → Project Settings → API → anon public).",
+      "views.noClient": "Supabase istemci kütüphanesi yüklenemedi (vendor/supabase.js)."
+    }
+  });
+  function T(key, fallback) {
+    if (window.QWI18n && QWI18n.t) { var v = QWI18n.t(key); if (v !== key) return v; }
+    return fallback;
+  }
+
   function el(id) { return document.getElementById(id); }
   function esc(s) {
     return (s == null ? "" : String(s)).replace(/[&<>"]/g, function (c) {
@@ -94,17 +110,18 @@
     if (!configured) {
       if (boot_) {
         boot_.hidden = false;
-        boot_.textContent = "Not configured: set SUPABASE_ANON_KEY in dashboard-config.js (Supabase → Project Settings → API → anon public).";
+        boot_.textContent = T("views.notConfigured", "Not configured: set SUPABASE_ANON_KEY in dashboard-config.js (Supabase → Project Settings → API → anon public).");
       }
       return;
     }
     if (!window.supabase || !window.supabase.createClient) {
-      if (boot_) { boot_.hidden = false; boot_.textContent = "Could not load the Supabase client library (vendor/supabase.js)."; }
+      if (boot_) { boot_.hidden = false; boot_.textContent = T("views.noClient", "Could not load the Supabase client library (vendor/supabase.js)."); }
       return;
     }
 
     var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
     API.sb = sb;
+    if (window.QWI18n && QWI18n.setClient) QWI18n.setClient(sb);
 
     // SECURITY: intercept the login submit FIRST + unconditionally so it can never
     // fall back to a native GET (email+password in the URL).
@@ -115,7 +132,10 @@
 
     sb.auth.getSession().then(function (res) {
       var s = res.data && res.data.session;
-      if (s && s.user) { onAuthed(s.user.email || ""); }
+      if (s && s.user) {
+        if (window.QWI18n && QWI18n.reconcileUser) QWI18n.reconcileUser(s.user);
+        onAuthed(s.user.email || "");
+      }
       else showLogin();
     }, showLogin);
 
@@ -123,16 +143,17 @@
       e.preventDefault();
       var err = el("loginError"); if (err) err.textContent = "";
       var btn = el("loginBtn");
-      if (btn) { btn.disabled = true; btn.textContent = "Signing in…"; }
+      if (btn) { btn.disabled = true; btn.textContent = T("common.signingIn", "Signing in…"); }
       sb.auth.signInWithPassword({ email: el("email").value.trim(), password: el("password").value })
         .then(function (res) {
-          if (btn) { btn.disabled = false; btn.textContent = "Sign in"; }
+          if (btn) { btn.disabled = false; btn.textContent = T("common.signIn", "Sign in"); }
           if (res.error) { if (err) err.textContent = res.error.message; return; }
+          if (window.QWI18n && QWI18n.reconcileUser) QWI18n.reconcileUser(res.data.user);
           onAuthed((res.data.user && res.data.user.email) || "");
         })
         .catch(function () {
-          if (btn) { btn.disabled = false; btn.textContent = "Sign in"; }
-          if (err) err.textContent = "Network error.";
+          if (btn) { btn.disabled = false; btn.textContent = T("common.signIn", "Sign in"); }
+          if (err) err.textContent = T("common.networkError", "Network error.");
         });
     }
     function showLogin() {

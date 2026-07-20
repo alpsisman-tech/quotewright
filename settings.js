@@ -5,6 +5,194 @@
    Degrades gracefully when the settings columns / table don't exist yet. */
 (function () {
   "use strict";
+
+  // ── i18n dictionary for the Settings surface ──────────────────────────────
+  if (window.QWI18n && QWI18n.add) QWI18n.add({
+    en: {
+      "set.lang.label": "Console language",
+      "set.lang.hint": "The language of this console. Separate from the language your quotes go out in.",
+      "set.kicker": "Settings",
+      "set.h1": "How Quotewright works for you",
+      "set.lede": "Your details, the voice quotes go out in, and exactly how much the pipeline does on its own. Every switch here changes real behaviour — nothing is decorative.",
+      "set.tab.profile": "Profile", "set.tab.voice": "Quoting voice",
+      "set.tab.automation": "Automation", "set.tab.notif": "Notifications",
+      "set.profile.h3": "Your profile",
+      "set.profile.sub": "Who the quotes come from. Your name and company appear on the sign-off; the rest is kept for the record.",
+      "set.f.name": "Your name", "set.f.company": "Company", "set.f.role": "Role",
+      "set.f.phone": "Phone", "set.f.country": "Country", "set.f.address": "Business address",
+      "set.profile.save": "Save profile",
+      "set.voice.h3": "Quoting voice",
+      "set.voice.sub": "The language, sign-off and default terms every quote goes out with. The pipeline still replies in the customer's own language when you leave language on auto.",
+      "set.voice.replyLang": "Reply language",
+      "set.voice.replyAuto": "Auto — match the customer's language",
+      "set.voice.replyHint": "Auto is recommended — the customer hears back in the language they wrote in. Pick a fixed language only to force every quote into one.",
+      "set.voice.incoterm": "Default incoterm",
+      "set.voice.incotermHint": "The shipping term quotes assume unless the customer names another.",
+      "set.voice.validity": "Quote validity (days)",
+      "set.voice.validityHint": "How long the prices in a quote stand before the footer says they may change.",
+      "set.voice.sig": "Sign-off / signature",
+      "set.voice.sigHint": "Closes every quote email. Leave blank to use the standard sign-off.",
+      "set.voice.save": "Save quoting voice",
+      "set.incoterm.EXW": "EXW — Ex Works", "set.incoterm.FCA": "FCA — Free Carrier",
+      "set.incoterm.FOB": "FOB — Free On Board", "set.incoterm.CFR": "CFR — Cost & Freight",
+      "set.incoterm.CIF": "CIF — Cost, Insurance & Freight", "set.incoterm.CPT": "CPT — Carriage Paid To",
+      "set.incoterm.CIP": "CIP — Carriage & Insurance Paid", "set.incoterm.DAP": "DAP — Delivered At Place",
+      "set.incoterm.DPU": "DPU — Delivered At Place Unloaded", "set.incoterm.DDP": "DDP — Delivered Duty Paid",
+      "set.auto.h3": "Automation & autonomy",
+      "set.auto.sub": "How much the pipeline does on its own — from filling repeat prices to sending finished quotes. Start conservative; loosen once you trust it.",
+      "set.auto.autoResolve": "Auto-fill repeat lines",
+      "set.auto.autoResolveHint": "When a line is an <b>exact repeat</b> of one your team already resolved before, the pipeline reuses that decision automatically instead of flagging it again. When off, every unmatched line waits for a human — exactly as today.",
+      "set.auto.sendGate": "The send gate",
+      "set.auto.autoSend": "Send green-tier quotes automatically",
+      "set.auto.autoSendHint": "The one money-facing switch. When on, only quotes that clear <b>both</b> green gates below send on their own. Amber and red always wait. When off, nothing sends — the pipeline just drafts.",
+      "set.auto.greenConf": "Green · minimum confidence",
+      "set.auto.greenConfDesc": "How sure the match has to be before a quote counts as green. Higher = the system only trusts itself on near-certain matches.",
+      "set.auto.greenMargin": "Green · minimum margin",
+      "set.auto.greenMarginDesc": "The deal also has to be healthy. Below this margin a quote can never be green — it drops to amber for a look.",
+      "set.auto.amberConf": "Amber · minimum confidence",
+      "set.auto.amberConfDesc": "The floor for \"worth reviewing.\" Above this (but short of green) a quote is amber. Below it, the quote is red — flagged for a careful look.",
+      "set.auto.marginFloor": "Thin-margin floor",
+      "set.auto.marginFloorDesc": "Any quote landing under this margin is tagged <b>needs approval</b> — held for a human even when confidence is high. Your safety net against underpricing.",
+      "set.auto.followups": "Follow-ups",
+      "set.auto.chase": "Chase quotes that go quiet",
+      "set.auto.waitNudge": "Wait before nudging", "set.auto.maxNudges": "Maximum nudges",
+      "set.unit.days": "days", "set.unit.total": "total",
+      "set.auto.clarifications": "Clarifications",
+      "set.auto.clarifyHint": "When a line is missing a spec the pipeline needs a question answered. Choose whether that question goes straight to the customer, or waits as a draft for you.",
+      "set.auto.clarifyDraftT": "Draft it for me", "set.auto.clarifyDraftD": "Waits in the console for your OK",
+      "set.auto.clarifySendT": "Send straight away", "set.auto.clarifySendD": "The question goes to the customer at once",
+      "set.auto.save": "Save automation",
+      "set.notif.h3": "Notifications",
+      "set.notif.sub": "What lands in your inbox. Everything is a summary — the pipeline never emails a customer without your sign-off unless you turned that on above.",
+      "set.notif.digest": "Daily digest",
+      "set.notif.digestHint": "One email each morning: quotes drafted, replies in, anything waiting on you, and the day's catalogue gaps.",
+      "set.notif.thin": "Thin-margin alerts",
+      "set.notif.thinHint": "An immediate heads-up whenever a fresh quote lands under your thin-margin floor — so nothing underpriced slips past.",
+      "set.notif.save": "Save notifications",
+      "set.help.h3": "Guided tour & help",
+      "set.help.body": "A quick walkthrough of the whole console — the quotes queue, the send gate, insights and settings. It runs on sample data and changes nothing in your account.",
+      "set.help.take": "Take the tour",
+      // switch state lines
+      "set.sw.autoResolve.on": "On — exact repeats fill themselves",
+      "set.sw.autoResolve.off": "Off — the sales team picks each first-time match",
+      "set.sw.autoSend.on": "On — green-tier quotes send automatically",
+      "set.sw.autoSend.off": "Off — every quote waits for you",
+      "set.sw.followup.on": "On — a gentle nudge if the customer goes silent",
+      "set.sw.followup.off": "Off — quiet quotes are left alone",
+      "set.sw.digest.on": "On — a morning rollup of activity",
+      "set.sw.digest.off": "Off — no daily email",
+      "set.sw.thin.on": "On — flag me the moment a quote dips low",
+      "set.sw.thin.off": "Off — no thin-margin pings",
+      // status / toasts
+      "set.unsaved": "Unsaved changes", "set.saved": "Saved ✓",
+      "set.demoNotSaved": "Demo — not saved",
+      "set.toast.demo": "Demo mode — settings aren't saved.",
+      "set.toast.saved": "Saved.",
+      "set.toast.network": "Network error — not saved.",
+      "set.toast.missingCols": "Some settings columns aren't there yet — run quotewright-settings.sql, then save again.",
+      "set.toast.saveFail": "Couldn't save: {msg}",
+      "set.toast.noRow": "No settings row for {owner} — run quotewright-settings.sql (it seeds the row).",
+      "set.toast.defaults": "No saved row yet — showing defaults. Saving needs the seeded row (run quotewright-settings.sql).",
+      "set.err.unknown": "unknown error",
+      "set.missing.h4": "Settings aren't switched on yet",
+      "set.missing.body": "The <code>autonomy_settings</code> table doesn't exist. Run <code>quotewright-intelligence.sql</code> then <code>quotewright-settings.sql</code> in the Supabase SQL editor — they create the table, add the settings columns and seed the row for <code>{owner}</code>.",
+      "set.load.errH4": "Couldn't load settings",
+      "set.load.errBody": "Something went wrong reaching the settings store.",
+      "set.load.netErr": "Network error — check your connection and try again."
+    },
+    tr: {
+      "set.lang.label": "Konsol dili",
+      "set.lang.hint": "Bu konsolun dili. Tekliflerinizin yazıldığı dilden ayrıdır.",
+      "set.kicker": "Ayarlar",
+      "set.h1": "Quotewright sizin için nasıl çalışır",
+      "set.lede": "Bilgileriniz, tekliflerin çıktığı üslup ve akışın kendi başına ne kadarını yaptığı. Buradaki her anahtar gerçek davranışı değiştirir — hiçbiri süs değildir.",
+      "set.tab.profile": "Profil", "set.tab.voice": "Teklif üslubu",
+      "set.tab.automation": "Otomasyon", "set.tab.notif": "Bildirimler",
+      "set.profile.h3": "Profiliniz",
+      "set.profile.sub": "Tekliflerin kimden geldiği. Adınız ve şirketiniz imzada görünür; gerisi kayıt için tutulur.",
+      "set.f.name": "Adınız", "set.f.company": "Şirket", "set.f.role": "Görev",
+      "set.f.phone": "Telefon", "set.f.country": "Ülke", "set.f.address": "İş adresi",
+      "set.profile.save": "Profili kaydet",
+      "set.voice.h3": "Teklif üslubu",
+      "set.voice.sub": "Her teklifin taşıdığı dil, imza ve varsayılan koşullar. Dili otomatik bıraktığınızda akış yine de müşterinin kendi dilinde yanıt verir.",
+      "set.voice.replyLang": "Yanıt dili",
+      "set.voice.replyAuto": "Otomatik — müşterinin diline uy",
+      "set.voice.replyHint": "Otomatik önerilir — müşteri yazdığı dilde yanıt alır. Her teklifi tek bir dile zorlamak için yalnızca sabit bir dil seçin.",
+      "set.voice.incoterm": "Varsayılan teslim şekli (incoterm)",
+      "set.voice.incotermHint": "Müşteri başka bir şey belirtmedikçe tekliflerin varsaydığı teslim koşulu.",
+      "set.voice.validity": "Teklif geçerliliği (gün)",
+      "set.voice.validityHint": "Fiyatların, alt bilgide değişebileceği yazılmadan önce kaç gün geçerli kalacağı.",
+      "set.voice.sig": "İmza / kapanış",
+      "set.voice.sigHint": "Her teklif e-postasını kapatır. Standart imzayı kullanmak için boş bırakın.",
+      "set.voice.save": "Teklif üslubunu kaydet",
+      "set.incoterm.EXW": "EXW — Ticari İşletmede Teslim", "set.incoterm.FCA": "FCA — Taşıyıcıya Teslim",
+      "set.incoterm.FOB": "FOB — Gemide Teslim", "set.incoterm.CFR": "CFR — Masraf ve Navlun",
+      "set.incoterm.CIF": "CIF — Masraf, Sigorta ve Navlun", "set.incoterm.CPT": "CPT — Taşıma Ödenmiş Teslim",
+      "set.incoterm.CIP": "CIP — Taşıma ve Sigorta Ödenmiş Teslim", "set.incoterm.DAP": "DAP — Belirlenen Yerde Teslim",
+      "set.incoterm.DPU": "DPU — Belirlenen Yerde Boşaltılmış Teslim", "set.incoterm.DDP": "DDP — Gümrük Vergileri Ödenmiş Teslim",
+      "set.auto.h3": "Otomasyon ve özerklik",
+      "set.auto.sub": "Akışın kendi başına ne kadarını yaptığı — tekrarlayan fiyatları doldurmaktan bitmiş teklifleri göndermeye kadar. Temkinli başlayın; güvendikçe gevşetin.",
+      "set.auto.autoResolve": "Tekrarlayan satırları otomatik doldur",
+      "set.auto.autoResolveHint": "Bir satır, ekibinizin daha önce çözdüğü bir satırın <b>birebir tekrarı</b> olduğunda, akış onu yeniden işaretlemek yerine o kararı otomatik olarak yeniden kullanır. Kapalıyken, eşleşmeyen her satır bir insanı bekler — tıpkı bugünkü gibi.",
+      "set.auto.sendGate": "Gönderim kapısı",
+      "set.auto.autoSend": "Yeşil kademe teklifleri otomatik gönder",
+      "set.auto.autoSendHint": "Paraya dokunan tek anahtar. Açıkken yalnızca aşağıdaki <b>her iki</b> yeşil eşiği geçen teklifler kendiliğinden gönderilir. Sarı ve kırmızı her zaman bekler. Kapalıyken hiçbir şey gönderilmez — akış yalnızca taslak hazırlar.",
+      "set.auto.greenConf": "Yeşil · en düşük güven",
+      "set.auto.greenConfDesc": "Bir teklifin yeşil sayılması için eşleşmenin ne kadar kesin olması gerektiği. Yüksek = sistem yalnızca neredeyse kesin eşleşmelerde kendine güvenir.",
+      "set.auto.greenMargin": "Yeşil · en düşük kâr marjı",
+      "set.auto.greenMarginDesc": "Anlaşmanın da sağlıklı olması gerekir. Bu marjın altında bir teklif asla yeşil olamaz — incelenmek üzere sarıya düşer.",
+      "set.auto.amberConf": "Sarı · en düşük güven",
+      "set.auto.amberConfDesc": "\"İncelemeye değer\" için alt sınır. Bunun üstünde (ama yeşilin altında) bir teklif sarıdır. Altında ise kırmızıdır — dikkatli bir bakış için işaretlenir.",
+      "set.auto.marginFloor": "İnce marj tabanı",
+      "set.auto.marginFloorDesc": "Bu marjın altına düşen her teklif <b>onay gerekir</b> olarak etiketlenir — güven yüksek olsa bile bir insana bırakılır. Düşük fiyatlandırmaya karşı güvenlik ağınız.",
+      "set.auto.followups": "Takipler",
+      "set.auto.chase": "Sessizleşen teklifleri takip et",
+      "set.auto.waitNudge": "Dürtmeden önce bekle", "set.auto.maxNudges": "En fazla dürtme",
+      "set.unit.days": "gün", "set.unit.total": "toplam",
+      "set.auto.clarifications": "Açıklamalar",
+      "set.auto.clarifyHint": "Bir satırda eksik bir özellik olduğunda akışın bir sorunun yanıtlanmasına ihtiyacı olur. Bu sorunun doğrudan müşteriye mi gideceğini yoksa size taslak olarak mı bekleyeceğini seçin.",
+      "set.auto.clarifyDraftT": "Benim için taslak hazırla", "set.auto.clarifyDraftD": "Onayınız için konsolda bekler",
+      "set.auto.clarifySendT": "Hemen gönder", "set.auto.clarifySendD": "Soru anında müşteriye gider",
+      "set.auto.save": "Otomasyonu kaydet",
+      "set.notif.h3": "Bildirimler",
+      "set.notif.sub": "Gelen kutunuza ne düşeceği. Her şey bir özettir — yukarıda açmadığınız sürece akış, onayınız olmadan asla bir müşteriye e-posta göndermez.",
+      "set.notif.digest": "Günlük özet",
+      "set.notif.digestHint": "Her sabah tek e-posta: hazırlanan teklifler, gelen yanıtlar, sizi bekleyen her şey ve günün katalog boşlukları.",
+      "set.notif.thin": "İnce marj uyarıları",
+      "set.notif.thinHint": "Yeni bir teklif ince marj tabanınızın altına düştüğü anda hemen haber — böylece düşük fiyatlı hiçbir şey gözden kaçmaz.",
+      "set.notif.save": "Bildirimleri kaydet",
+      "set.help.h3": "Rehberli tur ve yardım",
+      "set.help.body": "Tüm konsolun kısa bir gezisi — teklif kuyruğu, gönderim kapısı, analizler ve ayarlar. Örnek veriyle çalışır ve hesabınızda hiçbir şeyi değiştirmez.",
+      "set.help.take": "Turu başlat",
+      "set.sw.autoResolve.on": "Açık — birebir tekrarlar kendiliğinden dolar",
+      "set.sw.autoResolve.off": "Kapalı — her ilk eşleşmeyi satış ekibi seçer",
+      "set.sw.autoSend.on": "Açık — yeşil kademe teklifler otomatik gönderilir",
+      "set.sw.autoSend.off": "Kapalı — her teklif sizi bekler",
+      "set.sw.followup.on": "Açık — müşteri sessizleşirse nazik bir dürtme",
+      "set.sw.followup.off": "Kapalı — sessiz teklifler rahat bırakılır",
+      "set.sw.digest.on": "Açık — sabah etkinlik derlemesi",
+      "set.sw.digest.off": "Kapalı — günlük e-posta yok",
+      "set.sw.thin.on": "Açık — bir teklif düştüğü anda beni uyar",
+      "set.sw.thin.off": "Kapalı — ince marj uyarısı yok",
+      "set.unsaved": "Kaydedilmemiş değişiklikler", "set.saved": "Kaydedildi ✓",
+      "set.demoNotSaved": "Demo — kaydedilmedi",
+      "set.toast.demo": "Demo modu — ayarlar kaydedilmez.",
+      "set.toast.saved": "Kaydedildi.",
+      "set.toast.network": "Ağ hatası — kaydedilmedi.",
+      "set.toast.missingCols": "Bazı ayar sütunları henüz yok — quotewright-settings.sql'i çalıştırın, sonra tekrar kaydedin.",
+      "set.toast.saveFail": "Kaydedilemedi: {msg}",
+      "set.toast.noRow": "{owner} için ayar satırı yok — quotewright-settings.sql'i çalıştırın (satırı oluşturur).",
+      "set.toast.defaults": "Henüz kayıtlı satır yok — varsayılanlar gösteriliyor. Kaydetmek için oluşturulmuş satır gerekir (quotewright-settings.sql).",
+      "set.err.unknown": "bilinmeyen hata",
+      "set.missing.h4": "Ayarlar henüz açık değil",
+      "set.missing.body": "<code>autonomy_settings</code> tablosu yok. Supabase SQL düzenleyicisinde önce <code>quotewright-intelligence.sql</code> sonra <code>quotewright-settings.sql</code> dosyasını çalıştırın — bunlar tabloyu oluşturur, ayar sütunlarını ekler ve <code>{owner}</code> için satırı hazırlar.",
+      "set.load.errH4": "Ayarlar yüklenemedi",
+      "set.load.errBody": "Ayar deposuna erişirken bir şeyler ters gitti.",
+      "set.load.netErr": "Ağ hatası — bağlantınızı kontrol edip yeniden deneyin."
+    }
+  });
+  function tt(key, vars) { return (window.QWI18n && QWI18n.t) ? QWI18n.t(key, vars) : key; }
+
   var Q = window.QWConsole;
   var el = Q.el, esc = Q.esc, num = Q.numOrNull, toast = Q.toast;
   var sb = null;
@@ -43,15 +231,15 @@
   // switch id → { key, row, stateEl, on, off }
   var SWITCHES = {
     autoResolve: { key: "auto_resolve_enabled", row: "autoResolveRow", st: "arState",
-      on: "On — exact repeats fill themselves", off: "Off — the sales team picks each first-time match" },
+      on: "set.sw.autoResolve.on", off: "set.sw.autoResolve.off" },
     autoSend: { key: "auto_send_enabled", row: "switchRow", st: "swState",
-      on: "On — green-tier quotes send automatically", off: "Off — every quote waits for you" },
+      on: "set.sw.autoSend.on", off: "set.sw.autoSend.off" },
     followupEnabled: { key: "followup_enabled", row: "followupRow", st: "fuState",
-      on: "On — a gentle nudge if the customer goes silent", off: "Off — quiet quotes are left alone" },
+      on: "set.sw.followup.on", off: "set.sw.followup.off" },
     digestEnabled: { key: "digest_enabled", row: "digestRow", st: "dgState",
-      on: "On — a morning rollup of activity", off: "Off — no daily email" },
+      on: "set.sw.digest.on", off: "set.sw.digest.off" },
     alertThinMargin: { key: "alert_thin_margin", row: "thinRow", st: "tmState",
-      on: "On — flag me the moment a quote dips low", off: "Off — no thin-margin pings" }
+      on: "set.sw.thin.on", off: "set.sw.thin.off" }
   };
   var RANGES = {
     greenConf: { key: "green_min_confidence", val: "gcVal" },
@@ -64,6 +252,7 @@
     sb = client;
     el("subnav").hidden = false;
     wireTabs();
+    wireLangToggle();
     // text / number / select
     Object.keys(TEXT).forEach(function (id) {
       var node = el(id); if (!node) return;
@@ -104,6 +293,31 @@
     load();
   }});
 
+  // ── language toggle (per-user UI preference via QWI18n) ───────────────────
+  function syncLangToggle() {
+    var seg = el("langSeg"); if (!seg || !window.QWI18n) return;
+    var cur = QWI18n.getLang();
+    Array.prototype.forEach.call(seg.querySelectorAll("[data-lang]"), function (b) {
+      b.setAttribute("aria-checked", b.getAttribute("data-lang") === cur ? "true" : "false");
+    });
+  }
+  function wireLangToggle() {
+    var seg = el("langSeg"); if (!seg || !window.QWI18n) return;
+    seg.addEventListener("click", function (e) {
+      var b = e.target.closest ? e.target.closest("[data-lang]") : null;
+      if (!b) return;
+      QWI18n.setLang(b.getAttribute("data-lang"));   // persists + applies + dispatches qw:langchange
+    });
+    syncLangToggle();
+    // Re-label JS-rendered controls live when the language changes (from here or elsewhere).
+    window.addEventListener("qw:langchange", function () {
+      syncLangToggle();
+      // Re-translate switch-state lines + clarify segment without disturbing dirty state.
+      Object.keys(SWITCHES).forEach(function (id) { if (el(id)) setSwitch(id, state[SWITCHES[id].key] === true); });
+      setClarify(state.clarify_mode === "send" ? "send" : "draft");
+    });
+  }
+
   // ── tabs ────────────────────────────────────────────────────────────────
   function wireTabs() {
     var tabs = Array.prototype.slice.call(document.querySelectorAll(".qc-hubtab"));
@@ -136,7 +350,7 @@
     var sw = el(id);
     sw.setAttribute("aria-checked", on ? "true" : "false");
     el(s.row).classList.toggle("on", on);
-    el(s.st).textContent = on ? s.on : s.off;
+    el(s.st).textContent = tt(on ? s.on : s.off);
     if (id === "followupEnabled") { var o = el("followupOpts"); if (o) o.classList.toggle("off", !on); }
   }
   function setClarify(mode) {
@@ -172,7 +386,7 @@
     var n = document.querySelector('[data-dirty="' + section + '"]');
     if (!n) return;
     if (savedTxt) { n.textContent = savedTxt; n.className = "qc-saved ok"; }
-    else { n.textContent = dirty ? "Unsaved changes" : ""; n.className = "qc-saved"; }
+    else { n.textContent = dirty ? tt("set.unsaved") : ""; n.className = "qc-saved"; }
   }
   function markDirty() {
     Object.keys(SECTIONS).forEach(function (s) { setDirtyNote(s, sectionVal(s) !== snapshot[s]); });
@@ -181,9 +395,9 @@
   // ── save one section ────────────────────────────────────────────────────
   function save(section, btn) {
     var keys = SECTIONS[section]; if (!keys) return;
-    if (window.QWDemo && QWDemo.isOn()) { snapSection(section); setDirtyNote(section, false, "Demo — not saved"); toast("Demo mode — settings aren't saved."); return; }
+    if (window.QWDemo && QWDemo.isOn()) { snapSection(section); setDirtyNote(section, false, tt("set.demoNotSaved")); toast(tt("set.toast.demo")); return; }
     var label = btn.textContent;
-    btn.disabled = true; btn.textContent = "Saving…";
+    btn.disabled = true; btn.textContent = tt("common.saving");
     var patch = { updated_at: new Date().toISOString() };
     keys.forEach(function (key) {
       var v = state[key];
@@ -195,22 +409,22 @@
       if (res.error) {
         if (Q.isMissingTable(res.error)) { showMissing(); return; }
         if (isMissingColumn(res.error)) {
-          toast("Some settings columns aren't there yet — run quotewright-settings.sql, then save again.", true);
+          toast(tt("set.toast.missingCols"), true);
           return;
         }
-        toast("Couldn't save: " + (res.error.message || "unknown error"), true);
+        toast(tt("set.toast.saveFail", { msg: res.error.message || tt("set.err.unknown") }), true);
         return;
       }
       if (!res.data || res.data.length === 0) {
-        toast("No settings row for " + owner + " — run quotewright-settings.sql (it seeds the row).", true);
+        toast(tt("set.toast.noRow", { owner: owner }), true);
         return;
       }
       snapSection(section);
-      setDirtyNote(section, false, "Saved ✓");
-      toast("Saved.");
+      setDirtyNote(section, false, tt("set.saved"));
+      toast(tt("set.toast.saved"));
     }, function () {
       btn.disabled = false; btn.textContent = label;
-      toast("Network error — not saved.", true);
+      toast(tt("set.toast.network"), true);
     });
   }
 
@@ -225,15 +439,15 @@
     el("settingsHub").hidden = true; el("loadingCard").hidden = true;
     var t = el("tableError");
     t.innerHTML = '<div class="ico" style="background:var(--row)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--grey)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.4.98 2 2 0 0 1-3.86 0 1.65 1.65 0 0 0-2.4-.98l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a2 2 0 0 1 0-3.86 1.65 1.65 0 0 0 .98-2.4l-.06-.06A2 2 0 1 1 8.35 5.85l.06.06a1.65 1.65 0 0 0 2.4-.98 2 2 0 0 1 3.86 0 1.65 1.65 0 0 0 2.4.98l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.98 2.4 2 2 0 0 1 0 3.86z"/></svg></div>' +
-      '<h4>Settings aren’t switched on yet</h4>' +
-      '<p>The <code>autonomy_settings</code> table doesn’t exist. Run <code>quotewright-intelligence.sql</code> then <code>quotewright-settings.sql</code> in the Supabase SQL editor — they create the table, add the settings columns and seed the row for <code>' + esc(owner) + '</code>.</p>';
+      '<h4>' + tt("set.missing.h4") + '</h4>' +
+      '<p>' + tt("set.missing.body", { owner: esc(owner) }) + '</p>';
     t.hidden = false;
   }
   function showError(msg) {
     el("settingsHub").hidden = true; el("loadingCard").hidden = true;
     var t = el("tableError");
-    t.innerHTML = '<div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b42318" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><h4>Couldn’t load settings</h4><p>' + esc(msg) + '</p>' +
-      '<button type="button" id="retryBtn" class="btn btn-primary btn-sm">Try again</button>';
+    t.innerHTML = '<div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b42318" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><h4>' + tt("set.load.errH4") + '</h4><p>' + esc(msg) + '</p>' +
+      '<button type="button" id="retryBtn" class="btn btn-primary btn-sm">' + tt("common.tryAgain") + '</button>';
     t.hidden = false;
     var rb = el("retryBtn"); if (rb) rb.addEventListener("click", function () { t.hidden = true; el("loadingCard").hidden = false; load(); });
   }
@@ -253,7 +467,7 @@
       el("loadingCard").hidden = true;
       if (res.error) {
         if (Q.isMissingTable(res.error)) { showMissing(); return; }
-        showError(res.error.message || "Something went wrong reaching the settings store.");
+        showError(res.error.message || tt("set.load.errBody"));
         return;
       }
       var r = res.data;
@@ -274,10 +488,10 @@
       }
       el("settingsHub").hidden = false;
       paint();
-      if (!r) toast("No saved row yet — showing defaults. Saving needs the seeded row (run quotewright-settings.sql).");
+      if (!r) toast(tt("set.toast.defaults"));
     }, function (err) {
       el("loadingCard").hidden = true;
-      showError((err && err.message) || "Network error — check your connection and try again.");
+      showError((err && err.message) || tt("set.load.netErr"));
     });
   }
 })();
