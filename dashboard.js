@@ -127,6 +127,43 @@
       "dash.lineResolved": "Line resolved — quote updated.",
       "dash.searching": "Searching…", "dash.catFail": "Catalogue search failed: {msg}",
       "dash.catNoMatch": "No catalogue products match “{term}”.", "dash.use": "Use", "dash.catFailNet": "Catalogue search failed (network).",
+      // drawer — draft briefing panel ("What does this draft say?")
+      "dash.brief.head": "What does this draft say?", "dash.brief.tag": "Draft briefing",
+      "dash.brief.noOutput": "No structured agent output was stored for this quote, so no briefing can be built. The draft text below is in the customer’s language.",
+      "dash.brief.hSummary": "Summary",
+      "dash.brief.replyLang": "Reply language",
+      "dash.brief.replyLangVal": "Drafted for the customer in {lang}",
+      "dash.brief.replyLangUnknown": "The reply language was not stated.",
+      "dash.brief.currency": "Currency", "dash.brief.incoterm": "Delivery terms", "dash.brief.unset": "Not stated",
+      "dash.brief.total": "Grand total", "dash.brief.totalCash": "Grand total (cash)", "dash.brief.totalTerm": "Grand total (term)",
+      "dash.brief.noTotal": "No total could be produced — no line could be priced.",
+      "dash.brief.hLines": "Lines",
+      "dash.brief.noLines": "The agent output contains no lines — no product could be extracted from this request.",
+      "dash.brief.qty": "Quantity", "dash.brief.noQty": "no quantity stated",
+      "dash.brief.unitPrice": "Unit price", "dash.brief.noUnit": "no unit price",
+      "dash.brief.lineTotal": "Line total", "dash.brief.noLineTotal": "no total",
+      "dash.brief.stPriced": "Priced", "dash.brief.stInfo": "Awaiting info (from the customer)",
+      "dash.brief.stHassan": "Sales team will price it", "dash.brief.stUnknown": "Status not stated",
+      "dash.brief.hWhy": "Why it could not be priced",
+      "dash.brief.allPriced": "Every line was priced — nothing outstanding.",
+      "dash.brief.whyNoLines": "There are no lines to price, so no reason can be listed.",
+      "dash.brief.rNoQty": "The customer did not state a quantity — the line total cannot be calculated.",
+      "dash.brief.rNoPrice": "This product has no catalogued sale price; the sales team will price it.",
+      "dash.brief.rMissing": "Missing information: ",
+      "dash.brief.rMissingBare": "A detail is awaited from the customer; the agent did not say which.",
+      "dash.brief.rGeneric": "This line could not be priced. ",
+      "dash.brief.rGenericBare": "This line could not be priced; the agent gave no reason.",
+      "dash.brief.subInfo": "Still needed from the customer",
+      "dash.brief.subUnmatched": "Requests with no catalogue match",
+      "dash.brief.agentNote": "Agent’s note:",
+      "dash.brief.intHead": "Internal note — not sent to the customer",
+      "dash.brief.intLead": "The following is not part of the email going to the customer; it is for your review only.",
+      "dash.brief.intNone": "This quote is flagged for review, but the agent listed no reason.",
+      // language names, for rendering the draft's language in the console's language
+      "lang.en": "English", "lang.tr": "Turkish", "lang.es": "Spanish", "lang.de": "German",
+      "lang.fr": "French", "lang.bg": "Bulgarian", "lang.it": "Italian", "lang.ru": "Russian",
+      "lang.pt": "Portuguese", "lang.nl": "Dutch", "lang.ar": "Arabic", "lang.pl": "Polish",
+      "lang.ro": "Romanian", "lang.el": "Greek", "lang.zh": "Chinese",
       // toasts / actions
       "dash.ocWonLc": "won", "dash.ocLostLc": "lost",
       "dash.markedDemo": "Marked {o} · demo — not saved.", "dash.marked": "Marked {o}.",
@@ -265,6 +302,43 @@
       "dash.lineResolved": "Satır çözüldü — teklif güncellendi.",
       "dash.searching": "Aranıyor…", "dash.catFail": "Katalog araması başarısız: {msg}",
       "dash.catNoMatch": "“{term}” ile eşleşen katalog ürünü yok.", "dash.use": "Kullan", "dash.catFailNet": "Katalog araması başarısız (ağ).",
+      // drawer — taslak brifingi ("Bu taslak ne diyor?")
+      "dash.brief.head": "Bu taslak ne diyor?", "dash.brief.tag": "Taslak brifingi",
+      "dash.brief.noOutput": "Bu teklif için yapılandırılmış ajan çıktısı bulunamadı, bu yüzden brifing oluşturulamıyor. Aşağıdaki taslak metni müşterinin dilindedir.",
+      "dash.brief.hSummary": "Özet",
+      "dash.brief.replyLang": "Yanıt dili",
+      "dash.brief.replyLangVal": "Müşteriye {lang} yanıt hazırlandı",
+      "dash.brief.replyLangUnknown": "Yanıtın dili belirtilmemiş.",
+      "dash.brief.currency": "Para birimi", "dash.brief.incoterm": "Teslim şekli", "dash.brief.unset": "Belirtilmemiş",
+      "dash.brief.total": "Genel toplam", "dash.brief.totalCash": "Genel toplam (peşin)", "dash.brief.totalTerm": "Genel toplam (vadeli)",
+      "dash.brief.noTotal": "Toplam tutar oluşturulamadı — fiyatlandırılabilen satır yok.",
+      "dash.brief.hLines": "Satırlar",
+      "dash.brief.noLines": "Ajan çıktısında hiç satır yok — bu talepten fiyatlandırılacak ürün çıkarılamamış.",
+      "dash.brief.qty": "Miktar", "dash.brief.noQty": "miktar belirtilmemiş",
+      "dash.brief.unitPrice": "Birim fiyat", "dash.brief.noUnit": "birim fiyat yok",
+      "dash.brief.lineTotal": "Satır toplamı", "dash.brief.noLineTotal": "toplam yok",
+      "dash.brief.stPriced": "Fiyatlandırıldı", "dash.brief.stInfo": "Bilgi bekleniyor (müşteriden)",
+      "dash.brief.stHassan": "Satış ekibi fiyatlandıracak", "dash.brief.stUnknown": "Durum belirtilmemiş",
+      "dash.brief.hWhy": "Neden fiyatlandırılamadı",
+      "dash.brief.allPriced": "Tüm satırlar fiyatlandırıldı — bekleyen bilgi yok.",
+      "dash.brief.whyNoLines": "Fiyatlandırılacak satır bulunmadığı için gerekçe listelenemiyor.",
+      "dash.brief.rNoQty": "Müşteri miktar belirtmemiş — satır toplamı hesaplanamıyor.",
+      "dash.brief.rNoPrice": "Bu ürünün kayıtlı satış fiyatı yok; satış ekibi fiyatlandıracak.",
+      "dash.brief.rMissing": "Eksik bilgi: ",
+      "dash.brief.rMissingBare": "Müşteriden bir ayrıntı bekleniyor; ajan ayrıntıyı belirtmemiş.",
+      "dash.brief.rGeneric": "Bu satır fiyatlandırılamadı. ",
+      "dash.brief.rGenericBare": "Bu satır fiyatlandırılamadı; ajan bir gerekçe belirtmemiş.",
+      "dash.brief.subInfo": "Müşteriden hâlâ beklenen bilgiler",
+      "dash.brief.subUnmatched": "Katalogda eşleşmeyen talepler",
+      "dash.brief.agentNote": "Ajanın notu:",
+      "dash.brief.intHead": "İç not — müşteriye gitmez",
+      "dash.brief.intLead": "Aşağıdakiler müşteriye gidecek e-postanın parçası değildir; yalnızca sizin kontrolünüz içindir.",
+      "dash.brief.intNone": "Bu teklif kontrol gerektiriyor olarak işaretlenmiş, ancak ajan bir gerekçe listelememiş.",
+      // dil adları — taslağın dili, konsolun dilinde yazılır
+      "lang.en": "İngilizce", "lang.tr": "Türkçe", "lang.es": "İspanyolca", "lang.de": "Almanca",
+      "lang.fr": "Fransızca", "lang.bg": "Bulgarca", "lang.it": "İtalyanca", "lang.ru": "Rusça",
+      "lang.pt": "Portekizce", "lang.nl": "Felemenkçe", "lang.ar": "Arapça", "lang.pl": "Lehçe",
+      "lang.ro": "Romence", "lang.el": "Yunanca", "lang.zh": "Çince",
       "dash.ocWonLc": "kazanıldı", "dash.ocLostLc": "kaybedildi",
       "dash.markedDemo": "{o} olarak işaretlendi · demo — kaydedilmedi.", "dash.marked": "{o} olarak işaretlendi.",
       "dash.runAnalyticsSql": "Önce Supabase'de quote-analytics.sql çalıştırın.",
@@ -1637,6 +1711,7 @@
         reply +
         threadPanel(q) +
         linesPanel(q, id) +
+        briefPanel(q) +
         draftPanel(q, id) +
       "</div>";
   }
@@ -1774,6 +1849,203 @@
     return section(tt("dash.draftReply"), isDraft(q) ? tt("dash.pendingSend") : tt("dash.sentLc"), body);
   }
 
+  // ── draft briefing panel ("What does this draft say?") ───────────────────────
+  /* The draft email is written in the CUSTOMER's language, so the operator often
+     cannot evaluate it before sending. This panel does NOT translate the draft
+     prose, and makes no network call: the site CSP is `script-src 'self'` with a
+     locked `connect-src`, so a translation/LLM API is both blocked and
+     unnecessary. Instead it RE-RENDERS the agent's STRUCTURED `output` (the Quote
+     Schema) in the CONSOLE's language, and derives — from the data alone — why
+     each line could not be priced. Every label, heading, status and derived
+     sentence goes through tt(); a live `qw:langchange` re-runs renderDrawer().
+
+     Agent-authored free text (`note`, `info_needed[]`, `review_items[]`) is in the
+     CUSTOMER's language. It is rendered VERBATIM as quoted source material under a
+     localised label — never machine-translated, always escaped. */
+  var briefOpen = true;   // panel expanded state, kept across drawer re-renders
+
+  // Aliases → ISO code; the NAME itself is localised via tt("lang." + code).
+  var LANG_CODES = {
+    en: "en", tr: "tr", es: "es", de: "de", fr: "fr", bg: "bg", it: "it", ru: "ru",
+    pt: "pt", nl: "nl", ar: "ar", pl: "pl", ro: "ro", el: "el", zh: "zh",
+    english: "en", turkish: "tr", "türkçe": "tr", turkce: "tr",
+    spanish: "es", "español": "es", espanol: "es",
+    german: "de", deutsch: "de", french: "fr", "français": "fr", francais: "fr",
+    bulgarian: "bg", italian: "it", italiano: "it", russian: "ru",
+    portuguese: "pt", "português": "pt", dutch: "nl", nederlands: "nl",
+    arabic: "ar", polish: "pl", romanian: "ro", greek: "el", chinese: "zh"
+  };
+  // 'es' / 'es-DO' / 'Spanish' / 'Español' → "Spanish" or "İspanyolca" per console
+  // language. An unrecognised value is shown verbatim, exactly as before.
+  function langName(v) {
+    var k = String(v == null ? "" : v).trim().toLowerCase();
+    if (!k) return "";
+    var code = LANG_CODES[k] || LANG_CODES[k.split(/[-_]/)[0]];
+    return code ? tt("lang." + code) : String(v).trim();
+  }
+  function briefStatusLabel(s) {
+    return s === "priced" ? tt("dash.brief.stPriced")
+      : s === "pending_info" ? tt("dash.brief.stInfo")
+      : s === "pending_hassan" ? tt("dash.brief.stHassan")
+      : tt("dash.brief.stUnknown");
+  }
+  function briefStatusClass(s) {
+    return s === "priced" ? "sent" : s === "pending_hassan" ? "info" : "pending";
+  }
+  // Agent-authored text, quoted verbatim under a localised label (never translated).
+  function agentNote(text) {
+    return '<span class="qc-brief-agent"><span class="qc-brief-agentlbl">' + esc(tt("dash.brief.agentNote")) + "</span>" +
+      '<q class="qc-brief-quote">' + nl2br(String(text)) + "</q></span>";
+  }
+  // Every reason below is DERIVED from the structured data, never from the prose.
+  function briefLineReasons(l, rawStatus) {
+    var out = [];
+    var note = (l.raw && l.raw.note != null) ? String(l.raw.note).trim() : "";
+    if (l.qty == null || l.qty === 0) out.push(esc(tt("dash.brief.rNoQty")));
+    if (rawStatus === "pending_hassan") out.push(esc(tt("dash.brief.rNoPrice")));
+    if (rawStatus === "pending_info") {
+      out.push(note ? esc(tt("dash.brief.rMissing")) + agentNote(note)
+                    : esc(tt("dash.brief.rMissingBare")));
+    }
+    if (!out.length) {
+      out.push(note ? esc(tt("dash.brief.rGeneric")) + agentNote(note)
+                    : esc(tt("dash.brief.rGenericBare")));
+    }
+    return out;
+  }
+  function briefRow(label, value) {
+    return '<div class="qc-brief-row"><dt>' + esc(label) + "</dt>" +
+      '<dd lang="en">' + esc(value) + "</dd></div>";
+  }
+  function briefCleanList(v) {
+    return Array.isArray(v)
+      ? v.filter(function (x) { return x != null && String(x).trim() !== ""; })
+      : [];
+  }
+  function briefNoteList(items) {
+    return '<ul class="qc-brief-info">' + items.map(function (x) {
+      return "<li>" + agentNote(String(x).trim()) + "</li>";
+    }).join("") + "</ul>";
+  }
+
+  function briefPanel(q) {
+    var o = parseOutput(q);   // tolerates a JSON-string `output`; null when absent/unparseable
+    var lines = linesOf(q).map(function (raw) {
+      var l = normLine(raw);
+      // normLine() re-labels a priced pending_info line as "provisional" for the
+      // line panel; the briefing must state the RAW schema status instead.
+      l.briefStatus = String((raw && raw.status) || "").toLowerCase();
+      return l;
+    });
+
+    var head =
+      '<div class="qc-brief-head">' +
+        '<button type="button" class="qc-brief-toggle" data-brief="1" aria-expanded="' +
+          (briefOpen ? "true" : "false") + '" aria-controls="briefBody">' +
+          '<svg class="qc-brief-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>' +
+          "<span>" + esc(tt("dash.brief.head")) + "</span>" +
+        "</button>" +
+        '<span class="qc-brief-tag">' + esc(tt("dash.brief.tag")) + "</span>" +
+      "</div>";
+    var openBody = '<div class="qc-brief-body" id="briefBody"' + (briefOpen ? "" : " hidden") + ">";
+
+    if (!o) {
+      return '<section class="qc-dsec qc-brief">' + head + openBody +
+        '<div class="qc-empty-mini">' + esc(tt("dash.brief.noOutput")) + "</div>" +
+        "</div></section>";
+    }
+
+    var cur = o.currency || q.currency || "";
+    var gt = numOrNull(o.grand_total);
+    var gtv = numOrNull(o.grand_total_vadeli);
+    var lname = langName(o.language);
+
+    // 1 ── summary
+    var sum = [];
+    sum.push(briefRow(tt("dash.customer"), o.customer || q.customer || "—"));
+    sum.push('<div class="qc-brief-row"><dt>' + esc(tt("dash.brief.replyLang")) + "</dt><dd>" +
+      esc(lname ? tt("dash.brief.replyLangVal", { lang: lname }) : tt("dash.brief.replyLangUnknown")) + "</dd></div>");
+    sum.push(briefRow(tt("dash.brief.currency"), cur || tt("dash.brief.unset")));
+    sum.push(briefRow(tt("dash.brief.incoterm"), o.incoterm || tt("dash.brief.unset")));
+    if (gt != null && gt > 0) {
+      sum.push(briefRow(tt("dash.brief.totalCash"), money(gt, cur)));
+      if (gtv != null && gtv > 0) sum.push(briefRow(tt("dash.brief.totalTerm"), money(gtv, cur)));
+    } else {
+      sum.push('<div class="qc-brief-row"><dt>' + esc(tt("dash.brief.total")) + "</dt>" +
+        '<dd class="qc-brief-warn">' + esc(tt("dash.brief.noTotal")) + "</dd></div>");
+    }
+    var secSum = '<h4 class="qc-brief-h">' + esc(tt("dash.brief.hSummary")) + "</h4>" +
+      '<dl class="qc-brief-dl">' + sum.join("") + "</dl>";
+
+    // 2 ── lines
+    var secLines = '<h4 class="qc-brief-h">' + esc(tt("dash.brief.hLines")) + "</h4>";
+    if (!lines.length) {
+      secLines += '<div class="qc-empty-mini">' + esc(tt("dash.brief.noLines")) + "</div>";
+    } else {
+      secLines += '<div class="qc-brief-lines">' + lines.map(function (l) {
+        var qty = (l.qty != null && l.qty !== 0)
+          ? l.qty.toLocaleString("en-US") + (l.qty_unit ? " " + l.qty_unit : "")
+          : tt("dash.brief.noQty");
+        var unit = (l.unit_cash != null && String(l.unit_cash).trim() !== "")
+          ? String(l.unit_cash) : tt("dash.brief.noUnit");
+        var total = l.total_cash != null ? money(l.total_cash, cur) : tt("dash.brief.noLineTotal");
+        return '<div class="qc-brief-line">' +
+          '<div class="qc-brief-line-top">' +
+            '<span class="qc-brief-line-name" lang="en">' + esc(l.name) + "</span>" +
+            '<span class="pill ' + briefStatusClass(l.briefStatus) + '">' + esc(briefStatusLabel(l.briefStatus)) + "</span>" +
+          "</div>" +
+          '<div class="qc-brief-line-meta">' +
+            "<span>" + esc(tt("dash.brief.qty")) + ': <b lang="en">' + esc(qty) + "</b></span>" +
+            "<span>" + esc(tt("dash.brief.unitPrice")) + ': <b lang="en">' + esc(unit) + "</b></span>" +
+            "<span>" + esc(tt("dash.brief.lineTotal")) + ': <b lang="en">' + esc(total) + "</b></span>" +
+          "</div></div>";
+      }).join("") + "</div>";
+    }
+
+    // 3 ── why it could not be priced
+    var unpriced = lines.filter(function (l) { return l.briefStatus !== "priced"; });
+    var info = briefCleanList(o.info_needed);
+    var unmatched = briefCleanList(o.unmatched_lines);
+    var secWhy = '<h4 class="qc-brief-h">' + esc(tt("dash.brief.hWhy")) + "</h4>";
+    if (!unpriced.length && !info.length && !unmatched.length) {
+      secWhy += lines.length
+        ? '<div class="qc-brief-ok">' + esc(tt("dash.brief.allPriced")) + "</div>"
+        : '<div class="qc-empty-mini">' + esc(tt("dash.brief.whyNoLines")) + "</div>";
+    } else {
+      if (unpriced.length) {
+        secWhy += '<ul class="qc-brief-why">' + unpriced.map(function (l) {
+          return "<li>" + '<span class="qc-brief-why-name" lang="en">' + esc(l.name) + "</span>" +
+            briefLineReasons(l, l.briefStatus).map(function (r) {
+              return '<span class="qc-brief-why-reason">' + r + "</span>";
+            }).join("") + "</li>";
+        }).join("") + "</ul>";
+      }
+      if (info.length) {
+        secWhy += '<div class="qc-brief-sub">' + esc(tt("dash.brief.subInfo")) + "</div>" + briefNoteList(info);
+      }
+      if (unmatched.length) {
+        secWhy += '<div class="qc-brief-sub">' + esc(tt("dash.brief.subUnmatched")) + "</div>" + briefNoteList(unmatched);
+      }
+    }
+
+    // 4 ── internal note (never sent to the customer)
+    var secInternal = "";
+    if (o.needs_review === true) {
+      var review = briefCleanList(o.review_items);
+      secInternal =
+        '<div class="qc-brief-internal">' +
+          '<div class="qc-brief-internal-head">' + esc(tt("dash.brief.intHead")) + "</div>" +
+          '<p class="qc-brief-internal-lead">' + esc(tt("dash.brief.intLead")) + "</p>" +
+          (review.length ? briefNoteList(review)
+                         : '<p class="qc-brief-internal-lead">' + esc(tt("dash.brief.intNone")) + "</p>") +
+        "</div>";
+    }
+
+    return '<section class="qc-dsec qc-brief">' + head + openBody +
+      secSum + secLines + secWhy + secInternal +
+    "</div></section>";
+  }
+
   function section(title, sub, inner) {
     return '<section class="qc-dsec">' +
       '<div class="qc-dsec-head"><h3>' + esc(title) + "</h3>" + (sub ? '<span class="qc-dsec-sub">' + esc(sub) + "</span>" : "") + "</div>" +
@@ -1785,6 +2057,8 @@
     var t = e.target;
     var closeBtn = t.closest ? t.closest(".qc-drawer-close") : null;
     if (closeBtn) { closeDrawer(); return; }
+    var brBtn = t.closest ? t.closest("button[data-brief]") : null;
+    if (brBtn) { toggleBrief(brBtn); return; }
     var cand = t.closest ? t.closest("button[data-resolve]") : null;
     if (cand) { resolveLine(cand.getAttribute("data-resolve"), cand.getAttribute("data-ref"), cand.getAttribute("data-sku"), cand); return; }
     var use = t.closest ? t.closest("button[data-usesku]") : null;
@@ -1798,6 +2072,14 @@
     var rel = t.closest ? t.closest("button[data-relabel]") : null;
     if (rel) { doRelabel(rel.getAttribute("data-relabel"), rel.getAttribute("data-action"), rel); return; }
   }
+  // Briefing panel — collapse/expand in place (no re-render, no data churn)
+  function toggleBrief(btn) {
+    briefOpen = btn.getAttribute("aria-expanded") !== "true";
+    btn.setAttribute("aria-expanded", briefOpen ? "true" : "false");
+    var body = el("drawerInner").querySelector(".qc-brief-body");
+    if (body) body.hidden = !briefOpen;
+  }
+
   var catTimer = null;
   function onDrawerInput(e) {
     var inp = e.target;
