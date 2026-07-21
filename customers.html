@@ -95,6 +95,7 @@
         <option value="orders" data-i18n="cust.sort.orders">Most orders</option>
         <option value="name" data-i18n="cust.sort.name">Name A–Z</option>
       </select>
+      <button id="deletedToggle" type="button" class="btn btn-ghost btn-sm qc-deltoggle" aria-pressed="false" hidden data-i18n="cust.showDeleted">Recently deleted</button>
       <span id="rowCount" class="qc-count"></span>
     </div>
 
@@ -104,7 +105,7 @@
           <tr>
             <th data-i18n="cust.th.customer">Customer</th><th data-i18n="cust.th.email">Email</th>
             <th class="num" data-i18n="cust.th.quotes">Quotes</th><th class="num" data-i18n="cust.th.orders">Orders</th>
-            <th data-i18n="cust.th.currency">Currency</th><th data-i18n="cust.th.lastSeen">Last seen</th><th data-i18n-attr="aria-label:cust.th.open" aria-label="Open"></th>
+            <th data-i18n="cust.th.currency">Currency</th><th id="thWhen" data-i18n="cust.th.lastSeen">Last seen</th><th data-i18n-attr="aria-label:cust.th.open" aria-label="Open"></th>
           </tr>
         </thead>
         <tbody id="custBody"></tbody>
@@ -115,6 +116,8 @@
   </section>
 
   <dialog id="drawer" class="qc-drawer" aria-label="Customer detail"></dialog>
+  <!-- Delete-scope dialog. Content is built in customers.js (site CSP forbids inline handlers). -->
+  <dialog id="delDialog" class="qc-confirm qc-confirm-wide" aria-labelledby="delTitle"></dialog>
   <div id="bootError" class="qc-boot-error" hidden></div>
   <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
 </main>

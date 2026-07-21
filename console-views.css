@@ -387,3 +387,86 @@ dialog.qc-drawer[open]::backdrop { animation: qc-fade-in .34s var(--ease) both; 
 .qc-login-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--lime); z-index: 2; }
 
 @media (prefers-reduced-motion: reduce) { .qc-tile, .qc-gap, .qc-table tbody tr { transition: none; } }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   CLIENT EDITING / DELETION (customers.html)
+   White · ink · lime, same language as the rest of the console. Every control
+   below is wired up by delegation in customers.js — the site CSP (script-src
+   'self') forbids inline handlers, so never add onclick="" to this markup.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── confirm dialog ─────────────────────────────────────────────────────────
+   Mirrors dashboard.css so the auxiliary views (which don't load dashboard.css)
+   get the identical confirm treatment. Keep the two in sync. */
+.qc-confirm { border: 0; padding: 0; margin: auto; inset: 0; position: fixed; border-radius: var(--r-md);
+  box-shadow: 0 30px 80px -30px rgba(0,0,0,.5); max-width: 400px; width: calc(100vw - 32px); background: #fff; color: var(--ink); }
+.qc-confirm.qc-confirm-wide { max-width: 520px; max-height: calc(100vh - 48px); overflow-y: auto; }
+.qc-confirm::backdrop { background: rgba(17,17,17,.45); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.qc-confirm-card { padding: 24px 24px 20px; background: #fff; border: 0; box-shadow: none; }
+.qc-confirm-card h3 { font-family: var(--font); font-weight: 600; font-size: 19px; letter-spacing: -.03em; color: var(--ink); margin-bottom: 8px; }
+.qc-confirm-card p { font-size: 14px; line-height: 1.6; color: var(--soft); margin-bottom: 20px; }
+.qc-confirm-card p strong { color: var(--ink); font-weight: 600; }
+.qc-confirm-acts { display: flex; justify-content: flex-end; gap: 10px; }
+.qc-confirm-acts .btn-primary.is-danger { background: #b42318; }
+.qc-confirm-acts .btn-primary.is-danger:hover { background: #9a1d13; }
+.qc-confirm-acts .btn:disabled { opacity: .45; pointer-events: none; }
+.qc-confirm[open] { animation: qc-dialog-in .26s var(--expo); }
+@keyframes qc-dialog-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+
+/* ── delete-scope card ──────────────────────────────────────────────────────── */
+.qc-delcard .qc-del-lead { margin-bottom: 10px; }
+.qc-delcard .qc-del-count { font-family: var(--mono); font-size: 12px; color: var(--grey); margin-bottom: 16px; }
+.qc-scopes { border: 0; padding: 0; margin: 0 0 16px; display: grid; gap: 10px; }
+.qc-scopes legend { font-family: var(--mono); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--grey); font-weight: 600; padding: 0; margin-bottom: 10px; }
+.qc-scope { display: flex; gap: 11px; align-items: flex-start; cursor: pointer; padding: 13px 14px;
+  border: 1px solid var(--hair); border-radius: 13px; background: #fff;
+  transition: border-color .16s, background .16s, box-shadow .16s; }
+.qc-scope:hover { border-color: var(--line-strong); }
+.qc-scope.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); background: var(--row); }
+.qc-scope.off { opacity: .45; cursor: not-allowed; }
+.qc-scope input { margin-top: 3px; flex: none; accent-color: #111; width: 15px; height: 15px; }
+.qc-scope:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.qc-scope-b { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.qc-scope-t { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-family: var(--font); font-weight: 600; font-size: 13.5px; color: var(--ink); }
+.qc-scope-d { font-size: 12.5px; line-height: 1.55; color: var(--soft); }
+.qc-scope-tag { font-family: var(--mono); font-style: normal; font-size: 10px; font-weight: 600;
+  letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 100px; }
+.qc-scope-tag.ok { background: var(--ok-bg); color: #1f6d3a; }
+.qc-scope-tag.warn { background: var(--amber-bg); color: var(--amber); }
+.qc-scope-tag.bad { background: #fbe3df; color: #b42318; }
+.qc-del-warn { font-size: 12.5px; line-height: 1.55; color: #b42318; background: #fbe3df;
+  border-radius: 11px; padding: 11px 13px; margin-bottom: 16px; }
+.qc-delcard .qc-del-confirm { margin-bottom: 16px; }
+.qc-delcard .qc-del-keep { margin-bottom: 14px; }
+.qc-delcard .qc-error { margin-top: 0; margin-bottom: 12px; }
+
+/* ── drawer: action bar + edit form + learned block ─────────────────────────── */
+.qc-drawer-acts { flex: none; display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+  padding: 14px 24px; border-top: 1px solid var(--hair); background: #fff; }
+.qc-drawer-acts .qc-hint { margin: 0; text-align: right; }
+.qc-btn-danger { color: #b42318; border-color: #f0cdc7; }
+.qc-btn-danger:hover { border-color: #b42318; }
+.qc-editform { grid-template-columns: 1fr 1fr; gap: 16px 18px; margin-bottom: 4px; }
+.qc-editform .qc-error { margin: 0; }
+.qc-hidden-submit { position: absolute; width: 1px; height: 1px; padding: 0; border: 0;
+  opacity: 0; pointer-events: none; overflow: hidden; }
+.qc-learned { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--hair); }
+.qc-learned-note { margin: 0 0 14px; }
+
+/* ── recently-deleted list ──────────────────────────────────────────────────── */
+.qc-deltoggle { flex: none; }
+.qc-deltoggle[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.qc-table tbody tr.qc-row-deleted { cursor: default; color: var(--soft); }
+.qc-table tbody tr.qc-row-deleted:hover { box-shadow: none; background: var(--row); }
+.qc-table tbody tr.qc-row-deleted .qc-cust-name { color: var(--soft); }
+
+@media (max-width: 560px) {
+  .qc-editform { grid-template-columns: 1fr; }
+  .qc-drawer-acts { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qc-confirm[open] { animation: none; }
+  .qc-scope { transition: none; }
+}

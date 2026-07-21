@@ -80,7 +80,7 @@
 
       "tour.step12.kick": "Memory",
       "tour.step12.title": "The pipeline remembers customers",
-      "tour.step12.body": "As RFQs arrive, senders are remembered here — quote and order counts, currency and colour preferences, when you last spoke. It's how repeat quotes get faster and more accurate.",
+      "tour.step12.body": "As RFQs arrive, senders are remembered here — quote and order counts, currency and colour preferences, when you last spoke. It's how repeat quotes get faster and more accurate. Open any client to correct their details, or to forget them.",
 
       "tour.step13.kick": "Demand signal",
       "tour.step13.title": "See what you don't stock — yet",
@@ -152,7 +152,7 @@
 
       "tour.step12.kick": "Bellek",
       "tour.step12.title": "Akış müşterileri hatırlar",
-      "tour.step12.body": "<span lang=\"en\">RFQ</span>'lar geldikçe, gönderenler burada hatırlanır — teklif ve sipariş sayıları, para birimi ve renk tercihleri, en son ne zaman görüştüğünüz. Tekrarlayan teklifler böyle daha hızlı ve daha doğru olur.",
+      "tour.step12.body": "<span lang=\"en\">RFQ</span>'lar geldikçe, gönderenler burada hatırlanır — teklif ve sipariş sayıları, para birimi ve renk tercihleri, en son ne zaman görüştüğünüz. Tekrarlayan teklifler böyle daha hızlı ve daha doğru olur. Bilgilerini düzeltmek ya da müşteriyi unutmak için üzerine tıklayın.",
 
       "tour.step13.kick": "Talep sinyali",
       "tour.step13.title": "Henüz stoklamadığınızı görün",
@@ -230,7 +230,7 @@
 
     { page: "customers.html", sel: "#custTable", place: "top",
       kick: "Memory", title: "The pipeline remembers customers",
-      body: "As RFQs arrive, senders are remembered here — quote and order counts, currency and colour preferences, when you last spoke. It's how repeat quotes get faster and more accurate." },
+      body: "As RFQs arrive, senders are remembered here — quote and order counts, currency and colour preferences, when you last spoke. It's how repeat quotes get faster and more accurate. Open any client to correct their details, or to forget them." },
 
     { page: "gaps.html", sel: "#gaps", place: "top",
       kick: "Demand signal", title: "See what you don't stock — yet",
