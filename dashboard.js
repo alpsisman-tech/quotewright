@@ -51,12 +51,12 @@
       "dash.sfAll": "All send states", "dash.sfDraft": "Draft (pending send)", "dash.sfSent": "Sent",
       "dash.tfAll": "All tiers", "dash.tfGreen": "Green — ready", "dash.tfAmber": "Amber — review", "dash.tfRed": "Red — needs work",
       "dash.ofAll": "All outcomes", "dash.ofPending": "Pending decision", "dash.ofWon": "Won", "dash.ofLost": "Lost",
-      "dash.needsApproval": "Needs approval",
+      "dash.needsApproval": "Needs sign-off",
       "dash.ariaSort": "Sort", "dash.ariaSend": "Send state", "dash.ariaTier": "Autonomy tier", "dash.ariaOutcome": "Outcome",
       // table headers
       "dash.thDate": "Date", "dash.thCust": "Customer & products", "dash.thTotal": "Total",
       "dash.thMargin": "Margin", "dash.thConf": "Confidence", "dash.thSend": "Send",
-      "dash.thApproval": "Approval", "dash.thOutcome": "Outcome", "dash.thTier": "Tier", "dash.thOpen": "Open",
+      "dash.thApproval": "Sign-off", "dash.thOutcome": "Outcome", "dash.thTier": "Tier", "dash.thOpen": "Open",
       "dash.selectAll": "Select all", "dash.selectQuote": "Select quote",
       "dash.drawerAria": "Quote workspace", "dash.bulkAria": "Bulk actions",
       // digest
@@ -85,7 +85,8 @@
       "dash.tierReady": "Ready", "dash.tierReview": "Review", "dash.tierWork": "Needs work",
       "dash.tierNone": "Tier not computed yet", "dash.tierTitle": "Autonomy tier: {t}",
       "dash.marginTitle": "{v} margin",
-      "dash.approve": "Approve", "dash.approved": "Approved", "dash.approvedByTitle": "Approved by {who}",
+      "dash.approve": "Sign off", "dash.approved": "Signed off", "dash.approvedByTitle": "Signed off by {who}",
+      "dash.approveTitle": "Records your sign-off on the flagged margin. This does not email anyone.",
       "dash.draft": "Draft", "dash.sent": "Sent",
       "dash.ocPending": "Pending", "dash.ocWon": "Won", "dash.ocLost": "Lost",
       "dash.won": "Won", "dash.lost": "Lost", "dash.reset": "Reset",
@@ -93,10 +94,10 @@
       "dash.plusLine": "+{n} line", "dash.plusLines": "+{n} lines",
       // needs-you
       "dash.nyReplyT": "Customer replied", "dash.nyReplyS": "They’re waiting on a response",
-      "dash.nyApproveT": "Needs your approval", "dash.nyApproveS": "Margin or discount flagged — decide before it sends",
+      "dash.nyApproveT": "Needs your sign-off", "dash.nyApproveS": "Margin or discount flagged. Signing off records your decision — it does not send anything.",
       "dash.nyInfoT": "Lines to resolve", "dash.nyInfoS": "A line is missing a spec or price",
       "dash.nyReadyT": "Ready to send", "dash.nyReadyS": "Priced, high-confidence drafts",
-      "dash.send": "Send", "dash.open": "Open", "dash.viewInLedger": "View in ledger",
+      "dash.send": "Send", "dash.sendNoDraft": "Can’t send", "dash.open": "Open", "dash.viewInLedger": "View in ledger",
       "dash.moreInLedger": "+{n} more in the full ledger →",
       "dash.nyCaughtT": "You’re all caught up", "dash.nyNoneT": "Nothing needs you yet",
       "dash.nyCaughtB": "No quotes are waiting on a human right now. New drafts, approvals and customer replies surface here the moment they need you.",
@@ -107,8 +108,9 @@
       "dash.sentLine": "Sent {dt}", "dash.term": "term {v}",
       "dash.newReplyHead": "New customer reply",
       "dash.convo": "Conversation", "dash.msg1": "1 message", "dash.msgN": "{n} messages",
-      "dash.threadEmpty": "The conversation snapshot appears once the pipeline stores <code>thread_snapshot</code>. Until then, open the customer’s thread from the draft below.",
-      "dash.customer": "Customer",
+      "dash.threadEmpty": "No conversation was captured for this quote. Open the customer’s thread in the mailbox to read it.",
+      "dash.customer": "Customer", "dash.ourTeam": "Our team",
+      "dash.msgNoBody": "(no message text was captured for this message)",
       "dash.priced": "Priced", "dash.provisional": "Priced · confirm spec",
       "dash.needsInfo": "Needs info", "dash.pendingPrice": "Pending price",
       "dash.candidate": "Candidate", "dash.useThis": "Use this",
@@ -117,16 +119,35 @@
       "dash.noCands": "No ranked candidates were logged for this line. Search the catalogue below.",
       "dash.catSearchPh": "Search catalogue by name, SKU, colour or GSM…",
       "dash.askSpec": "Ask the customer for this spec",
+      "dash.askSpecOff": "No email thread or customer address is linked to this quote, so the console cannot ask the customer.",
       "dash.noLineDetail": "No line-by-line detail was logged with this quote.",
       "dash.line1": "1 line", "dash.lineN": "{n} lines", "dash.toResolve": "{n} to resolve", "dash.allPriced": "all priced",
       "dash.lineItems": "Line items",
-      "dash.approveSend": "Approve & send", "dash.sendEdited": "Send edited reply",
       "dash.labelPh": "Label", "dash.add": "Add", "dash.remove": "Remove",
-      "dash.gateNote": "Sending emails the customer from the firm mailbox. Nothing leaves until you approve it here — this is the send gate.",
-      "dash.draftReply": "Draft reply", "dash.pendingSend": "pending your send", "dash.sentLc": "sent",
-      "dash.lineResolved": "Line resolved — quote updated.",
+      "dash.labelSec": "Gmail label for this thread",
+      "dash.gateNote": "Nothing reaches the customer until you press Send here — this is the send gate.",
+      "dash.draftReply": "The email to the customer", "dash.pendingSend": "not sent yet", "dash.sentLc": "sent",
+      // reply panel — one preview, one Send
+      "dash.prevTitle": "Preview of the email to the customer",
+      "dash.prevBranded": "The branded quotation, exactly as the customer will see it.",
+      "dash.prevPlain": "Plain-text draft. No branded version was stored for this quote, so this is what the pipeline logged.",
+      "dash.prevNone": "No draft was stored for this quote — there is nothing to preview or send.",
+      "dash.editBtn": "Edit the text", "dash.discardBtn": "Discard my edits", "dash.backToPrev": "Back to the preview",
+      "dash.editedTag": "Edited",
+      "dash.sendBtn": "Send to the customer", "dash.sentBtn": "Already sent",
+      "dash.whatBranded": "Send emails the branded quotation above, with its PDF, from the firm mailbox.",
+      "dash.whatPlain": "Send emails the plain-text draft above from the firm mailbox.",
+      "dash.whatEdited": "Send will email the text above as a plain-text reply on the existing thread — the branded layout and the PDF are not used.",
+      "dash.blockNoDraftT": "No email draft was created for this quote",
+      "dash.blockNoDraftB": "The pipeline never finished writing a draft into the mailbox, so there is nothing to send as it stands.",
+      "dash.blockNoDraftFix": "You can still write the reply yourself: choose “Edit the text”, write it, then send.",
+      "dash.blockNoThreadT": "No email thread is linked to this quote",
+      "dash.blockNoThreadB": "Without a thread the console cannot post a reply. Handle this one directly in the mailbox.",
+      "dash.blockSentT": "This quote has already been sent.",
+      "dash.lineResolved": "Line resolved — the quote and its draft were rebuilt. Nothing was sent.",
       "dash.searching": "Searching…", "dash.catFail": "Catalogue search failed: {msg}",
       "dash.catNoMatch": "No catalogue products match “{term}”.", "dash.use": "Use", "dash.catFailNet": "Catalogue search failed (network).",
+      "dash.catNoView": "The catalogue isn’t available to the console yet. Ask your administrator to create the products_public view in Supabase.",
       // drawer — draft briefing panel ("What does this draft say?")
       "dash.brief.head": "What does this draft say?", "dash.brief.tag": "Draft briefing",
       "dash.brief.noOutput": "No structured agent output was stored for this quote, so no briefing can be built. The draft text below is in the customer’s language.",
@@ -149,16 +170,22 @@
       "dash.brief.whyNoLines": "There are no lines to price, so no reason can be listed.",
       "dash.brief.rNoQty": "The customer did not state a quantity — the line total cannot be calculated.",
       "dash.brief.rNoPrice": "This product has no catalogued sale price; the sales team will price it.",
-      "dash.brief.rMissing": "Missing information: ",
-      "dash.brief.rMissingBare": "A detail is awaited from the customer; the agent did not say which.",
-      "dash.brief.rGeneric": "This line could not be priced. ",
-      "dash.brief.rGenericBare": "This line could not be priced; the agent gave no reason.",
+      "dash.brief.rMissingBare": "A detail is still awaited from the customer.",
+      "dash.brief.rGenericBare": "This line could not be priced.",
       "dash.brief.subInfo": "Still needed from the customer",
       "dash.brief.subUnmatched": "Requests with no catalogue match",
-      "dash.brief.agentNote": "Agent’s note:",
-      "dash.brief.intHead": "Internal note — not sent to the customer",
-      "dash.brief.intLead": "The following is not part of the email going to the customer; it is for your review only.",
+      "dash.brief.dInfo1": "1 detail is still needed from the customer.",
+      "dash.brief.dInfoN": "{n} details are still needed from the customer.",
+      "dash.brief.dUnm1": "1 requested item had no catalogue match.",
+      "dash.brief.dUnmN": "{n} requested items had no catalogue match.",
+      "dash.brief.subLineNotes": "Notes on individual lines",
+      "dash.brief.subReview": "Why it was flagged for review",
+      "dash.brief.flagHead": "Flagged for your review",
+      "dash.brief.flagLead": "The agent marked this quote as needing a human look before it goes out. This flag is not part of the email to the customer.",
       "dash.brief.intNone": "This quote is flagged for review, but the agent listed no reason.",
+      "dash.brief.rawHead": "Show the agent’s own wording",
+      "dash.brief.rawLeadLang": "Everything below is text the agent wrote itself, shown word for word. It is in the language of the reply ({lang}), not the console language, and is not translated.",
+      "dash.brief.rawLead": "Everything below is text the agent wrote itself, shown word for word. It is in the language of the reply, not the console language, and is not translated.",
       // language names, for rendering the draft's language in the console's language
       "lang.en": "English", "lang.tr": "Turkish", "lang.es": "Spanish", "lang.de": "German",
       "lang.fr": "French", "lang.bg": "Bulgarian", "lang.it": "Italian", "lang.ru": "Russian",
@@ -169,28 +196,32 @@
       "dash.markedDemo": "Marked {o} · demo — not saved.", "dash.marked": "Marked {o}.",
       "dash.runAnalyticsSql": "Run quote-analytics.sql in Supabase first.",
       "dash.couldntSave": "Couldn’t save: {m}",
-      "dash.approvedDemo": "Approved · demo — not saved.",
+      "dash.approvedDemo": "Signed off · demo — not saved.",
       "dash.runExpansionSql": "Run quotewright-expansion.sql in Supabase first.",
-      "dash.couldntApprove": "Couldn’t approve: {m}", "dash.approvedToast": "Approved.",
-      "dash.netErrNotApproved": "Network error — not approved.",
+      "dash.couldntApprove": "Couldn’t record the sign-off: {m}",
+      "dash.approvedToast": "Signed off. Nothing was emailed — send it separately when you’re ready.",
+      "dash.netErrNotApproved": "Network error — the sign-off was not recorded.",
       "dash.sessionExpired": "Session expired — sign in again.",
       "dash.notAuthorised": "Not authorised — your session may have expired.",
       "dash.requestFailed": "Request failed ({status}).",
       "dash.sendQTitle": "Send this quote?",
-      "dash.sendQBody": "This emails <strong>{c}</strong> the drafted quotation from the firm mailbox.",
+      "dash.sendQBody": "This emails <strong>{c}</strong> the branded quotation already drafted in the firm mailbox, with its PDF attached.",
       "dash.sendNow": "Send now", "dash.quoteSentTo": "Quote sent to {c}.",
+      "dash.sendOddStatus": "The mailbox accepted the request but reported “{s}”, not sent. Check the thread before telling the customer.",
       "dash.theCustomer": "the customer",
       "dash.writeReplyFirst": "Write a reply first.",
-      "dash.sendEditedTitle": "Send edited reply?",
-      "dash.sendEditedBody": "This sends your edited message to <strong>{c}</strong> on the existing thread.",
-      "dash.sendReply": "Send reply", "dash.replySent": "Reply sent.",
-      "dash.clarifySent": "Clarification email sent to the customer.",
+      "dash.sendEditedTitle": "Send your edited version?",
+      "dash.sendEditedBody": "This emails the text you wrote to <strong>{c}</strong> as a plain-text reply on the existing thread. The branded layout and the PDF are <strong>not</strong> included.",
+      "dash.sendReply": "Send my version", "dash.replySent": "Your reply was sent to {c}.",
+      "dash.clarifyDrafted": "Clarification written as a draft in the mailbox — it was NOT sent. Open the mailbox to review and send it.",
+      "dash.clarifySentTo": "Clarification sent to {c}.",
       "dash.typeLabelFirst": "Type a label name first.",
       "dash.labelApplied": "Applied label “{l}”.", "dash.labelRemoved": "Removed label “{l}”.",
-      "dash.noDraftsSel": "No drafts selected.",
+      "dash.noDraftsSel": "None of the selected quotes has an email draft that can be sent.",
+      "dash.bulkSkipped": " · {n} skipped (no email draft)",
       "dash.bulkSendTitle1": "Send 1 quote?", "dash.bulkSendTitleN": "Send {n} quotes?",
-      "dash.bulkSendBody1": "This emails 1 customer their drafted quotation. This can’t be undone.",
-      "dash.bulkSendBodyN": "This emails {n} customers their drafted quotation. This can’t be undone.",
+      "dash.bulkSendBody1": "This emails 1 customer the branded quotation already drafted for them. This can’t be undone.",
+      "dash.bulkSendBodyN": "This emails {n} customers the branded quotation already drafted for them. This can’t be undone.",
       "dash.sendAll": "Send all", "dash.sending": "Sending…",
       "dash.sentN": "Sent {n}", "dash.failedN": " · {n} failed",
       "dash.typeLabelName": "Type a label name.",
@@ -198,8 +229,8 @@
       "dash.bulkLabelBody1": "Applies the Gmail label “{l}” to 1 thread.",
       "dash.bulkLabelBodyN": "Applies the Gmail label “{l}” to {n} threads.",
       "dash.applyLabel": "Apply label", "dash.applying": "Applying…", "dash.labelledN": "Labelled {n}",
-      "dash.nSelected": "{n} selected", "dash.nDraft1": "1 draft", "dash.nDraftN": "{n} drafts",
-      "dash.sendNDraft1": "Send 1 draft", "dash.sendNDraftN": "Send {n} drafts",
+      "dash.nSelected": "{n} selected", "dash.nDraft1": "1 can be sent", "dash.nDraftN": "{n} can be sent",
+      "dash.sendNDraft1": "Send 1 quote", "dash.sendNDraftN": "Send {n} quotes",
       "dash.labelNamePh": "Label name", "dash.clear": "Clear", "dash.clearSel": "Clear selection"
     },
     tr: {
@@ -233,11 +264,11 @@
       "dash.sfAll": "Tüm gönderim durumları", "dash.sfDraft": "Taslak (gönderim bekliyor)", "dash.sfSent": "Gönderildi",
       "dash.tfAll": "Tüm kademeler", "dash.tfGreen": "Yeşil — hazır", "dash.tfAmber": "Sarı — incele", "dash.tfRed": "Kırmızı — çalışma gerek",
       "dash.ofAll": "Tüm sonuçlar", "dash.ofPending": "Karar bekliyor", "dash.ofWon": "Kazanıldı", "dash.ofLost": "Kaybedildi",
-      "dash.needsApproval": "Onay gerekiyor",
+      "dash.needsApproval": "İmza gerekiyor",
       "dash.ariaSort": "Sıralama", "dash.ariaSend": "Gönderim durumu", "dash.ariaTier": "Otonomi kademesi", "dash.ariaOutcome": "Sonuç",
       "dash.thDate": "Tarih", "dash.thCust": "Müşteri ve ürünler", "dash.thTotal": "Toplam",
       "dash.thMargin": "Marj", "dash.thConf": "Güven", "dash.thSend": "Gönderim",
-      "dash.thApproval": "Onay", "dash.thOutcome": "Sonuç", "dash.thTier": "Kademe", "dash.thOpen": "Aç",
+      "dash.thApproval": "İmza", "dash.thOutcome": "Sonuç", "dash.thTier": "Kademe", "dash.thOpen": "Aç",
       "dash.selectAll": "Tümünü seç", "dash.selectQuote": "Teklifi seç",
       "dash.drawerAria": "Teklif çalışma alanı", "dash.bulkAria": "Toplu işlemler",
       "dash.digestClear": "Gelen kutusu temiz — şu anda sizi bekleyen teklif yok.",
@@ -262,17 +293,18 @@
       "dash.tierReady": "Hazır", "dash.tierReview": "İncele", "dash.tierWork": "Çalışma gerek",
       "dash.tierNone": "Kademe henüz hesaplanmadı", "dash.tierTitle": "Otonomi kademesi: {t}",
       "dash.marginTitle": "{v} marj",
-      "dash.approve": "Onayla", "dash.approved": "Onaylandı", "dash.approvedByTitle": "Onaylayan: {who}",
+      "dash.approve": "İmzala", "dash.approved": "İmzalandı", "dash.approvedByTitle": "İmzalayan: {who}",
+      "dash.approveTitle": "İşaretlenen marj için imzanızı kaydeder. Kimseye e-posta göndermez.",
       "dash.draft": "Taslak", "dash.sent": "Gönderildi",
       "dash.ocPending": "Beklemede", "dash.ocWon": "Kazanıldı", "dash.ocLost": "Kaybedildi",
       "dash.won": "Kazanıldı", "dash.lost": "Kaybedildi", "dash.reset": "Sıfırla",
       "dash.newReplyDot": "yeni yanıt", "dash.newReplyTitle": "Bu konuda yeni müşteri yanıtı",
       "dash.plusLine": "+{n} satır", "dash.plusLines": "+{n} satır",
       "dash.nyReplyT": "Müşteri yanıtladı", "dash.nyReplyS": "Yanıt bekliyorlar",
-      "dash.nyApproveT": "Onayınız gerekiyor", "dash.nyApproveS": "Marj veya iskonto işaretlendi — göndermeden önce karar verin",
+      "dash.nyApproveT": "İmzanız gerekiyor", "dash.nyApproveS": "Marj veya iskonto işaretlendi. İmzalamak kararınızı kaydeder — hiçbir şey göndermez.",
       "dash.nyInfoT": "Çözülecek satırlar", "dash.nyInfoS": "Bir satırda özellik veya fiyat eksik",
       "dash.nyReadyT": "Göndermeye hazır", "dash.nyReadyS": "Fiyatlandırılmış, yüksek güvenli taslaklar",
-      "dash.send": "Gönder", "dash.open": "Aç", "dash.viewInLedger": "Kayıtta görüntüle",
+      "dash.send": "Gönder", "dash.sendNoDraft": "Gönderilemez", "dash.open": "Aç", "dash.viewInLedger": "Kayıtta görüntüle",
       "dash.moreInLedger": "tam kayıtta +{n} tane daha →",
       "dash.nyCaughtT": "Her şey güncel", "dash.nyNoneT": "Henüz sizi bekleyen bir şey yok",
       "dash.nyCaughtB": "Şu anda bir insanı bekleyen teklif yok. Yeni taslaklar, onaylar ve müşteri yanıtları sizi gerektiği an burada belirir.",
@@ -282,8 +314,9 @@
       "dash.sentLine": "Gönderildi {dt}", "dash.term": "vadeli {v}",
       "dash.newReplyHead": "Yeni müşteri yanıtı",
       "dash.convo": "Yazışma", "dash.msg1": "1 mesaj", "dash.msgN": "{n} mesaj",
-      "dash.threadEmpty": "Yazışma anlık görüntüsü, akış <code>thread_snapshot</code> verisini kaydettiğinde görünür. O zamana kadar aşağıdaki taslaktan müşterinin konusunu açın.",
-      "dash.customer": "Müşteri",
+      "dash.threadEmpty": "Bu teklif için yazışma kaydedilmemiş. Müşterinin yazışmasını okumak için posta kutusundan açın.",
+      "dash.customer": "Müşteri", "dash.ourTeam": "Ekibimiz",
+      "dash.msgNoBody": "(bu mesajın metni kaydedilmemiş)",
       "dash.priced": "Fiyatlandı", "dash.provisional": "Fiyatlandı · özelliği doğrula",
       "dash.needsInfo": "Bilgi gerekiyor", "dash.pendingPrice": "Fiyat bekliyor",
       "dash.candidate": "Aday", "dash.useThis": "Bunu kullan",
@@ -292,16 +325,35 @@
       "dash.noCands": "Bu satır için sıralı aday kaydedilmedi. Aşağıdaki katalogda arayın.",
       "dash.catSearchPh": "Katalogda ada, SKU'ya, renge veya GSM'e göre ara…",
       "dash.askSpec": "Bu özelliği müşteriden iste",
+      "dash.askSpecOff": "Bu teklife bağlı bir e-posta yazışması veya müşteri adresi yok; konsol müşteriye soramaz.",
       "dash.noLineDetail": "Bu teklifle satır satır ayrıntı kaydedilmedi.",
       "dash.line1": "1 satır", "dash.lineN": "{n} satır", "dash.toResolve": "{n} çözülecek", "dash.allPriced": "tümü fiyatlandı",
       "dash.lineItems": "Satır kalemleri",
-      "dash.approveSend": "Onayla ve gönder", "dash.sendEdited": "Düzenlenmiş yanıtı gönder",
       "dash.labelPh": "Etiket", "dash.add": "Ekle", "dash.remove": "Kaldır",
-      "dash.gateNote": "Gönderim, müşteriye firma posta kutusundan e-posta atar. Siz burada onaylamadan hiçbir şey gitmez — gönderim kapısı budur.",
-      "dash.draftReply": "Taslak yanıt", "dash.pendingSend": "gönderiminizi bekliyor", "dash.sentLc": "gönderildi",
-      "dash.lineResolved": "Satır çözüldü — teklif güncellendi.",
+      "dash.labelSec": "Bu yazışma için Gmail etiketi",
+      "dash.gateNote": "Siz buradan Gönder’e basmadan müşteriye hiçbir şey ulaşmaz — gönderim kapısı budur.",
+      "dash.draftReply": "Müşteriye gidecek e-posta", "dash.pendingSend": "henüz gönderilmedi", "dash.sentLc": "gönderildi",
+      // yanıt paneli — tek önizleme, tek Gönder
+      "dash.prevTitle": "Müşteriye gidecek e-postanın önizlemesi",
+      "dash.prevBranded": "Markalı teklif — müşterinin göreceği hâliyle.",
+      "dash.prevPlain": "Düz metin taslak. Bu teklif için markalı sürüm kaydedilmemiş; akışın kaydettiği metin budur.",
+      "dash.prevNone": "Bu teklif için taslak kaydedilmemiş — önizlenecek veya gönderilecek bir şey yok.",
+      "dash.editBtn": "Metni düzenle", "dash.discardBtn": "Düzenlemelerimi at", "dash.backToPrev": "Önizlemeye dön",
+      "dash.editedTag": "Düzenlendi",
+      "dash.sendBtn": "Müşteriye gönder", "dash.sentBtn": "Zaten gönderildi",
+      "dash.whatBranded": "Gönder, yukarıdaki markalı teklifi PDF’iyle birlikte firma posta kutusundan e-postalar.",
+      "dash.whatPlain": "Gönder, yukarıdaki düz metin taslağı firma posta kutusundan e-postalar.",
+      "dash.whatEdited": "Gönder, yukarıdaki metni mevcut yazışmaya düz metin yanıt olarak e-postalar — markalı düzen ve PDF kullanılmaz.",
+      "dash.blockNoDraftT": "Bu teklif için e-posta taslağı oluşturulmamış",
+      "dash.blockNoDraftB": "Akış, posta kutusuna taslağı yazmayı tamamlayamamış; bu hâliyle gönderilecek bir şey yok.",
+      "dash.blockNoDraftFix": "Yanıtı yine de kendiniz yazabilirsiniz: “Metni düzenle”yi seçin, yazın ve gönderin.",
+      "dash.blockNoThreadT": "Bu teklife bağlı bir e-posta yazışması yok",
+      "dash.blockNoThreadB": "Yazışma olmadan konsol yanıt gönderemez. Bunu doğrudan posta kutusundan halledin.",
+      "dash.blockSentT": "Bu teklif zaten gönderildi.",
+      "dash.lineResolved": "Satır çözüldü — teklif ve taslağı yeniden oluşturuldu. Hiçbir şey gönderilmedi.",
       "dash.searching": "Aranıyor…", "dash.catFail": "Katalog araması başarısız: {msg}",
       "dash.catNoMatch": "“{term}” ile eşleşen katalog ürünü yok.", "dash.use": "Kullan", "dash.catFailNet": "Katalog araması başarısız (ağ).",
+      "dash.catNoView": "Katalog henüz konsola açılmamış. Yöneticinizden Supabase’de products_public görünümünü oluşturmasını isteyin.",
       // drawer — taslak brifingi ("Bu taslak ne diyor?")
       "dash.brief.head": "Bu taslak ne diyor?", "dash.brief.tag": "Taslak brifingi",
       "dash.brief.noOutput": "Bu teklif için yapılandırılmış ajan çıktısı bulunamadı, bu yüzden brifing oluşturulamıyor. Aşağıdaki taslak metni müşterinin dilindedir.",
@@ -324,16 +376,22 @@
       "dash.brief.whyNoLines": "Fiyatlandırılacak satır bulunmadığı için gerekçe listelenemiyor.",
       "dash.brief.rNoQty": "Müşteri miktar belirtmemiş — satır toplamı hesaplanamıyor.",
       "dash.brief.rNoPrice": "Bu ürünün kayıtlı satış fiyatı yok; satış ekibi fiyatlandıracak.",
-      "dash.brief.rMissing": "Eksik bilgi: ",
-      "dash.brief.rMissingBare": "Müşteriden bir ayrıntı bekleniyor; ajan ayrıntıyı belirtmemiş.",
-      "dash.brief.rGeneric": "Bu satır fiyatlandırılamadı. ",
-      "dash.brief.rGenericBare": "Bu satır fiyatlandırılamadı; ajan bir gerekçe belirtmemiş.",
+      "dash.brief.rMissingBare": "Müşteriden hâlâ bir ayrıntı bekleniyor.",
+      "dash.brief.rGenericBare": "Bu satır fiyatlandırılamadı.",
       "dash.brief.subInfo": "Müşteriden hâlâ beklenen bilgiler",
       "dash.brief.subUnmatched": "Katalogda eşleşmeyen talepler",
-      "dash.brief.agentNote": "Ajanın notu:",
-      "dash.brief.intHead": "İç not — müşteriye gitmez",
-      "dash.brief.intLead": "Aşağıdakiler müşteriye gidecek e-postanın parçası değildir; yalnızca sizin kontrolünüz içindir.",
+      "dash.brief.dInfo1": "Müşteriden hâlâ 1 ayrıntı bekleniyor.",
+      "dash.brief.dInfoN": "Müşteriden hâlâ {n} ayrıntı bekleniyor.",
+      "dash.brief.dUnm1": "Talep edilen 1 kalemde katalog eşleşmesi yok.",
+      "dash.brief.dUnmN": "Talep edilen {n} kalemde katalog eşleşmesi yok.",
+      "dash.brief.subLineNotes": "Tek tek satırlara dair notlar",
+      "dash.brief.subReview": "Neden kontrol için işaretlendi",
+      "dash.brief.flagHead": "Kontrolünüz için işaretlendi",
+      "dash.brief.flagLead": "Ajan, bu teklifin gitmeden önce bir insan tarafından incelenmesi gerektiğini işaretledi. Bu işaret müşteriye giden e-postanın parçası değildir.",
       "dash.brief.intNone": "Bu teklif kontrol gerektiriyor olarak işaretlenmiş, ancak ajan bir gerekçe listelememiş.",
+      "dash.brief.rawHead": "Ajanın kendi ifadelerini göster",
+      "dash.brief.rawLeadLang": "Aşağıdakilerin tamamı ajanın kendi yazdığı metindir, kelimesi kelimesine gösterilir. Konsolun dilinde değil, yanıtın dilindedir ({lang}) ve çevrilmemiştir.",
+      "dash.brief.rawLead": "Aşağıdakilerin tamamı ajanın kendi yazdığı metindir, kelimesi kelimesine gösterilir. Konsolun dilinde değil, yanıtın dilindedir ve çevrilmemiştir.",
       // dil adları — taslağın dili, konsolun dilinde yazılır
       "lang.en": "İngilizce", "lang.tr": "Türkçe", "lang.es": "İspanyolca", "lang.de": "Almanca",
       "lang.fr": "Fransızca", "lang.bg": "Bulgarca", "lang.it": "İtalyanca", "lang.ru": "Rusça",
@@ -343,28 +401,32 @@
       "dash.markedDemo": "{o} olarak işaretlendi · demo — kaydedilmedi.", "dash.marked": "{o} olarak işaretlendi.",
       "dash.runAnalyticsSql": "Önce Supabase'de quote-analytics.sql çalıştırın.",
       "dash.couldntSave": "Kaydedilemedi: {m}",
-      "dash.approvedDemo": "Onaylandı · demo — kaydedilmedi.",
+      "dash.approvedDemo": "İmzalandı · demo — kaydedilmedi.",
       "dash.runExpansionSql": "Önce Supabase'de quotewright-expansion.sql çalıştırın.",
-      "dash.couldntApprove": "Onaylanamadı: {m}", "dash.approvedToast": "Onaylandı.",
-      "dash.netErrNotApproved": "Ağ hatası — onaylanmadı.",
+      "dash.couldntApprove": "İmza kaydedilemedi: {m}",
+      "dash.approvedToast": "İmzalandı. Hiçbir e-posta gönderilmedi — hazır olduğunuzda ayrıca gönderin.",
+      "dash.netErrNotApproved": "Ağ hatası — imza kaydedilmedi.",
       "dash.sessionExpired": "Oturum sona erdi — yeniden giriş yapın.",
       "dash.notAuthorised": "Yetkiniz yok — oturumunuz sona ermiş olabilir.",
       "dash.requestFailed": "İstek başarısız ({status}).",
       "dash.sendQTitle": "Bu teklif gönderilsin mi?",
-      "dash.sendQBody": "Bu, hazırlanan teklifi firma posta kutusundan <strong>{c}</strong> adresine e-postayla gönderir.",
+      "dash.sendQBody": "Bu, firma posta kutusunda hazırlanmış markalı teklifi PDF’iyle birlikte <strong>{c}</strong> adresine e-postalar.",
       "dash.sendNow": "Şimdi gönder", "dash.quoteSentTo": "Teklif {c} adresine gönderildi.",
+      "dash.sendOddStatus": "Posta kutusu isteği kabul etti ancak “gönderildi” yerine “{s}” bildirdi. Müşteriye söylemeden önce yazışmayı kontrol edin.",
       "dash.theCustomer": "müşteriye",
       "dash.writeReplyFirst": "Önce bir yanıt yazın.",
-      "dash.sendEditedTitle": "Düzenlenmiş yanıt gönderilsin mi?",
-      "dash.sendEditedBody": "Bu, düzenlediğiniz mesajı mevcut yazışmada <strong>{c}</strong> adresine gönderir.",
-      "dash.sendReply": "Yanıtı gönder", "dash.replySent": "Yanıt gönderildi.",
-      "dash.clarifySent": "Açıklama e-postası müşteriye gönderildi.",
+      "dash.sendEditedTitle": "Düzenlediğiniz sürüm gönderilsin mi?",
+      "dash.sendEditedBody": "Bu, yazdığınız metni mevcut yazışmada <strong>{c}</strong> adresine düz metin yanıt olarak e-postalar. Markalı düzen ve PDF <strong>dâhil edilmez</strong>.",
+      "dash.sendReply": "Kendi sürümümü gönder", "dash.replySent": "Yanıtınız {c} adresine gönderildi.",
+      "dash.clarifyDrafted": "Açıklama isteği posta kutusunda taslak olarak yazıldı — GÖNDERİLMEDİ. İncelemek ve göndermek için posta kutusunu açın.",
+      "dash.clarifySentTo": "Açıklama isteği {c} adresine gönderildi.",
       "dash.typeLabelFirst": "Önce bir etiket adı yazın.",
       "dash.labelApplied": "“{l}” etiketi uygulandı.", "dash.labelRemoved": "“{l}” etiketi kaldırıldı.",
-      "dash.noDraftsSel": "Seçili taslak yok.",
+      "dash.noDraftsSel": "Seçilen tekliflerin hiçbirinde gönderilebilecek bir e-posta taslağı yok.",
+      "dash.bulkSkipped": " · {n} atlandı (e-posta taslağı yok)",
       "dash.bulkSendTitle1": "1 teklif gönderilsin mi?", "dash.bulkSendTitleN": "{n} teklif gönderilsin mi?",
-      "dash.bulkSendBody1": "Bu, 1 müşteriye hazırlanan teklifini e-postayla gönderir. Bu geri alınamaz.",
-      "dash.bulkSendBodyN": "Bu, {n} müşteriye hazırlanan tekliflerini e-postayla gönderir. Bu geri alınamaz.",
+      "dash.bulkSendBody1": "Bu, 1 müşteriye kendisi için hazırlanmış markalı teklifi e-postalar. Bu geri alınamaz.",
+      "dash.bulkSendBodyN": "Bu, {n} müşteriye kendileri için hazırlanmış markalı teklifleri e-postalar. Bu geri alınamaz.",
       "dash.sendAll": "Tümünü gönder", "dash.sending": "Gönderiliyor…",
       "dash.sentN": "{n} gönderildi", "dash.failedN": " · {n} başarısız",
       "dash.typeLabelName": "Bir etiket adı yazın.",
@@ -372,8 +434,8 @@
       "dash.bulkLabelBody1": "“{l}” Gmail etiketini 1 konuya uygular.",
       "dash.bulkLabelBodyN": "“{l}” Gmail etiketini {n} konuya uygular.",
       "dash.applyLabel": "Etiket uygula", "dash.applying": "Uygulanıyor…", "dash.labelledN": "{n} etiketlendi",
-      "dash.nSelected": "{n} seçildi", "dash.nDraft1": "1 taslak", "dash.nDraftN": "{n} taslak",
-      "dash.sendNDraft1": "1 taslak gönder", "dash.sendNDraftN": "{n} taslak gönder",
+      "dash.nSelected": "{n} seçildi", "dash.nDraft1": "1 tanesi gönderilebilir", "dash.nDraftN": "{n} tanesi gönderilebilir",
+      "dash.sendNDraft1": "1 teklif gönder", "dash.sendNDraftN": "{n} teklif gönder",
       "dash.labelNamePh": "Etiket adı", "dash.clear": "Temizle", "dash.clearSel": "Seçimi temizle"
     }
   });
@@ -1235,8 +1297,8 @@
   }
   function approvalCell(q, id) {
     if (needsApproval(q)) {
-      return '<button class="qc-approve" data-approve="' + esc(id) + '"' +
-        (q.approval_reason ? ' title="' + esc(q.approval_reason) + '"' : "") + '>' +
+      var ttl = q.approval_reason ? (q.approval_reason + "  ·  " + tt("dash.approveTitle")) : tt("dash.approveTitle");
+      return '<button class="qc-approve" data-approve="' + esc(id) + '" title="' + esc(ttl) + '">' +
         '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>' + esc(tt("dash.approve")) + '</button>';
     }
     if (q.approved_by) {
@@ -1379,9 +1441,16 @@
     var meta = [money(q.total, q.currency), fmtDate(q.created_at)]
       .filter(function (x) { return x && x !== "—"; }).join("  ·  ");
     var actHtml;
-    if (action === "approve") actHtml = '<button class="btn btn-primary btn-sm" data-approve="' + esc(id) + '">' + esc(tt("dash.approve")) + '</button>';
-    else if (action === "send") actHtml = '<button class="btn btn-primary btn-sm qc-send" data-send="' + esc(id) + '">' +
-      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>' + esc(tt("dash.send")) + '</button>';
+    if (action === "approve") {
+      // Deliberately NOT the primary style: this writes a flag, it sends nothing.
+      actHtml = '<button class="btn btn-ghost btn-sm" data-approve="' + esc(id) + '" title="' + esc(tt("dash.approveTitle")) + '">' + esc(tt("dash.approve")) + '</button>';
+    } else if (action === "send") {
+      var can = canSendDraft(q);
+      actHtml = '<button class="btn btn-primary btn-sm qc-send" data-send="' + esc(id) + '"' +
+        (can ? "" : ' disabled title="' + esc(tt("dash.blockNoDraftB")) + '"') + '>' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>' +
+        esc(can ? tt("dash.send") : tt("dash.sendNoDraft")) + '</button>';
+    }
     else actHtml = '<span class="qc-ny-open" aria-hidden="true">' + esc(tt("dash.open")) + CHEVRON + "</span>";
     return '<div class="qc-ny-card" data-row="' + esc(id) + '" tabindex="0" role="button" aria-label="' + esc(tt("dash.openCust", { c: q.customer || tt("dash.quoteFallback") })) + '">' +
       '<div class="qc-ny-main">' +
@@ -1477,7 +1546,7 @@
     var bar = el("bulkBar");
     var list = selectedQuotes();
     if (!list.length) { bar.hidden = true; bar.innerHTML = ""; document.body.classList.remove("qc-has-bulk"); return; }
-    var drafts = list.filter(isDraft).length;
+    var drafts = list.filter(function (q) { return isDraft(q) && canSendDraft(q); }).length;
     bar.hidden = false;
     document.body.classList.add("qc-has-bulk");
     bar.innerHTML =
@@ -1497,7 +1566,9 @@
   function api(path, body) {
     // DEMO MODE: simulate a successful pipeline call — never hit the network / DB.
     if (window.QWDemo && QWDemo.isOn()) {
-      var out = { ok: true, status: "sent", demo: true };
+      var out = /clarify/.test(path)
+        ? { ok: true, mode: "draft", demo: true }   // draft-mode is the default setting
+        : { ok: true, status: "sent", demo: true };
       var q = body && body.quote_id ? findQuote(body.quote_id) : null;
       if (/resolve-line/.test(path) && q) {
         // reflect the resolution locally so the drawer visibly updates during the tour
@@ -1717,28 +1788,39 @@
   }
 
   // ── thread panel (reads thread_snapshot; no live Gmail call) ─────────────────
-  function normMsg(m) {
-    var from = m.from || m.sender || m.author || m.email || "";
+  function normMsg(m, q) {
+    var from = m.from || m.sender || m.author || m.email || m.from_email || "";
     var date = m.date || m.ts || m.timestamp || m.created_at || m.time || "";
-    var body = m.body || m.text || m.snippet || m.content || m.message || "";
+    // The pipeline has written the body under several names over the life of the
+    // project — `preview` is what existing rows carry, `body` is what it writes
+    // now. Accept every spelling so old and new rows both render.
+    var body = m.body || m.body_text || m.text || m.preview || m.snippet || m.content || m.message || "";
     var dir = (m.direction || m.type || m.role || "").toLowerCase();
     var outbound;
     if (dir === "outbound" || dir === "sent" || dir === "firm" || dir === "agent" || dir === "us") outbound = true;
     else if (dir === "inbound" || dir === "received" || dir === "customer") outbound = false;
     else outbound = FIRM_HINTS.some(function (h) { return String(from).toLowerCase().indexOf(h) !== -1; });
-    return { from: from, date: date, body: body, outbound: outbound };
+    // A message with no sender is still attributable: outbound is us, inbound is
+    // whoever this quote is for.
+    if (!String(from).trim()) {
+      from = outbound ? tt("dash.ourTeam")
+                      : ((q && (q.customer_email || q.customer)) || tt("dash.customer"));
+    }
+    return { from: from, date: date, body: String(body).trim(), outbound: outbound };
   }
   function threadPanel(q) {
-    var msgs = threadOf(q).map(normMsg);
+    var msgs = threadOf(q).map(function (m) { return normMsg(m, q); });
     var inner;
     if (!msgs.length) {
-      inner = '<div class="qc-empty-mini">' + tt("dash.threadEmpty") + "</div>";
+      inner = '<div class="qc-empty-mini">' + esc(tt("dash.threadEmpty")) + "</div>";
     } else {
       inner = '<div class="qc-thread">' + msgs.map(function (m) {
         return '<div class="qc-msg ' + (m.outbound ? "out" : "in") + '">' +
-          '<div class="qc-msg-head"><span class="qc-msg-from" lang="en">' + esc(m.from || (m.outbound ? "Hassan" : tt("dash.customer"))) + "</span>" +
+          '<div class="qc-msg-head"><span class="qc-msg-from" lang="en">' + esc(m.from) + "</span>" +
             (m.date ? '<span class="qc-msg-date" lang="en">' + esc(fmtDateTime(m.date)) + "</span>" : "") + "</div>" +
-          '<div class="qc-msg-body" lang="en">' + nl2br(m.body) + "</div></div>";
+          '<div class="qc-msg-body" lang="en">' +
+            (m.body ? nl2br(m.body) : '<span class="qc-msg-nobody">' + esc(tt("dash.msgNoBody")) + "</span>") +
+          "</div></div>";
       }).join("") + "</div>";
     }
     return section(tt("dash.convo"), msgs.length ? (msgs.length === 1 ? tt("dash.msg1") : tt("dash.msgN", { n: msgs.length })) : "", inner);
@@ -1797,6 +1879,7 @@
 
     var resolver = "";
     if (weak) {
+      var canAsk = canReply(q) || !!q.customer_email;
       var chips = l.candidates.length
         ? '<div class="qc-cands">' + l.candidates.map(function (c) { return candChip(id, l.ref, c); }).join("") + "</div>"
         : '<div class="qc-empty-mini">' + esc(tt("dash.noCands")) + "</div>";
@@ -1809,7 +1892,10 @@
             '<div class="qc-catresults" data-ref="' + esc(l.ref) + '"></div>' +
           "</div>" +
           '<div class="qc-line-actions">' +
-            '<button type="button" class="qc-mini-btn" data-clarify="' + esc(id) + '" data-ref="' + esc(l.ref) + '">' + esc(tt("dash.askSpec")) + "</button>" +
+            (canAsk
+              ? '<button type="button" class="qc-mini-btn" data-clarify="' + esc(id) + '" data-ref="' + esc(l.ref) + '">' + esc(tt("dash.askSpec")) + "</button>"
+              : '<button type="button" class="qc-mini-btn" disabled title="' + esc(tt("dash.askSpecOff")) + '">' + esc(tt("dash.askSpec")) + "</button>" +
+                '<p class="qc-line-blocked">' + esc(tt("dash.askSpecOff")) + "</p>") +
           "</div>" +
         "</div>";
     }
@@ -1829,24 +1915,121 @@
     return section(tt("dash.lineItems"), sub, inner);
   }
 
-  // ── draft + actions ──────────────────────────────────────────────────────────
+  // ── the email to the customer: one preview, one Send ─────────────────────────
+  /* SECURITY — `html_body` is written by an LLM and is NEVER injected into this
+     document. It is handed to an iframe through `srcdoc` with `sandbox=""`: no
+     scripts, no same-origin, no forms, no plugins, no top-level navigation. The
+     worst a malformed or hostile draft can do is look wrong inside its own frame.
+     (The site CSP is `default-src 'self'`, so `frame-src` resolves to 'self'; a
+     srcdoc frame inherits the parent policy rather than being fetched, so this
+     needs no CSP change. Remote images inside a quote would be blocked by
+     `img-src 'self' data:` — inline styles and data: URIs render normally.) */
+  var draftEdits = {};   // quote id -> the operator's edited text
+  var editOpen = {};     // quote id -> the plain-text editor is open
+
+  function htmlBodyOf(q) {
+    var h = q.html_body;
+    return (typeof h === "string" && h.trim() !== "") ? h : "";
+  }
+  function pristineDraft(q) { return draftText(q) || ""; }
+  function isEdited(id, q) {
+    var e = draftEdits[String(id)];
+    return e != null && e.trim() !== "" && e !== pristineDraft(q);
+  }
+  // Can the pre-built branded draft be sent? (qw/send-quote sends the Gmail draft.)
+  function canSendDraft(q) { return !!q.gmail_draft_id; }
+  // Can an operator-written message be posted? (qw/reply replies on the thread.)
+  function canReply(q) { return !!q.gmail_thread_id; }
+
+  function plainSrcdoc(txt) {
+    return '<!doctype html><html><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<style>body{margin:0;padding:18px;background:#fff;color:#131313;' +
+      'font:13.5px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;' +
+      'white-space:pre-wrap;word-break:break-word}</style></head><body>' +
+      esc(txt) + '</body></html>';
+  }
+  function previewFrame(q) {
+    // esc() here escapes the document for the srcdoc ATTRIBUTE; the parser undoes
+    // exactly one layer when it reads the attribute, so the frame gets the
+    // original markup and this page never parses it.
+    var doc = htmlBodyOf(q) || plainSrcdoc(pristineDraft(q));
+    return '<iframe class="qc-preview" sandbox="" referrerpolicy="no-referrer" loading="lazy" ' +
+      'title="' + esc(tt("dash.prevTitle")) + '" srcdoc="' + esc(doc) + '"></iframe>';
+  }
+
   function draftPanel(q, id) {
-    var txt = draftText(q);
+    var sent = !isDraft(q);
+    var branded = !!htmlBodyOf(q);
+    var pristine = pristineDraft(q);
+    var hasSomething = branded || pristine !== "";
+    var editing = !sent && !!editOpen[id];
+    var edited = !sent && isEdited(id, q);
+
+    // 1 ── the message: the preview the customer will get, or your editor
+    var view, modeBtn, what;
+    if (editing) {
+      var val = draftEdits[id] != null ? draftEdits[id] : pristine;
+      view = '<textarea class="qc-draft" id="draftBox" data-draft="' + esc(id) + '" spellcheck="true" ' +
+        'aria-label="' + esc(tt("dash.draftReply")) + '" lang="en">' + esc(val) + "</textarea>";
+      modeBtn = '<button type="button" class="btn btn-ghost btn-sm" data-discard="' + esc(id) + '">' +
+        '<span class="qc-discard-lbl">' + esc(edited ? tt("dash.discardBtn") : tt("dash.backToPrev")) + "</span></button>";
+      what = tt("dash.whatEdited");
+    } else if (hasSomething) {
+      view = previewFrame(q) +
+        '<p class="qc-preview-note">' + esc(branded ? tt("dash.prevBranded") : tt("dash.prevPlain")) + "</p>";
+      modeBtn = sent ? "" : '<button type="button" class="btn btn-ghost btn-sm" data-edit="' + esc(id) + '">' + esc(tt("dash.editBtn")) + "</button>";
+      what = branded ? tt("dash.whatBranded") : tt("dash.whatPlain");
+    } else {
+      view = '<div class="qc-empty-mini">' + esc(tt("dash.prevNone")) + "</div>";
+      modeBtn = sent ? "" : '<button type="button" class="btn btn-ghost btn-sm" data-edit="' + esc(id) + '">' + esc(tt("dash.editBtn")) + "</button>";
+      // Nothing was logged here, but the mailbox may still hold the pipeline's
+      // draft — so Send stays live, and still has to say what it will send.
+      what = canSendDraft(q) ? tt("dash.whatBranded") : "";
+    }
+
+    // 2 ── can this actually be sent? Say so BEFORE the button is pressed.
+    var blocked = null;
+    if (sent) {
+      blocked = { t: tt("dash.blockSentT"), b: "", fix: "" };
+    } else if (editing && !canReply(q)) {
+      blocked = { t: tt("dash.blockNoThreadT"), b: tt("dash.blockNoThreadB"), fix: "" };
+    } else if (!editing && !canSendDraft(q)) {
+      blocked = { t: tt("dash.blockNoDraftT"), b: tt("dash.blockNoDraftB"),
+                  fix: canReply(q) ? tt("dash.blockNoDraftFix") : tt("dash.blockNoThreadB") };
+    }
+    var blockHtml = blocked
+      ? '<div class="qc-block' + (sent ? " is-done" : "") + '"><strong>' + esc(blocked.t) + "</strong>" +
+          (blocked.b ? "<p>" + esc(blocked.b) + "</p>" : "") +
+          (blocked.fix ? '<p class="qc-block-fix">' + esc(blocked.fix) + "</p>" : "") +
+        "</div>"
+      : "";
+
+    // 3 ── ONE primary action. Editor closed -> send the branded draft as it is;
+    //      editor open -> send what you wrote. The explanation line says which.
+    var sendBtn = '<button type="button" class="btn btn-primary qc-send" data-send="' + esc(id) + '"' +
+      (blocked ? " disabled" : "") + '>' +
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>' +
+      esc(sent ? tt("dash.sentBtn") : tt("dash.sendBtn")) + "</button>";
+
     var body =
-      '<textarea class="qc-draft" id="draftBox" spellcheck="true" aria-label="' + esc(tt("dash.draftReply")) + '" lang="en">' + esc(txt) + "</textarea>" +
-      '<div class="qc-draft-actions">' +
-        '<button type="button" class="btn btn-primary qc-send" data-send="' + esc(id) + '">' +
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>' +
-          esc(tt("dash.approveSend")) + "</button>" +
-        '<button type="button" class="btn btn-ghost qc-reply" data-reply="' + esc(id) + '">' + esc(tt("dash.sendEdited")) + "</button>" +
+      view +
+      '<div class="qc-draft-actions">' + sendBtn + modeBtn +
+        (editing ? '<span class="qc-edited-tag" id="editedTag"' + (edited ? "" : " hidden") + ">" +
+                     esc(tt("dash.editedTag")) + "</span>" : "") +
+      "</div>" +
+      (what && !blocked ? '<p class="qc-send-what">' + esc(what) + "</p>" : "") +
+      blockHtml +
+      '<p class="qc-gate-note">' + esc(tt("dash.gateNote")) + "</p>" +
+      '<div class="qc-label-sec">' +
+        '<span class="qc-label-lbl">' + esc(tt("dash.labelSec")) + "</span>" +
         '<div class="qc-label-inline">' +
           '<input type="text" class="qc-label-input" id="labelInput" placeholder="' + esc(tt("dash.labelPh")) + '" maxlength="60">' +
           '<button type="button" class="btn btn-ghost btn-sm qc-relabel" data-relabel="' + esc(id) + '" data-action="add">' + esc(tt("dash.add")) + "</button>" +
           '<button type="button" class="btn btn-ghost btn-sm qc-relabel" data-relabel="' + esc(id) + '" data-action="remove">' + esc(tt("dash.remove")) + "</button>" +
         "</div>" +
-      "</div>" +
-      '<p class="qc-gate-note">' + esc(tt("dash.gateNote")) + "</p>";
-    return section(tt("dash.draftReply"), isDraft(q) ? tt("dash.pendingSend") : tt("dash.sentLc"), body);
+      "</div>";
+    return section(tt("dash.draftReply"), sent ? tt("dash.sentLc") : tt("dash.pendingSend"), body);
   }
 
   // ── draft briefing panel ("What does this draft say?") ───────────────────────
@@ -1859,9 +2042,11 @@
      each line could not be priced. Every label, heading, status and derived
      sentence goes through tt(); a live `qw:langchange` re-runs renderDrawer().
 
-     Agent-authored free text (`note`, `info_needed[]`, `review_items[]`) is in the
-     CUSTOMER's language. It is rendered VERBATIM as quoted source material under a
-     localised label — never machine-translated, always escaped. */
+     Agent-authored free text (`note`, `info_needed[]`, `unmatched_lines[]`,
+     `review_items[]`) is in the CUSTOMER's language, so it is NOT part of the
+     explanation. It is collected into one collapsed disclosure whose lead
+     sentence names it and says which language it is in — verbatim, escaped,
+     never machine-translated. */
   var briefOpen = true;   // panel expanded state, kept across drawer re-renders
 
   // Aliases → ISO code; the NAME itself is localised via tt("lang." + code).
@@ -1892,25 +2077,15 @@
   function briefStatusClass(s) {
     return s === "priced" ? "sent" : s === "pending_hassan" ? "info" : "pending";
   }
-  // Agent-authored text, quoted verbatim under a localised label (never translated).
-  function agentNote(text) {
-    return '<span class="qc-brief-agent"><span class="qc-brief-agentlbl">' + esc(tt("dash.brief.agentNote")) + "</span>" +
-      '<q class="qc-brief-quote">' + nl2br(String(text)) + "</q></span>";
-  }
-  // Every reason below is DERIVED from the structured data, never from the prose.
+  /* Every reason here is DERIVED from the structured fields (status, qty). The
+     agent's own prose is in the CUSTOMER's language and is NOT mixed into the
+     explanation — it lives, clearly labelled, in the disclosure at the bottom. */
   function briefLineReasons(l, rawStatus) {
     var out = [];
-    var note = (l.raw && l.raw.note != null) ? String(l.raw.note).trim() : "";
-    if (l.qty == null || l.qty === 0) out.push(esc(tt("dash.brief.rNoQty")));
-    if (rawStatus === "pending_hassan") out.push(esc(tt("dash.brief.rNoPrice")));
-    if (rawStatus === "pending_info") {
-      out.push(note ? esc(tt("dash.brief.rMissing")) + agentNote(note)
-                    : esc(tt("dash.brief.rMissingBare")));
-    }
-    if (!out.length) {
-      out.push(note ? esc(tt("dash.brief.rGeneric")) + agentNote(note)
-                    : esc(tt("dash.brief.rGenericBare")));
-    }
+    if (l.qty == null || l.qty === 0) out.push(tt("dash.brief.rNoQty"));
+    if (rawStatus === "pending_hassan") out.push(tt("dash.brief.rNoPrice"));
+    if (rawStatus === "pending_info") out.push(tt("dash.brief.rMissingBare"));
+    if (!out.length) out.push(tt("dash.brief.rGenericBare"));
     return out;
   }
   function briefRow(label, value) {
@@ -1922,9 +2097,17 @@
       ? v.filter(function (x) { return x != null && String(x).trim() !== ""; })
       : [];
   }
+  // Verbatim agent text. Always escaped, never translated, only ever rendered
+  // inside the "agent's own wording" disclosure.
   function briefNoteList(items) {
     return '<ul class="qc-brief-info">' + items.map(function (x) {
-      return "<li>" + agentNote(String(x).trim()) + "</li>";
+      return '<li><q class="qc-brief-quote">' + nl2br(String(x).trim()) + "</q></li>";
+    }).join("") + "</ul>";
+  }
+  function briefNamedNoteList(pairs) {
+    return '<ul class="qc-brief-info">' + pairs.map(function (x) {
+      return '<li><span class="qc-brief-why-name" lang="en">' + esc(x.name) + "</span>" +
+        '<q class="qc-brief-quote">' + nl2br(x.note) + "</q></li>";
     }).join("") + "</ul>";
   }
 
@@ -2016,33 +2199,57 @@
         secWhy += '<ul class="qc-brief-why">' + unpriced.map(function (l) {
           return "<li>" + '<span class="qc-brief-why-name" lang="en">' + esc(l.name) + "</span>" +
             briefLineReasons(l, l.briefStatus).map(function (r) {
-              return '<span class="qc-brief-why-reason">' + r + "</span>";
+              return '<span class="qc-brief-why-reason">' + esc(r) + "</span>";
             }).join("") + "</li>";
         }).join("") + "</ul>";
       }
-      if (info.length) {
-        secWhy += '<div class="qc-brief-sub">' + esc(tt("dash.brief.subInfo")) + "</div>" + briefNoteList(info);
-      }
-      if (unmatched.length) {
-        secWhy += '<div class="qc-brief-sub">' + esc(tt("dash.brief.subUnmatched")) + "</div>" + briefNoteList(unmatched);
+      // Counts, not the agent's prose: the operator learns how much is outstanding
+      // in a language they read.
+      var tallies = [];
+      if (info.length) tallies.push(info.length === 1 ? tt("dash.brief.dInfo1") : tt("dash.brief.dInfoN", { n: info.length }));
+      if (unmatched.length) tallies.push(unmatched.length === 1 ? tt("dash.brief.dUnm1") : tt("dash.brief.dUnmN", { n: unmatched.length }));
+      if (tallies.length) {
+        secWhy += '<ul class="qc-brief-tally">' + tallies.map(function (x) {
+          return "<li>" + esc(x) + "</li>";
+        }).join("") + "</ul>";
       }
     }
 
-    // 4 ── internal note (never sent to the customer)
-    var secInternal = "";
+    // 4 ── flagged for review. DERIVED from the boolean; the agent's own reason
+    //      is verbatim customer-language text and belongs in the disclosure.
+    var review = (o.needs_review === true) ? briefCleanList(o.review_items) : [];
+    var secFlag = "";
     if (o.needs_review === true) {
-      var review = briefCleanList(o.review_items);
-      secInternal =
+      secFlag =
         '<div class="qc-brief-internal">' +
-          '<div class="qc-brief-internal-head">' + esc(tt("dash.brief.intHead")) + "</div>" +
-          '<p class="qc-brief-internal-lead">' + esc(tt("dash.brief.intLead")) + "</p>" +
-          (review.length ? briefNoteList(review)
-                         : '<p class="qc-brief-internal-lead">' + esc(tt("dash.brief.intNone")) + "</p>") +
+          '<div class="qc-brief-internal-head">' + esc(tt("dash.brief.flagHead")) + "</div>" +
+          '<p class="qc-brief-internal-lead">' + esc(tt("dash.brief.flagLead")) + "</p>" +
+          (review.length ? "" : '<p class="qc-brief-internal-lead">' + esc(tt("dash.brief.intNone")) + "</p>") +
         "</div>";
     }
 
+    /* 5 ── the agent's own wording. Collapsed, and the lead sentence says what it
+       is and WHY it is in another language. It is source material for the
+       curious, never the explanation itself. */
+    var lineNotes = [];
+    lines.forEach(function (l) {
+      var n = (l.raw && l.raw.note != null) ? String(l.raw.note).trim() : "";
+      if (n) lineNotes.push({ name: l.name, note: n });
+    });
+    var secRaw = "";
+    if (lineNotes.length || info.length || unmatched.length || review.length) {
+      secRaw = '<details class="qc-brief-raw"><summary>' + esc(tt("dash.brief.rawHead")) + "</summary>" +
+        '<p class="qc-brief-raw-lead">' +
+          esc(lname ? tt("dash.brief.rawLeadLang", { lang: lname }) : tt("dash.brief.rawLead")) + "</p>" +
+        (lineNotes.length ? '<div class="qc-brief-sub">' + esc(tt("dash.brief.subLineNotes")) + "</div>" + briefNamedNoteList(lineNotes) : "") +
+        (info.length ? '<div class="qc-brief-sub">' + esc(tt("dash.brief.subInfo")) + "</div>" + briefNoteList(info) : "") +
+        (unmatched.length ? '<div class="qc-brief-sub">' + esc(tt("dash.brief.subUnmatched")) + "</div>" + briefNoteList(unmatched) : "") +
+        (review.length ? '<div class="qc-brief-sub">' + esc(tt("dash.brief.subReview")) + "</div>" + briefNoteList(review) : "") +
+      "</details>";
+    }
+
     return '<section class="qc-dsec qc-brief">' + head + openBody +
-      secSum + secLines + secWhy + secInternal +
+      secSum + secLines + secWhy + secFlag + secRaw +
     "</div></section>";
   }
 
@@ -2063,10 +2270,12 @@
     if (cand) { resolveLine(cand.getAttribute("data-resolve"), cand.getAttribute("data-ref"), cand.getAttribute("data-sku"), cand); return; }
     var use = t.closest ? t.closest("button[data-usesku]") : null;
     if (use) { resolveLine(use.getAttribute("data-usesku"), use.getAttribute("data-ref"), use.getAttribute("data-sku"), use); return; }
+    var edit = t.closest ? t.closest("button[data-edit]") : null;
+    if (edit) { openEditor(edit.getAttribute("data-edit")); return; }
+    var disc = t.closest ? t.closest("button[data-discard]") : null;
+    if (disc) { discardEdits(disc.getAttribute("data-discard")); return; }
     var send = t.closest ? t.closest("button[data-send]") : null;
     if (send) { doSend(send.getAttribute("data-send"), send); return; }
-    var rep = t.closest ? t.closest("button[data-reply]") : null;
-    if (rep) { doReply(rep.getAttribute("data-reply"), rep); return; }
     var clar = t.closest ? t.closest("button[data-clarify]") : null;
     if (clar) { doClarify(clar.getAttribute("data-clarify"), clar.getAttribute("data-ref"), clar); return; }
     var rel = t.closest ? t.closest("button[data-relabel]") : null;
@@ -2080,9 +2289,41 @@
     if (body) body.hidden = !briefOpen;
   }
 
+  function openEditor(id) {
+    if (!id) return;
+    editOpen[id] = true;
+    renderDrawer();
+    var box = el("draftBox");
+    if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); }
+  }
+  function discardEdits(id) {
+    if (!id) return;
+    delete draftEdits[id]; delete editOpen[id];
+    renderDrawer();
+  }
+  // Live "Edited" indicator + discard-button wording. Deliberately an in-place
+  // DOM tweak: re-rendering the drawer while the operator types would tear the
+  // Send button out from under the very click that triggered the blur.
+  function syncEditUi(id) {
+    var q = findQuote(id);
+    if (!q) return;
+    var edited = isEdited(id, q);
+    var tag = el("editedTag");
+    if (tag) tag.hidden = !edited;
+    var lbl = el("drawerInner").querySelector(".qc-discard-lbl");
+    if (lbl) lbl.textContent = edited ? tt("dash.discardBtn") : tt("dash.backToPrev");
+  }
+
   var catTimer = null;
   function onDrawerInput(e) {
     var inp = e.target;
+    // Track the edit WITHOUT re-rendering on every keystroke; the "Edited" tag and
+    // the send explanation refresh when the field loses focus (see below).
+    if (inp && inp.id === "draftBox") {
+      var did = inp.getAttribute("data-draft");
+      if (did) { draftEdits[did] = inp.value; syncEditUi(did); }
+      return;
+    }
     if (inp && inp.classList && inp.classList.contains("qc-catsearch")) {
       var ref = inp.getAttribute("data-ref");
       var val = inp.value.trim();
@@ -2104,12 +2345,27 @@
     var digits = term.replace(/[^0-9]/g, "");
     var orExpr = "urun_adi.ilike." + like + ",sku.ilike." + like + ",color.ilike." + like + ",product_line.ilike." + like;
     if (digits) orExpr += ",gsm.eq." + digits;
-    sb.from("products")
-      .select("sku,urun_adi,gsm,color,product_line,satis_eur,satis_usd,is_microfiber")
+    // `products` is RLS-locked to the pipeline's service role, so the console
+    // always read zero rows from it. `products_public` is the restricted view
+    // (sale-side columns only — no cost, no margin) meant for this search.
+    function fail(err) {
+      var m = (err && err.message) || "";
+      host.innerHTML = '<div class="qc-empty-mini">' +
+        esc(/products_public|does not exist|schema cache|relation|permission/i.test(m)
+              ? tt("dash.catNoView") : tt("dash.catFail", { msg: m })) + "</div>";
+    }
+    function run(cols, retry) {
+    sb.from("products_public")
+      .select(cols)
       .or(orExpr).limit(8)
       .then(function (res) {
         if (openId == null) return;
-        if (res.error) { host.innerHTML = '<div class="qc-empty-mini">' + esc(tt("dash.catFail", { msg: res.error.message })) + "</div>"; return; }
+        // A failed query is NOT an empty result — say so, or the operator reads
+        // "no match" and believes the catalogue genuinely lacks the product.
+        if (res.error) {
+          if (retry) { run("*", false); return; }   // view may expose a different column set
+          fail(res.error); return;
+        }
         var rows = res.data || [];
         if (!rows.length) { host.innerHTML = '<div class="qc-empty-mini">' + esc(tt("dash.catNoMatch", { term: term })) + "</div>"; return; }
         host.innerHTML = rows.map(function (p) {
@@ -2127,6 +2383,8 @@
       }, function () {
         if (host) host.innerHTML = '<div class="qc-empty-mini">' + esc(tt("dash.catFailNet")) + "</div>";
       });
+    }
+    run("sku,urun_adi,gsm,color,product_line,satis_eur,satis_usd,is_microfiber", true);
   }
 
   function resolveLine(id, ref, sku, btn) {
@@ -2139,8 +2397,11 @@
       if (q) {
         if (r.output) q.output = r.output;
         if (r.total != null) q.total = r.total;
+        if (r.html_body) q.html_body = r.html_body;
         if (r.draft_id) q.gmail_draft_id = r.draft_id;
       }
+      // The draft was rebuilt — an edit of the previous text is no longer valid.
+      delete draftEdits[String(id)]; delete editOpen[String(id)];
       render();
       if (openId === String(id)) renderDrawer();
       toast(tt("dash.lineResolved"));
@@ -2151,18 +2412,30 @@
     });
   }
 
+  /* THE single send action. Untouched draft -> send the branded draft Gmail
+     already holds. Edited -> post YOUR text as a reply on the thread. Two
+     mechanisms, but one decision the operator already made by typing or not. */
   function doSend(id, btn) {
+    id = String(id);
     var q = findQuote(id);
     if (!q) return;
+    // Pick up an in-flight edit that hasn't blurred yet.
+    var live = el("draftBox");
+    if (live && live.getAttribute("data-draft") === id) draftEdits[id] = live.value;
+    if (editOpen[id]) { sendEdited(id, q, btn); return; }
+    if (!canSendDraft(q)) { toast(tt("dash.blockNoDraftB"), true); return; }
     confirmDialog(tt("dash.sendQTitle"),
       tt("dash.sendQBody", { c: esc(q.customer || tt("dash.theCustomer")) }),
       tt("dash.sendNow")).then(function (ok) {
       if (!ok) return;
       btn.disabled = true; btn.classList.add("is-busy");
       api("qw/send-quote", { quote_id: id }).then(function (r) {
-        patchLocal(id, { status: (r && r.status) || "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
+        var st = (r && r.status) ? String(r.status) : "sent";
+        if (st !== "sent") { afterOddStatus(id, btn, st); return; }
+        delete draftEdits[id]; delete editOpen[id];
+        patchLocal(id, { status: "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
         render();
-        if (openId === String(id)) renderDrawer();
+        if (openId === id) renderDrawer();
         toast(tt("dash.quoteSentTo", { c: q.customer || tt("dash.customer") }));
       }).catch(function (err) {
         btn.disabled = false; btn.classList.remove("is-busy");
@@ -2170,32 +2443,46 @@
       });
     });
   }
-  function doReply(id, btn) {
-    var box = el("draftBox");
-    var body = box ? box.value.trim() : "";
-    if (!body) { toast(tt("dash.writeReplyFirst"), true); if (box) box.focus(); return; }
-    var q = findQuote(id);
+  function sendEdited(id, q, btn) {
+    var body = (draftEdits[id] != null ? draftEdits[id] : pristineDraft(q)).trim();
+    if (!body) { toast(tt("dash.writeReplyFirst"), true); var b = el("draftBox"); if (b) b.focus(); return; }
+    if (!canReply(q)) { toast(tt("dash.blockNoThreadB"), true); return; }
     confirmDialog(tt("dash.sendEditedTitle"),
-      tt("dash.sendEditedBody", { c: esc((q && q.customer) || tt("dash.theCustomer")) }),
+      tt("dash.sendEditedBody", { c: esc(q.customer || tt("dash.theCustomer")) }),
       tt("dash.sendReply")).then(function (ok) {
       if (!ok) return;
       btn.disabled = true; btn.classList.add("is-busy");
-      api("qw/reply", { quote_id: id, body: body }).then(function () {
+      api("qw/reply", { quote_id: id, body: body }).then(function (r) {
+        var st = (r && r.status) ? String(r.status) : "sent";
+        if (st !== "sent") { afterOddStatus(id, btn, st); return; }
+        delete draftEdits[id]; delete editOpen[id];
         patchLocal(id, { status: "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
         render();
-        if (openId === String(id)) renderDrawer();
-        toast(tt("dash.replySent"));
+        if (openId === id) renderDrawer();
+        toast(tt("dash.replySent", { c: q.customer || tt("dash.customer") }));
       }).catch(function (err) {
         btn.disabled = false; btn.classList.remove("is-busy");
         handleApiError(err);
       });
     });
   }
+  // The webhook accepted the call but did not report "sent" — do NOT claim it was.
+  function afterOddStatus(id, btn, st) {
+    if (btn) { btn.disabled = false; btn.classList.remove("is-busy"); }
+    toast(tt("dash.sendOddStatus", { s: st }), true);
+    loadQuotes();
+  }
+  /* Clarifications obey the tenant's `clarify_mode` setting, which DEFAULTS TO
+     DRAFT — i.e. nothing is sent. Report whichever actually happened; never
+     assume delivery. */
   function doClarify(id, ref, btn) {
+    var q = findQuote(id);
     btn.disabled = true; btn.classList.add("is-busy");
-    api("qw/clarify", { quote_id: id, line_ref: ref }).then(function () {
+    api("qw/clarify", { quote_id: id, line_ref: ref }).then(function (r) {
       btn.disabled = false; btn.classList.remove("is-busy");
-      toast(tt("dash.clarifySent"));
+      var wasSent = !!(r && (r.sent === true || r.status === "sent" || r.mode === "send"));
+      if (wasSent) toast(tt("dash.clarifySentTo", { c: (q && q.customer) || tt("dash.customer") }));
+      else toast(tt("dash.clarifyDrafted"));
     }).catch(function (err) {
       btn.disabled = false; btn.classList.remove("is-busy");
       handleApiError(err);
@@ -2217,7 +2504,9 @@
 
   // ── bulk actions ─────────────────────────────────────────────────────────────
   function bulkSend() {
-    var drafts = selectedQuotes().filter(isDraft);
+    var pending = selectedQuotes().filter(isDraft);
+    var drafts = pending.filter(canSendDraft);
+    var skipped = pending.length - drafts.length;
     if (!drafts.length) { toast(tt("dash.noDraftsSel"), true); return; }
     confirmDialog(drafts.length === 1 ? tt("dash.bulkSendTitle1") : tt("dash.bulkSendTitleN", { n: drafts.length }),
       drafts.length === 1 ? tt("dash.bulkSendBody1") : tt("dash.bulkSendBodyN", { n: drafts.length }),
@@ -2229,12 +2518,16 @@
       var next = function (i) {
         if (i >= drafts.length) {
           render(); renderBulk();
-          toast(tt("dash.sentN", { n: done }) + (failed ? tt("dash.failedN", { n: failed }) : "") + ".", failed > 0);
+          toast(tt("dash.sentN", { n: done }) +
+                (failed ? tt("dash.failedN", { n: failed }) : "") +
+                (skipped ? tt("dash.bulkSkipped", { n: skipped }) : "") + ".", failed > 0 || skipped > 0);
           return;
         }
         var qid = String(drafts[i].id);
         api("qw/send-quote", { quote_id: qid }).then(function (r) {
-          done++; patchLocal(qid, { status: (r && r.status) || "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
+          // Only count it as sent if the mailbox actually says so.
+          if (r && r.status && String(r.status) !== "sent") { failed++; next(i + 1); return; }
+          done++; patchLocal(qid, { status: "sent", sent_at: new Date().toISOString(), sent_by: currentEmail || "console" });
           delete selected[qid];
           next(i + 1);
         }).catch(function () { failed++; next(i + 1); });

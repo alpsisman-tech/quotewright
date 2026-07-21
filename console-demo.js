@@ -60,7 +60,22 @@
         needs_approval: true, approval_reason: "Line margin 18% — under the 20% green floor",
         approved_by: null, approved_at: null, sent_at: null, outcome: "pending",
         unmatched_lines: [{ ref: "4", text: "Anti-static packaging surcharge" }],
-        gmail_draft_id: "r-demo-1",
+        gmail_draft_id: "r-demo-1", gmail_thread_id: "t-demo-1", customer_email: "buyer1@example.com",
+        html_body: '<html><body style="margin:0;font-family:Helvetica,Arial,sans-serif;background:#F8F6F0">' +
+          '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px">' +
+          '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #E4E0D6">' +
+          '<tr><td style="background:#20284A;color:#fff;padding:20px 24px;font-size:17px;letter-spacing:.04em">HASSAN &middot; Nonwoven &amp; Microfibre</td></tr>' +
+          '<tr><td style="padding:24px;color:#20284A;font-size:14px;line-height:1.6">' +
+          '<p>Dear Northwind team,</p><p>Please find our quotation for your microfibre programme below.</p>' +
+          '<table role="presentation" width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse;font-size:13px">' +
+          '<tr style="background:#EEEBE2"><th align="left">Line</th><th align="left">Product</th><th align="right">Cash</th><th align="right">Term</th></tr>' +
+          '<tr><td>1</td><td>Microfibre cloth 40&times;40 &mdash; blue</td><td align="right">1.480 USD/pack</td><td align="right">1.540 USD/pack</td></tr>' +
+          '<tr><td>2</td><td>Microfibre cloth 40&times;40 &mdash; grey</td><td align="right">2.250 USD/pack</td><td align="right">2.340 USD/pack</td></tr>' +
+          '<tr><td>3</td><td>Anthracite shade &mdash; awaiting confirmation</td><td align="right" colspan="2">Pending</td></tr>' +
+          '</table><p style="margin-top:18px"><b>Total (cash): 152,100.00 USD &middot; (term): 158,220.00 USD</b></p>' +
+          '<p>Best regards,<br>Sales Engineering<br>Hassan Tekstil A.&#350;.</p></td></tr>' +
+          '<tr><td style="background:#EEEBE2;color:#5b5f6e;padding:14px 24px;font-size:11px">Hassan Tekstil Sanayi ve Ticaret A.&#350;. &middot; Esenyurt, &#304;stanbul, T&uuml;rkiye &middot; hassan.com.tr</td></tr>' +
+          '</table></td></tr></table></body></html>',
         output: {
           match_confidence: 74,
           quote_text: "Dear Northwind team,\n\nThank you for your continued business. Please find our quotation for your microfibre programme below. Prices are shown per pack, cash and term.\n\nLine 1 — Microfibre cloth 40×40, 320gsm, blue: 1.480 USD/pack.\nLine 2 — Microfibre cloth 40×40, 320gsm, grey: 2.250 USD/pack.\nLine 3 — Awaiting your confirmation of the anthracite shade before we price it.\nLine 4 — Anti-static packaging: this sits outside our catalogue, so our sales team will follow up directly rather than quote an invented figure.\n\nBest regards,\nSales Engineering\nHassan Tekstil A.Ş.",
@@ -101,7 +116,7 @@
         total: 1188.00, grand_total_vadeli: null,
         margin_pct: 27, match_confidence: 94, autonomy_tier: "green",
         needs_approval: false, approved_by: null, approved_at: null, sent_at: null, outcome: "pending",
-        unmatched_lines: [], gmail_draft_id: "r-demo-2",
+        unmatched_lines: [], gmail_draft_id: "r-demo-2", gmail_thread_id: "t-demo-2", customer_email: "buyer2@example.com",
         output: {
           match_confidence: 94,
           quote_text: "Sehr geehrte Damen und Herren,\n\nvielen Dank für Ihre Anfrage. Gerne unterbreiten wir Ihnen folgendes Angebot:\n\nHASKEÇE K 220, schwarz, 165 cm breit — 1.000 lfm (= 1.650 m²) zu 0,72 EUR/m² = 1.188,00 EUR.\n\nMit freundlichen Grüßen,\nSales Engineering",
@@ -124,7 +139,7 @@
         total: null, grand_total_vadeli: null,
         margin_pct: null, match_confidence: 52, autonomy_tier: "red",
         needs_approval: false, approved_by: null, approved_at: null, sent_at: null, outcome: "pending",
-        unmatched_lines: [{ ref: "1", text: "FR-treated PET felt 220gsm" }], gmail_draft_id: "r-demo-3",
+        unmatched_lines: [{ ref: "1", text: "FR-treated PET felt 220gsm" }], gmail_draft_id: "r-demo-3", gmail_thread_id: "t-demo-3", customer_email: "buyer3@example.com",
         last_reply_text: "Merhaba, yangına dayanıklı (FR) versiyonu da fiyatlandırabilir misiniz? Teşekkürler.",
         output: {
           match_confidence: 52,
@@ -150,7 +165,7 @@
         total: 8640.00, grand_total_vadeli: null,
         margin_pct: 22, match_confidence: 68, autonomy_tier: "amber",
         needs_approval: false, approved_by: null, approved_at: null, sent_at: null, outcome: "pending",
-        unmatched_lines: [], gmail_draft_id: "r-demo-4",
+        unmatched_lines: [], gmail_draft_id: "r-demo-4", gmail_thread_id: "t-demo-4", customer_email: "buyer4@example.com",
         output: {
           match_confidence: 68,
           quote_text: "Dear Nordic Home,\n\nThank you for your enquiry. We can offer HASKEÇE 260gsm felt provisionally against your 240gsm request; please confirm the substitution and we'll firm up the price.\n\nBest regards,\nHassan Tekstil A.Ş.",
@@ -174,7 +189,7 @@
         total: null, grand_total_vadeli: null,
         margin_pct: null, match_confidence: 58, autonomy_tier: "red",
         needs_approval: false, approved_by: null, approved_at: null, sent_at: null, outcome: "pending",
-        unmatched_lines: [], gmail_draft_id: "r-demo-5",
+        unmatched_lines: [], gmail_draft_id: "r-demo-5", gmail_thread_id: "t-demo-5", customer_email: "buyer5@example.com",
         output: {
           match_confidence: 58,
           quote_text: "Dear Coastal Interiors,\n\nThank you for the enquiry. We'd like to confirm the acoustic rating on the charcoal felt before pricing.\n\nBest regards,\nHassan Tekstil A.Ş.",
@@ -261,6 +276,7 @@
       sent_at: sentAt, sent_by: "sales@example.com",
       outcome: outcome, outcome_at: (outcome === "won" || outcome === "lost") ? daysAgo(decidedDays, 12) : null,
       outcome_note: outcomeNote || null, unmatched_lines: [], gmail_draft_id: "r-" + id,
+      gmail_thread_id: "t-" + id, customer_email: "buyer@example.com",
       last_reply_text: null,
       output: {
         match_confidence: conf,
