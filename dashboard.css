@@ -471,6 +471,8 @@ body.qc-drawer-open { overflow: hidden; }
 .qc-msg-date { font-family: var(--mono); font-size: 10.5px; color: var(--soft); }
 .qc-msg.out .qc-msg-date { color: rgba(255,255,255,.55); }
 .qc-msg-body { font-size: 13.5px; line-height: 1.6; word-break: break-word; }
+.qc-msg-nobody { font-style: italic; color: var(--soft); }
+.qc-msg.out .qc-msg-nobody { color: rgba(255,255,255,.6); }
 
 /* ── product-forward line cards ─────────────────────────────── */
 .qc-lines-list { display: flex; flex-direction: column; gap: 12px; }
@@ -532,7 +534,26 @@ body.qc-drawer-open { overflow: hidden; }
 .qc-mini-btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
 .qc-mini-btn.primary:hover { background: #000; }
 
-/* ── draft + send gate ──────────────────────────────────────── */
+/* ── the email to the customer: preview, editor, send gate ──── */
+/* The preview is a sandboxed iframe (sandbox="", no scripts, no same-origin):
+   LLM-written HTML is rendered, never injected into this document. */
+.qc-preview { display: block; width: 100%; height: 460px; resize: vertical; border: 1px solid var(--hair); border-radius: 14px; background: #fff; }
+.qc-preview-note { font-size: 12px; color: var(--soft); margin-top: 8px; line-height: 1.55; max-width: 62ch; }
+.qc-send-what { font-size: 12.5px; color: var(--ink); margin-top: 12px; line-height: 1.6; max-width: 62ch; }
+.qc-edited-tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); background: var(--lime-dim); border: 1px solid var(--lime-border); border-radius: 100px; padding: 4px 10px; }
+.qc-edited-tag[hidden] { display: none; }
+
+/* Why a quote cannot be sent — visible without pressing anything. */
+.qc-block { margin-top: 12px; border: 1px solid #ecd9a8; background: #fffdf7; border-radius: 12px; padding: 12px 15px; }
+.qc-block strong { display: block; font-size: 13.5px; color: var(--ink); letter-spacing: -.01em; }
+.qc-block p { font-size: 12.5px; color: var(--soft); line-height: 1.55; margin-top: 5px; }
+.qc-block-fix { color: var(--ink) !important; }
+.qc-block.is-done { border-color: var(--hair); background: var(--row); }
+.qc-line-blocked { font-size: 12px; color: var(--soft); line-height: 1.5; margin-top: 6px; max-width: 56ch; }
+
+.qc-label-sec { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hair); }
+.qc-label-lbl { font-size: 12.5px; color: var(--soft); }
+
 .qc-draft { width: 100%; min-height: 220px; resize: vertical; padding: 15px 16px; border: 1px solid var(--hair); border-radius: 14px; font-family: var(--mono); font-size: 13px; line-height: 1.65; color: var(--ink); background: var(--row); }
 .qc-draft:focus { outline: none; border-color: var(--ink); background: #fff; box-shadow: 0 0 0 3px rgba(19,19,19,.06); }
 .qc-draft-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
@@ -540,6 +561,7 @@ body.qc-drawer-open { overflow: hidden; }
 .qc-send:hover { background: var(--lime) !important; filter: brightness(1.05); transform: translateY(-2px) scale(1.02); box-shadow: 0 14px 34px -14px var(--lime-glow); }
 .qc-send svg { stroke: #111 !important; }
 .qc-label-inline { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; }
+.qc-draft-actions .btn[disabled] { opacity: .45; cursor: not-allowed; transform: none !important; box-shadow: none !important; filter: none !important; }
 .qc-label-inline .qc-label-input { width: 130px; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--hair); background: #fff; color: var(--ink); font: inherit; font-size: 13px; }
 .qc-label-inline .qc-label-input:focus { outline: none; border-color: var(--ink); }
 .qc-gate-note { font-size: 12px; color: var(--soft); margin-top: 12px; line-height: 1.55; max-width: 62ch; }
@@ -583,9 +605,22 @@ body.qc-drawer-open { overflow: hidden; }
 .qc-brief-ok { font-size: 13px; color: var(--ink); background: var(--lime-dim); border: 1px solid var(--lime-border); border-radius: 12px; padding: 12px 15px; }
 
 /* agent-authored text, quoted verbatim in the CUSTOMER's language — never translated */
-.qc-brief-agent { display: block; }
-.qc-brief-agentlbl { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--grey); margin-bottom: 3px; }
 .qc-brief-quote { display: block; font-size: 13px; line-height: 1.55; color: var(--soft); font-style: italic; border-left: 2px solid var(--hair); padding-left: 10px; }
+
+.qc-brief-tally { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.qc-brief-tally li { font-size: 13px; line-height: 1.55; color: var(--ink); background: #fff; border: 1px solid var(--hair); border-radius: 10px; padding: 9px 13px; }
+
+/* The agent's own words: available, labelled, and never mistaken for the brief. */
+.qc-brief-raw { margin-top: 18px; border: 1px solid var(--hair); border-radius: 12px; background: #fff; padding: 4px 14px; }
+.qc-brief-raw > summary { cursor: pointer; list-style: none; padding: 10px 0; font-size: 12.5px; font-weight: 600; color: var(--soft); display: flex; align-items: center; gap: 8px; }
+.qc-brief-raw > summary::-webkit-details-marker { display: none; }
+.qc-brief-raw > summary::before { content: "›"; font-size: 15px; line-height: 1; transition: transform .18s ease; display: inline-block; }
+.qc-brief-raw[open] > summary::before { transform: rotate(90deg); }
+.qc-brief-raw > summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
+.qc-brief-raw-lead { font-size: 12.5px; line-height: 1.6; color: var(--soft); margin: 0 0 10px; max-width: 66ch; }
+.qc-brief-raw .qc-brief-info li { background: var(--row); }
+.qc-brief-raw .qc-brief-why-name { margin-bottom: 4px; }
+.qc-brief-raw > *:last-child { margin-bottom: 12px; }
 
 .qc-brief-internal { margin-top: 18px; border: 1px dashed #b42318; border-radius: 12px; background: #fff6f5; padding: 13px 15px; }
 .qc-brief-internal-head { font-family: var(--mono); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; font-weight: 600; color: #b42318; }
@@ -617,6 +652,9 @@ body.qc-has-bulk .qc-toast.show { bottom: 86px; }
   .qc-line-num { text-align: left; align-items: flex-start; width: 100%; flex-direction: row; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .qc-label-inline { margin-left: 0; width: 100%; }
   .qc-bulkbar { border-radius: 18px; }
+  .qc-preview { height: 360px; }
+  .qc-label-sec { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .qc-label-inline { margin-left: 0; }
   .qc-brief { padding: 14px; }
   .qc-brief-row { flex-direction: column; gap: 2px; }
   .qc-brief-row dt { width: auto; }

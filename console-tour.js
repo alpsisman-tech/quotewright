@@ -52,7 +52,7 @@
 
       "tour.step5.kick": "The ledger",
       "tour.step5.title": "Read a quote at a glance",
-      "tour.step5.body": "Each row shows the autonomy <b>tier</b> (green ready / amber review / red needs work), the <b>margin</b> and match <b>confidence</b>, plus inline <b>Approve</b> and <b>Won / Lost</b> so you can act without opening it.",
+      "tour.step5.body": "Each row shows the autonomy <b>tier</b> (green ready / amber review / red needs work), the <b>margin</b> and match <b>confidence</b>, plus inline <b>Sign off</b> (records your decision on a flagged margin — it emails nobody) and <b>Won / Lost</b>.",
 
       "tour.step6.kick": "Workspace",
       "tour.step6.title": "Open the workspace",
@@ -63,8 +63,8 @@
       "tour.step7.body": "When a line is ambiguous, you get ranked candidates. One tap prices it, regenerates the draft, <b>and</b> teaches the pipeline your choice — so next time it's automatic. It never invents a price.",
 
       "tour.step8.kick": "The send gate",
-      "tour.step8.title": "Approve &amp; send — you're the gate",
-      "tour.step8.body": "Nothing reaches a customer until you send it here. Edit the draft, <b>Approve &amp; send</b>, ask the customer for a missing spec, or label the thread. This is the human sign-off.",
+      "tour.step8.title": "One Send — you're the gate",
+      "tour.step8.body": "You see the branded email exactly as the customer will. One <b>Send</b> button: leave it alone and the branded quote goes as-is; choose <b>Edit the text</b> and your own words go instead, as a plain reply. Nothing leaves until you press it.",
 
       "tour.step9.kick": "Efficiency",
       "tour.step9.title": "Work in bulk",
@@ -124,7 +124,7 @@
 
       "tour.step5.kick": "Kayıt defteri",
       "tour.step5.title": "Bir teklifi bir bakışta okuyun",
-      "tour.step5.body": "Her satır özerklik <b>kademesini</b> (yeşil hazır / sarı incele / kırmızı çalışma gerekir), <b>marjı</b> ve eşleşme <b>güvenini</b> gösterir; ayrıca satır içi <b>Onayla</b> ve <b>Kazanıldı / Kaybedildi</b> ile teklifi açmadan işlem yapabilirsiniz.",
+      "tour.step5.body": "Her satır özerklik <b>kademesini</b> (yeşil hazır / sarı incele / kırmızı çalışma gerekir), <b>marjı</b> ve eşleşme <b>güvenini</b> gösterir; ayrıca satır içi <b>İmzala</b> (işaretli marj için kararınızı kaydeder — kimseye e-posta göndermez) ve <b>Kazanıldı / Kaybedildi</b> bulunur.",
 
       "tour.step6.kick": "Çalışma alanı",
       "tour.step6.title": "Çalışma alanını açın",
@@ -135,8 +135,8 @@
       "tour.step7.body": "Bir satır belirsiz olduğunda, sıralanmış adaylar alırsınız. Tek dokunuş onu fiyatlandırır, taslağı yeniden oluşturur <b>ve</b> seçiminizi akışa öğretir — böylece bir dahaki sefere otomatik olur. Asla bir fiyat uydurmaz.",
 
       "tour.step8.kick": "Gönderim kapısı",
-      "tour.step8.title": "Onayla ve gönder — kapı sizsiniz",
-      "tour.step8.body": "Siz buradan göndermeden hiçbir şey müşteriye ulaşmaz. Taslağı düzenleyin, <b>Onayla ve gönder</b>, müşteriden eksik bir teknik özellik isteyin ya da yazışmayı etiketleyin. Bu, insan onayıdır.",
+      "tour.step8.title": "Tek bir Gönder — kapı sizsiniz",
+      "tour.step8.body": "Markalı e-postayı müşterinin göreceği hâliyle görürsünüz. Tek bir <b>Gönder</b> düğmesi: dokunmazsanız markalı teklif olduğu gibi gider; <b>Metni düzenle</b>yi seçerseniz kendi sözleriniz düz metin yanıt olarak gider. Siz basmadan hiçbir şey gitmez.",
 
       "tour.step9.kick": "Verimlilik",
       "tour.step9.title": "Toplu çalışın",
@@ -202,7 +202,7 @@
 
     { page: "dashboard.html", sel: "#quotesBody tr[data-row]", place: "bottom", tab: "all",
       kick: "The ledger", title: "Read a quote at a glance",
-      body: "Each row shows the autonomy <b>tier</b> (green ready / amber review / red needs work), the <b>margin</b> and match <b>confidence</b>, plus inline <b>Approve</b> and <b>Won / Lost</b> so you can act without opening it." },
+      body: "Each row shows the autonomy <b>tier</b> (green ready / amber review / red needs work), the <b>margin</b> and match <b>confidence</b>, plus inline <b>Sign off</b> (records your decision on a flagged margin — it emails nobody) and <b>Won / Lost</b>." },
 
     { page: "dashboard.html", sel: ".qc-drawer.show", place: "left", tab: "all", drawer: "demo-1",
       kick: "Workspace", title: "Open the workspace",
@@ -213,8 +213,8 @@
       body: "When a line is ambiguous, you get ranked candidates. One tap prices it, regenerates the draft, <b>and</b> teaches the pipeline your choice — so next time it's automatic. It never invents a price." },
 
     { page: "dashboard.html", sel: ".qc-draft-actions", place: "left", tab: "all", drawer: "demo-1",
-      kick: "The send gate", title: "Approve &amp; send — you're the gate",
-      body: "Nothing reaches a customer until you send it here. Edit the draft, <b>Approve &amp; send</b>, ask the customer for a missing spec, or label the thread. This is the human sign-off." },
+      kick: "The send gate", title: "One Send — you're the gate",
+      body: "You see the branded email exactly as the customer will. One <b>Send</b> button: leave it alone and the branded quote goes as-is; choose <b>Edit the text</b> and your own words go instead, as a plain reply. Nothing leaves until you press it." },
 
     { page: "dashboard.html", sel: "#selectAll", place: "bottom", tab: "all",
       kick: "Efficiency", title: "Work in bulk",
