@@ -473,6 +473,16 @@ body.qc-drawer-open { overflow: hidden; }
 .qc-msg-body { font-size: 13.5px; line-height: 1.6; word-break: break-word; }
 .qc-msg-nobody { font-style: italic; color: var(--soft); }
 .qc-msg.out .qc-msg-nobody { color: rgba(255,255,255,.6); }
+/* Long messages: clamp visually, keep the full text in the DOM. */
+.qc-msg-body.clamped { max-height: 7.6em; overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 62%, transparent 100%); }
+.qc-msg-more { margin-top: 7px; padding: 0; border: 0; background: none; font: inherit;
+  font-size: 12px; font-weight: 600; color: var(--blue); cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px; }
+.qc-msg-more:hover { opacity: .78; }
+.qc-msg.out .qc-msg-more { color: var(--lime); }
+@media (prefers-reduced-motion: reduce) { .qc-msg-body.clamped { -webkit-mask-image: none; mask-image: none; } }
 
 /* ── product-forward line cards ─────────────────────────────── */
 .qc-lines-list { display: flex; flex-direction: column; gap: 12px; }
