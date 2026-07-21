@@ -544,6 +544,54 @@ body.qc-drawer-open { overflow: hidden; }
 .qc-label-inline .qc-label-input:focus { outline: none; border-color: var(--ink); }
 .qc-gate-note { font-size: 12px; color: var(--soft); margin-top: 12px; line-height: 1.55; max-width: 62ch; }
 
+/* ── draft briefing panel ("What does this draft say?") ─────── */
+/* The draft is in the customer's language; this panel re-renders the agent's
+   STRUCTURED output in the CONSOLE's language so the operator can judge it. */
+.qc-brief { background: var(--row); border-radius: 14px; padding: 16px 18px; margin: 4px 0; border: 1px solid var(--hair); }
+.qc-brief-head { display: flex; align-items: center; gap: 12px; }
+.qc-brief-toggle { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--font); font-weight: 600; font-size: 15px; letter-spacing: -.02em; color: var(--ink); }
+.qc-brief-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
+.qc-brief-chev { flex: none; color: var(--soft); transition: transform .18s ease; }
+.qc-brief-toggle[aria-expanded="true"] .qc-brief-chev { transform: rotate(90deg); }
+.qc-brief-tag { margin-left: auto; font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); border: 1px solid var(--hair); background: #fff; border-radius: 100px; padding: 3px 9px; }
+.qc-brief-body { margin-top: 14px; }
+.qc-brief-body[hidden] { display: none; }
+.qc-brief-h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--grey); font-weight: 600; margin: 18px 0 8px; }
+.qc-brief-h:first-child { margin-top: 0; }
+
+.qc-brief-dl { background: #fff; border: 1px solid var(--hair); border-radius: 12px; padding: 4px 14px; }
+.qc-brief-row { display: flex; gap: 14px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--hair); }
+.qc-brief-row:last-child { border-bottom: 0; }
+.qc-brief-row dt { flex: none; width: 148px; font-size: 12.5px; color: var(--soft); }
+.qc-brief-row dd { flex: 1; min-width: 0; font-size: 13.5px; color: var(--ink); font-weight: 600; }
+.qc-brief-warn { color: #8a5a00; font-weight: 600; }
+
+.qc-brief-lines { display: flex; flex-direction: column; gap: 8px; }
+.qc-brief-line { background: #fff; border: 1px solid var(--hair); border-radius: 12px; padding: 11px 14px; }
+.qc-brief-line-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.qc-brief-line-name { font-family: var(--font); font-weight: 600; font-size: 14px; letter-spacing: -.02em; color: var(--ink); flex: 1; min-width: 0; }
+.qc-brief-line-meta { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 7px; font-size: 12.5px; color: var(--soft); }
+.qc-brief-line-meta b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.qc-brief-why { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.qc-brief-why li { background: #fffdf7; border: 1px solid #ecd9a8; border-radius: 12px; padding: 11px 14px; }
+.qc-brief-why-name { display: block; font-family: var(--font); font-weight: 600; font-size: 13.5px; letter-spacing: -.02em; color: var(--ink); }
+.qc-brief-why-reason { display: block; font-size: 13px; line-height: 1.55; color: var(--soft); margin-top: 5px; }
+.qc-brief-sub { font-size: 12.5px; font-weight: 600; color: var(--ink); margin: 14px 0 7px; }
+.qc-brief-info { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.qc-brief-info li { background: #fff; border: 1px solid var(--hair); border-radius: 10px; padding: 9px 13px; }
+.qc-brief-ok { font-size: 13px; color: var(--ink); background: var(--lime-dim); border: 1px solid var(--lime-border); border-radius: 12px; padding: 12px 15px; }
+
+/* agent-authored text, quoted verbatim in the CUSTOMER's language — never translated */
+.qc-brief-agent { display: block; }
+.qc-brief-agentlbl { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--grey); margin-bottom: 3px; }
+.qc-brief-quote { display: block; font-size: 13px; line-height: 1.55; color: var(--soft); font-style: italic; border-left: 2px solid var(--hair); padding-left: 10px; }
+
+.qc-brief-internal { margin-top: 18px; border: 1px dashed #b42318; border-radius: 12px; background: #fff6f5; padding: 13px 15px; }
+.qc-brief-internal-head { font-family: var(--mono); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; font-weight: 600; color: #b42318; }
+.qc-brief-internal-lead { font-size: 12.5px; line-height: 1.55; color: var(--soft); margin: 6px 0 8px; }
+.qc-brief-internal .qc-brief-info li { border-color: #f0cfcb; }
+
 /* ── confirm dialog ─────────────────────────────────────────── */
 /* the global *{margin:0} reset kills the UA dialog centering — restore margin:auto */
 .qc-confirm { border: 0; padding: 0; margin: auto; inset: 0; position: fixed; border-radius: var(--r-md); box-shadow: 0 30px 80px -30px rgba(0,0,0,.5); max-width: 400px; width: calc(100vw - 32px); background: #fff; color: var(--ink); }
@@ -569,6 +617,9 @@ body.qc-has-bulk .qc-toast.show { bottom: 86px; }
   .qc-line-num { text-align: left; align-items: flex-start; width: 100%; flex-direction: row; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
   .qc-label-inline { margin-left: 0; width: 100%; }
   .qc-bulkbar { border-radius: 18px; }
+  .qc-brief { padding: 14px; }
+  .qc-brief-row { flex-direction: column; gap: 2px; }
+  .qc-brief-row dt { width: auto; }
 }
 
 /* ── reduced motion / transparency ──────────────────────────── */
@@ -577,6 +628,7 @@ body.qc-has-bulk .qc-toast.show { bottom: 86px; }
   .qc-drawer { transform: none; opacity: 0; }
   .qc-drawer.show { opacity: 1; }
   .qc-bulkbar, .qc-confirm[open] { animation: none; }
+  .qc-brief-chev { transition: none; }
   .is-busy::after { animation-duration: 1.2s; }
 }
 @media (prefers-reduced-transparency: reduce) {
