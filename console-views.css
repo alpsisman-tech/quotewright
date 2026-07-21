@@ -49,6 +49,18 @@ body.qc { background: var(--bg); min-height: 100vh; color: var(--ink); }
 .qc-login .btn-primary { width: 100%; margin-top: 6px; justify-content: center; }
 .qc-error { color: #b42318; font-size: 13px; margin-top: 12px; min-height: 1em; }
 
+/* ── awaiting-activation screen ───────────────────────────────────────────────
+   Shown INSTEAD of the data view when the signed-in user has no active tenant
+   assignment (pending / suspended / not linked). Mirrors .qc-pending in
+   dashboard.css so the state looks identical on every console page. */
+.qc-pending { text-align: center; max-width: 440px; }
+.qc-pending-ico { width: 54px; height: 54px; margin: 2px auto 16px; display: grid; place-items: center; border-radius: 16px; background: var(--lime-dim); color: #4e6a10; }
+.qc-pending h1 { font-size: 25px; text-wrap: balance; }
+.qc-pending .sub { max-width: 40ch; margin: 8px auto 12px; }
+.qc-pending b { color: var(--ink); }
+.qc-pending-note { font-size: 12.5px; color: var(--grey); margin: 0 auto 20px; max-width: 38ch; line-height: 1.5; }
+.qc-pending-acts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
 /* ── page shell ──────────────────────────────────────────────────────────── */
 .qc-view { padding-top: 32px; padding-bottom: 88px; }
 .qc-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }

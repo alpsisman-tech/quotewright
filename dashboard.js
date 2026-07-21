@@ -614,14 +614,29 @@
     currentEmail = (session.user && session.user.email) || "";
     if (window.QWI18n) { QWI18n.setClient(sb); QWI18n.reconcileUser(session.user); }
     if (!window.QWTenancy) { showDash(currentEmail, { isAdmin: false, owner: resolvedOwner }); startDash(session.user); return; }
+    // Demo / guided tour runs on simulated data — never gate it.
+    if (window.QWDemo && QWDemo.isOn()) {
+      showDash(currentEmail, { isAdmin: isAdminUser, owner: resolvedOwner });
+      startDash(session.user);
+      return;
+    }
     QWTenancy.resolve(sb).then(function (p) {
       if (p.anon) { showLogin(); return; }
-      if (!p.active) { showPending(p.email || currentEmail); return; }
+      // Not provisioned → explain it instead of rendering an empty console.
+      // p.error means the profile READ itself failed (network / unreadable) — that
+      // is INCONCLUSIVE, so we fail OPEN and render normally rather than locking a
+      // working install behind an awaiting-activation screen it can't clear.
+      if (!p.active && !p.error) { showPending(p); return; }
       resolvedOwner = p.owner || cfg.OWNER || null;
       isAdminUser = !!p.isAdmin;
       showDash(currentEmail, p);
       startDash(p.user);
-    }, function () { showPending(currentEmail); });
+    }, function () {
+      // Resolver blew up entirely — inconclusive, fail OPEN (RLS is the real gate).
+      resolvedOwner = resolvedOwner || cfg.OWNER || null;
+      showDash(currentEmail, { isAdmin: false, owner: resolvedOwner });
+      startDash(session.user);
+    });
   }
 
   // First successful dashboard entry only: load data + run per-user onboarding.
@@ -656,10 +671,19 @@
     var an = el("adminNav"); if (an) an.hidden = true;
     setMode("signin");
   }
-  function showPending(email) {
+  // profile = the QWTenancy result (or a bare { email, status }). The copy shown
+  // depends on WHY the account isn't provisioned: pending approval / suspended /
+  // not linked to a workspace. QWAccount.paint swaps the section's i18n keys.
+  function showPending(profile) {
+    profile = profile || {};
+    var email = profile.email || currentEmail || "";
+    var status = profile.status === "suspended" ? "suspended"
+      : (profile.noProfile || (profile.status === "active" && !profile.owner)) ? "unlinked"
+      : profile.status || "pending";
     el("loginView").hidden = true;
     el("dashView").hidden = true;
     var pv = el("pendingView"); if (pv) pv.hidden = false;
+    if (window.QWAccount && QWAccount.paint) QWAccount.paint(pv || document, { status: status }, email);
     var pe = el("pendingEmail"); if (pe) pe.textContent = email || "";
     el("logoutBtn").hidden = false; el("whoami").textContent = email || "";
     var nav = el("subnav"); if (nav) nav.hidden = true;

@@ -74,6 +74,24 @@
     </div>
   </section>
 
+  <!-- Awaiting activation (authenticated but not yet an active tenant member).
+       Copy is swapped per status by QWAccount.paint (pending / suspended / unlinked). -->
+  <section id="pendingView" class="qc-login" hidden>
+    <div class="qc-login-card qc-pending">
+      <div class="qc-pending-ico" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </div>
+      <div class="kicker" id="pendingKicker" data-i18n="pending.kicker">Almost there</div>
+      <h1 id="pendingTitle" data-i18n="pending.title">Your account is awaiting activation</h1>
+      <p class="sub"><span id="pendingBody1" data-i18n="pending.body1">You’re signed in as</span> <b id="pendingEmail" lang="en"></b><span id="pendingBody2" data-i18n="pending.body2">. A manager needs to approve your account and connect it to your company before the quote console opens. You’ll get access as soon as that’s done — no need to sign up again.</span></p>
+      <p class="qc-pending-note" id="pendingNote" data-i18n="pending.note">This usually takes a short while. If it’s urgent, let your Quotewright administrator know you’re waiting.</p>
+      <div class="qc-pending-acts">
+        <button type="button" class="btn btn-ghost btn-sm" id="pendingRefresh" data-i18n="common.checkAgain">Check again</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="pendingLogout" data-i18n="common.signOut">Sign out</button>
+      </div>
+    </div>
+  </section>
+
   <!-- App -->
   <section id="appView" class="wrap qc-view" hidden>
     <div class="qc-head">
@@ -127,6 +145,7 @@
 <script src="dashboard-config.js"></script>
 <script src="console-tenancy.js"></script>
 <script src="console-demo.js"></script>
+<script src="account-state.js"></script>
 <script src="console-tour.js"></script>
 <script src="console-nav.js"></script>
 <script src="console-views.js"></script>
