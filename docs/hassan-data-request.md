@@ -77,11 +77,11 @@ without asking.
 | Column | Meaning | Example |
 |---|---|---|
 | `customer_code` | SAP customer/debtor code (`KUNNR`) | `120045` |
-| `customer_name` | Customer name (for the human-readable confirm) | `Homesentry BG` |
-| `email_or_domain` | A full contact email **or** a bare domain that maps to this customer | `orders@homesentry.bg` **or** `homesentry.bg` |
+| `customer_name` | Customer name (for the human-readable confirm) | `Example Trading BV` |
+| `email_or_domain` | A full contact email **or** a bare domain that maps to this customer | `orders@example.com` **or** `example.com` |
 
 - Multiple rows per customer are fine (several contacts / domains → same code).
-- A **domain** row (`homesentry.bg`) covers every sender at that company; add
+- A **domain** row (`example.com`) covers every sender at that company; add
   specific full-email rows only for shared providers (gmail, hotmail) where the
   domain isn't unique to one customer.
 

@@ -71,7 +71,7 @@ as the send gate — **nothing goes out without sign-off.**
 - **Live in production** on Hassan's export inbox, drafting quotes end to end.
 - **~49 quotes** logged to the pipeline to date.
 - Validated to reproduce Hassan's **real quoted prices to the cent** (e.g. the
-  Homesentry lines), and to **refuse to invent** an uncatalogued surcharge even
+  microfibre pack lines), and to **refuse to invent** an uncatalogued surcharge even
   under direct instruction.
 - Handles genuine production complexity: multi-email negotiations, multi-currency
   quotes, unit conversions, and per-customer contract pricing.

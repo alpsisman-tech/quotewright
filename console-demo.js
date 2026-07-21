@@ -36,7 +36,7 @@
 
   function build() {
     // Candidate lists for the resolution picker (weak lines in the drawer).
-    var homesentryCands = [
+    var northwindCands = [
       { sku: "MF-320-AB-40", name: "Microfibre cloth 40×40 — anthracite", unit_price: 0.132, currency: "USD",
         confidence: 82, specs: "320 gsm · 40×40 cm · laser-cut edge", colour: "Anthracite",
         reason: "Same weave & weight; colour matches the requested anthracite." },
@@ -53,9 +53,9 @@
     var quotes = [
       // ── LIVE / needs-you drafts ──────────────────────────────────────────────
       {
-        id: "demo-1", owner: "demo", customer: "Homesentry Retail",
+        id: "demo-1", owner: "demo", customer: "Northwind Facilities BV",
         created_at: hoursAgo(20), status: "draft", currency: "USD",
-        total: 141600.89, grand_total_vadeli: 147739.48,
+        total: 152100.00, grand_total_vadeli: 158220.00,
         margin_pct: 18, match_confidence: 74, autonomy_tier: "amber",
         needs_approval: true, approval_reason: "Line margin 18% — under the 20% green floor",
         approved_by: null, approved_at: null, sent_at: null, outcome: "pending",
@@ -63,21 +63,21 @@
         gmail_draft_id: "r-demo-1",
         output: {
           match_confidence: 74,
-          quote_text: "Dear Homesentry team,\n\nThank you for your continued business. Please find our quotation for your microfibre programme below. Prices are shown per pack, cash and term.\n\nLine 1 — Microfibre cloth 40×40, 320gsm, blue: 1.367 USD/pack.\nLine 2 — Microfibre cloth 40×40, 320gsm, grey: 2.097 USD/pack.\nLine 3 — Awaiting your confirmation of the anthracite shade before we price it.\nLine 4 — Anti-static packaging: this sits outside our catalogue, so our sales team will follow up directly rather than quote an invented figure.\n\nBest regards,\nMehmed Yalçın · Export Sales\nHassan Tekstil A.Ş.",
+          quote_text: "Dear Northwind team,\n\nThank you for your continued business. Please find our quotation for your microfibre programme below. Prices are shown per pack, cash and term.\n\nLine 1 — Microfibre cloth 40×40, 320gsm, blue: 1.480 USD/pack.\nLine 2 — Microfibre cloth 40×40, 320gsm, grey: 2.250 USD/pack.\nLine 3 — Awaiting your confirmation of the anthracite shade before we price it.\nLine 4 — Anti-static packaging: this sits outside our catalogue, so our sales team will follow up directly rather than quote an invented figure.\n\nBest regards,\nSales Engineering\nHassan Tekstil A.Ş.",
           lines: [
             { ref: "1", product_name: "Microfibre cloth 40×40 — blue", spec: "320 gsm · 40×40 cm", colors: "Blue",
               sku: "MF-320-BL-40", status: "priced", confidence: 96, qty: 45000, qty_unit: "pcs",
-              unit_cash: "1.367 USD/pack", unit_term: "1.421 USD/pack", total_cash: 61515, total_term: 63945,
+              unit_cash: "1.480 USD/pack", unit_term: "1.540 USD/pack", total_cash: 66600, total_term: 69300,
               match_reason: "Exact catalogue match on weave, weight and colour.", candidates: [] },
             { ref: "2", product_name: "Microfibre cloth 40×40 — grey", spec: "320 gsm · 40×40 cm", colors: "Grey",
               sku: "MF-320-GY-40", status: "priced", confidence: 94, qty: 38000, qty_unit: "pcs",
-              unit_cash: "2.097 USD/pack", unit_term: "2.180 USD/pack", total_cash: 79686, total_term: 82840,
+              unit_cash: "2.250 USD/pack", unit_term: "2.340 USD/pack", total_cash: 85500, total_term: 88920,
               match_reason: "Exact catalogue match; repeat line from the last order.", candidates: [] },
             { ref: "3", product_name: "Microfibre cloth 40×40 — anthracite", spec: "320 gsm · 40×40 cm", colors: "Anthracite (unconfirmed)",
               sku: "", status: "pending_info", confidence: 58, qty: 20000, qty_unit: "pcs",
               unit_cash: "", unit_term: "", total_cash: null, total_term: null,
               match_reason: "Two shades could match — confirm which anthracite before pricing.",
-              candidates: homesentryCands },
+              candidates: northwindCands },
             { ref: "4", product_name: "Anti-static packaging surcharge", spec: "Per-pack surcharge", colors: "",
               sku: "", status: "pending_hassan", confidence: null, qty: 1, qty_unit: "pcs",
               unit_cash: "", unit_term: "", total_cash: null, total_term: null,
@@ -86,11 +86,11 @@
           ]
         },
         thread_snapshot: [
-          { from: "procurement@homesentry.com", direction: "inbound", date: daysAgo(2, 9, 14),
-            body: "Hi Mehmed,\n\nWe'd like to reorder our 40×40 microfibre programme: 45,000 blue, 38,000 grey, and 20,000 in the new anthracite shade. Please also quote anti-static packaging.\n\nThanks,\nDana" },
-          { from: "mehmed@hassan.com.tr", direction: "outbound", date: daysAgo(2, 11, 2),
-            body: "Dear Dana,\n\nGreat to hear from you. Could you confirm which anthracite you'd like — the laser-cut MF-320-AB or the overlock MF-320-GR? That decides the price on line 3.\n\nBest,\nMehmed" },
-          { from: "procurement@homesentry.com", direction: "inbound", date: hoursAgo(21),
+          { from: "procurement@example.com", direction: "inbound", date: daysAgo(2, 9, 14),
+            body: "Hi there,\n\nWe'd like to reorder our 40×40 microfibre programme: 45,000 blue, 38,000 grey, and 20,000 in the new anthracite shade. Please also quote anti-static packaging.\n\nThanks,\nDana" },
+          { from: "sales@example.com", direction: "outbound", date: daysAgo(2, 11, 2),
+            body: "Dear Dana,\n\nGreat to hear from you. Could you confirm which anthracite you'd like — the laser-cut MF-320-AB or the overlock MF-320-GR? That decides the price on line 3.\n\nBest,\nSales Engineering" },
+          { from: "procurement@example.com", direction: "inbound", date: hoursAgo(21),
             body: "We'll come back on the anthracite by Friday. Please get the rest quoted in the meantime.\n\nDana" }
         ],
         last_reply_text: null
@@ -104,7 +104,7 @@
         unmatched_lines: [], gmail_draft_id: "r-demo-2",
         output: {
           match_confidence: 94,
-          quote_text: "Sehr geehrte Damen und Herren,\n\nvielen Dank für Ihre Anfrage. Gerne unterbreiten wir Ihnen folgendes Angebot:\n\nHASKEÇE K 220, schwarz, 165 cm breit — 1.000 lfm (= 1.650 m²) zu 0,72 EUR/m² = 1.188,00 EUR.\n\nMit freundlichen Grüßen,\nMehmed Yalçın · Export",
+          quote_text: "Sehr geehrte Damen und Herren,\n\nvielen Dank für Ihre Anfrage. Gerne unterbreiten wir Ihnen folgendes Angebot:\n\nHASKEÇE K 220, schwarz, 165 cm breit — 1.000 lfm (= 1.650 m²) zu 0,72 EUR/m² = 1.188,00 EUR.\n\nMit freundlichen Grüßen,\nSales Engineering",
           lines: [
             { ref: "1", product_name: "HASKEÇE K 220 — schwarz", spec: "220 gsm · 165 cm breit", colors: "Schwarz",
               sku: "OK0220SD1659H915", status: "priced", confidence: 94, qty: 1650, qty_unit: "m2",
@@ -200,7 +200,7 @@
         "Automotive headliner foam; competitor undercut on lead time.", "HS-CAR-200-PB", "Headliner 200 — foam-backed", "Price — competitor undercut"),
       qSent("demo-8", "Delta Filtration", 12, 15400, "EUR", "green", 91, 29, "pending", null,
         "Spunlace media, standard grade.", "SL-060-AP", "Spunlace 60 — aperture"),
-      qSent("demo-9", "Homesentry Retail", 55, 96500, "USD", "green", 90, 26, "won", 45,
+      qSent("demo-9", "Northwind Facilities BV", 55, 88400, "USD", "green", 90, 26, "won", 45,
         "Prior microfibre programme.", "MF-320-BL-40", "Microfibre 40×40 — blue"),
       qSent("demo-10", "Kervan Yapı", 70, 41000, "EUR", "amber", 78, 21, "won", 60,
         "Floor felt roll goods.", "FL-300-GY", "Floor felt 300 — grey"),
@@ -215,7 +215,7 @@
     ];
 
     var customers = [
-      cust("Homesentry Retail", "procurement@homesentry.com", "homesentry.com", 3, 2, "USD", 0.5, "HS-4471",
+      cust("Northwind Facilities BV", "procurement@example.com", "example.com", 3, 2, "USD", 0.5, "NW-4471",
         { colours: "Blue, grey, anthracite", edge: "Laser-cut" }),
       cust("Delta Filtration", "buyer@deltafiltration.com", "deltafiltration.com", 2, 2, "EUR", 12, "DF-2210"),
       cust("Möbel Schmidt GmbH", "einkauf@moebel-schmidt.de", "moebel-schmidt.de", 2, 1, "EUR", 2, "MS-8830"),
@@ -239,10 +239,10 @@
     ];
 
     var resolutions = [
-      res("r1", "haskece-220-black-165", "OK0220SD1659H915", "mehmed@hassan.com.tr", "demo-6", "console", 18),
+      res("r1", "haskece-220-black-165", "OK0220SD1659H915", "sales@example.com", "demo-6", "console", 18),
       res("r2", "microfibre-40-blue-320", "MF-320-BL-40", "auto-pipeline", "demo-9", "auto", 44),
-      res("r3", "spunlace-60-aperture", "SL-060-AP", "hortensia@hassan.com.tr", "demo-8", "console", 11),
-      res("r4", "floor-felt-300-grey", "FL-300-GY", "mehmed@hassan.com.tr", "demo-10", "console", 60),
+      res("r3", "spunlace-60-aperture", "SL-060-AP", "sales@example.com", "demo-8", "console", 11),
+      res("r4", "floor-felt-300-grey", "FL-300-GY", "sales@example.com", "demo-10", "console", 60),
       res("r5", "haskece-220-black-165", "OK0220SD1659H915", "auto-pipeline", "demo-14", "auto", 119)
     ];
 
@@ -257,8 +257,8 @@
       created_at: daysAgo(createdDays, 10, 20), status: "sent", currency: currency,
       total: total, grand_total_vadeli: null,
       margin_pct: margin, match_confidence: conf, autonomy_tier: tier,
-      needs_approval: false, approved_by: "mehmed@hassan.com.tr", approved_at: daysAgo(createdDays, 10, 40),
-      sent_at: sentAt, sent_by: "mehmed@hassan.com.tr",
+      needs_approval: false, approved_by: "sales@example.com", approved_at: daysAgo(createdDays, 10, 40),
+      sent_at: sentAt, sent_by: "sales@example.com",
       outcome: outcome, outcome_at: (outcome === "won" || outcome === "lost") ? daysAgo(decidedDays, 12) : null,
       outcome_note: outcomeNote || null, unmatched_lines: [], gmail_draft_id: "r-" + id,
       last_reply_text: null,

@@ -456,7 +456,7 @@
     el("tableError").hidden = true;
     // DEMO MODE (tour): show the hub with sample settings, never touch Supabase.
     if (window.QWDemo && QWDemo.isOn()) {
-      state.display_name = "Mehmed Yalçın"; state.company = "Hassan Tekstil A.Ş."; state.role = "Export Sales Manager";
+      state.display_name = "Sales Engineering"; state.company = "Hassan Tekstil A.Ş."; state.role = "Export Sales Manager";
       state.auto_resolve_enabled = true; state.auto_send_enabled = false; state.followup_enabled = true;
       state.green_min_confidence = 90; state.green_min_margin = 20; state.amber_min_confidence = 60;
       state.margin_floor = 15; state.followup_days = 5; state.max_followups = 2;
