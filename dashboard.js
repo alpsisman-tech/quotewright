@@ -111,6 +111,7 @@
       "dash.threadEmpty": "No conversation was captured for this quote. Open the customer’s thread in the mailbox to read it.",
       "dash.customer": "Customer", "dash.ourTeam": "Our team",
       "dash.msgNoBody": "(no message text was captured for this message)",
+      "dash.msgMore": "Show full message", "dash.msgLess": "Show less",
       "dash.priced": "Priced", "dash.provisional": "Priced · confirm spec",
       "dash.needsInfo": "Needs info", "dash.pendingPrice": "Pending price",
       "dash.candidate": "Candidate", "dash.useThis": "Use this",
@@ -317,6 +318,7 @@
       "dash.threadEmpty": "Bu teklif için yazışma kaydedilmemiş. Müşterinin yazışmasını okumak için posta kutusundan açın.",
       "dash.customer": "Müşteri", "dash.ourTeam": "Ekibimiz",
       "dash.msgNoBody": "(bu mesajın metni kaydedilmemiş)",
+      "dash.msgMore": "Mesajın tamamını göster", "dash.msgLess": "Daha az göster",
       "dash.priced": "Fiyatlandı", "dash.provisional": "Fiyatlandı · özelliği doğrula",
       "dash.needsInfo": "Bilgi gerekiyor", "dash.pendingPrice": "Fiyat bekliyor",
       "dash.candidate": "Aday", "dash.useThis": "Bunu kullan",
@@ -1808,19 +1810,47 @@
     }
     return { from: from, date: date, body: String(body).trim(), outbound: outbound };
   }
+  // Long bodies are clamped in CSS, never truncated in JS: the full (escaped)
+  // text is always present in the DOM, so expanding reveals it with no re-render
+  // and nothing is ever silently cut off.
+  var MSG_CLAMP_CHARS = 420;
+
+  function msgTime(m) {
+    if (!m.date) return null;
+    var t = Date.parse(m.date);
+    if (isFinite(t)) return t;
+    var n = Number(m.date);                       // epoch seconds or milliseconds
+    if (isFinite(n) && n > 0) return n < 1e12 ? n * 1000 : n;
+    return null;
+  }
+  // Chronological, but stable: a message with no usable date keeps the position
+  // the pipeline gave it rather than being dumped at one end of the thread.
+  function sortMsgs(msgs) {
+    var idx = msgs.map(function (m, i) { return { m: m, i: i, t: msgTime(m) }; });
+    var dated = idx.filter(function (x) { return x.t != null; });
+    if (dated.length < 2) return msgs;
+    dated.sort(function (a, b) { return a.t - b.t || a.i - b.i; });
+    var k = 0;
+    return idx.map(function (x) { return x.t == null ? x.m : dated[k++].m; });
+  }
+
   function threadPanel(q) {
-    var msgs = threadOf(q).map(function (m) { return normMsg(m, q); });
+    var msgs = sortMsgs(threadOf(q).map(function (m) { return normMsg(m, q); }));
     var inner;
     if (!msgs.length) {
       inner = '<div class="qc-empty-mini">' + esc(tt("dash.threadEmpty")) + "</div>";
     } else {
       inner = '<div class="qc-thread">' + msgs.map(function (m) {
+        var long = m.body.length > MSG_CLAMP_CHARS;
         return '<div class="qc-msg ' + (m.outbound ? "out" : "in") + '">' +
           '<div class="qc-msg-head"><span class="qc-msg-from" lang="en">' + esc(m.from) + "</span>" +
             (m.date ? '<span class="qc-msg-date" lang="en">' + esc(fmtDateTime(m.date)) + "</span>" : "") + "</div>" +
-          '<div class="qc-msg-body" lang="en">' +
+          '<div class="qc-msg-body' + (long ? " clamped" : "") + '" lang="en">' +
             (m.body ? nl2br(m.body) : '<span class="qc-msg-nobody">' + esc(tt("dash.msgNoBody")) + "</span>") +
-          "</div></div>";
+          "</div>" +
+          (long ? '<button type="button" class="qc-msg-more" data-msgmore="1" aria-expanded="false">' +
+                    esc(tt("dash.msgMore")) + "</button>" : "") +
+        "</div>";
       }).join("") + "</div>";
     }
     return section(tt("dash.convo"), msgs.length ? (msgs.length === 1 ? tt("dash.msg1") : tt("dash.msgN", { n: msgs.length })) : "", inner);
@@ -2266,6 +2296,8 @@
     if (closeBtn) { closeDrawer(); return; }
     var brBtn = t.closest ? t.closest("button[data-brief]") : null;
     if (brBtn) { toggleBrief(brBtn); return; }
+    var msgMore = t.closest ? t.closest("button[data-msgmore]") : null;
+    if (msgMore) { toggleMsg(msgMore); return; }
     var cand = t.closest ? t.closest("button[data-resolve]") : null;
     if (cand) { resolveLine(cand.getAttribute("data-resolve"), cand.getAttribute("data-ref"), cand.getAttribute("data-sku"), cand); return; }
     var use = t.closest ? t.closest("button[data-usesku]") : null;
@@ -2280,6 +2312,15 @@
     if (clar) { doClarify(clar.getAttribute("data-clarify"), clar.getAttribute("data-ref"), clar); return; }
     var rel = t.closest ? t.closest("button[data-relabel]") : null;
     if (rel) { doRelabel(rel.getAttribute("data-relabel"), rel.getAttribute("data-action"), rel); return; }
+  }
+  // One long message — expand/collapse in place (no re-render, no data churn)
+  function toggleMsg(btn) {
+    var open = btn.getAttribute("aria-expanded") !== "true";
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    var wrap = btn.closest ? btn.closest(".qc-msg") : null;
+    var body = wrap ? wrap.querySelector(".qc-msg-body") : null;
+    if (body) { if (open) body.classList.remove("clamped"); else body.classList.add("clamped"); }
+    btn.textContent = open ? tt("dash.msgLess") : tt("dash.msgMore");
   }
   // Briefing panel — collapse/expand in place (no re-render, no data churn)
   function toggleBrief(btn) {
