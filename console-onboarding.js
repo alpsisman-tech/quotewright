@@ -197,7 +197,7 @@
             '<h2 class="ob-title" data-i18n="ob.welcome.title">' + L("ob.welcome.title") + '</h2>' +
             '<p class="ob-sub" data-i18n="ob.welcome.sub">' + L("ob.welcome.sub") + '</p>' +
             '<div class="ob-grid">' +
-              fld("ob_display_name", "ob.f.name", '<input id="ob_display_name" type="text" autocomplete="name" placeholder="e.g. Mehmed Yalçın">') +
+              fld("ob_display_name", "ob.f.name", '<input id="ob_display_name" type="text" autocomplete="name" placeholder="e.g. Sales Engineering">') +
               fld("ob_company", "ob.f.company", '<input id="ob_company" type="text" autocomplete="organization" placeholder="Hassan Tekstil A.Ş.">') +
               fld("ob_role", "ob.f.role", '<input id="ob_role" type="text" data-i18n-attr="placeholder:ob.ph.role" placeholder="' + L("ob.ph.role") + '">') +
               fld("ob_phone", "ob.f.phone", '<input id="ob_phone" type="tel" autocomplete="tel" placeholder="+90 …">') +
@@ -225,7 +225,7 @@
                 '<input id="ob_quote_validity_days" type="number" min="1" max="365" step="1" inputmode="numeric" placeholder="7">') +
               obRange("ob_margin_floor", "ob.q.marginFloor", "%", "obMfVal", 0, 50) +
               fld("ob_signature", "ob.q.signature",
-                '<textarea id="ob_signature" rows="3" placeholder="Best regards,&#10;Mehmed Yalçın · Export Sales&#10;Hassan Tekstil A.Ş."></textarea>' +
+                '<textarea id="ob_signature" rows="3" placeholder="Best regards,&#10;Sales Engineering&#10;Hassan Tekstil A.Ş."></textarea>' +
                 '<p class="ob-hint" data-i18n="ob.q.sigHint">' + L("ob.q.sigHint") + '</p>', "wide") +
             '</div>' +
           '</div>' +
