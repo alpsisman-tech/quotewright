@@ -61,9 +61,11 @@
           }
           var p = res && res.data;
           if (!p) {
-            // No profile row yet (signup trigger not applied / just-created) → pending.
+            // No profile row at all (signup trigger not applied / row deleted) → the
+            // account is not linked to any workspace. noProfile lets the awaiting-
+            // activation screen say that, rather than "awaiting approval".
             return { owner: null, role: "member", status: "pending", active: false,
-                     isAdmin: false, email: user.email, userId: user.id, user: user };
+                     noProfile: true, isAdmin: false, email: user.email, userId: user.id, user: user };
           }
           var active = p.status === "active" && !!p.owner;
           return {

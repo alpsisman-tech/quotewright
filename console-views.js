@@ -130,6 +130,24 @@
     var logoutBtn = el("logoutBtn");
     if (logoutBtn) logoutBtn.addEventListener("click", function () { sb.auth.signOut().then(showLogin); });
 
+    // Awaiting-activation screen actions (CSP: attached here, never inline).
+    var pendingLogout = el("pendingLogout");
+    if (pendingLogout) pendingLogout.addEventListener("click", function () { sb.auth.signOut().then(showLogin); });
+    var pendingRefresh = el("pendingRefresh");
+    if (pendingRefresh) pendingRefresh.addEventListener("click", function () {
+      pendingRefresh.disabled = true;
+      pendingRefresh.textContent = T("common.checking", "Checking…");
+      sb.auth.getSession().then(function (res) {
+        pendingRefresh.disabled = false;
+        pendingRefresh.textContent = T("common.checkAgain", "Check again");
+        var s = res.data && res.data.session;
+        if (s && s.user) onAuthed(s.user.email || ""); else showLogin();
+      }, function () {
+        pendingRefresh.disabled = false;
+        pendingRefresh.textContent = T("common.checkAgain", "Check again");
+      });
+    });
+
     sb.auth.getSession().then(function (res) {
       var s = res.data && res.data.session;
       if (s && s.user) {
@@ -159,24 +177,48 @@
     function showLogin() {
       var lv = el("loginView"), av = el("appView");
       if (lv) lv.hidden = false; if (av) av.hidden = true;
+      var pv = el("pendingView"); if (pv) pv.hidden = true;
       if (logoutBtn) logoutBtn.hidden = true;
       var who = el("whoami"); if (who) who.textContent = "";
       // Signed-out state must NOT wear the app rail (login card stands alone).
       var nav = el("subnav"); if (nav) nav.hidden = true;
       var an = el("adminNav"); if (an) an.hidden = true;
     }
-    function onAuthed(email) {
-      API.email = email;
-      var lv = el("loginView"), av = el("appView");
-      if (lv) lv.hidden = true; if (av) av.hidden = false;
+
+    /* Signed in, but the account has no active tenant assignment: RLS would return
+       ZERO rows on every table, so the page would render a convincingly-broken
+       empty console. Show the explanation INSTEAD — no data view, no zero tiles,
+       and opts.onAuth is never called so nothing queries. */
+    function showPending(state, email) {
+      var lv = el("loginView"), av = el("appView"), pv = el("pendingView");
+      if (lv) lv.hidden = true;
+      if (av) av.hidden = true;
+      if (pv) {
+        pv.hidden = false;
+        if (window.QWAccount && QWAccount.paint) QWAccount.paint(pv, state, email);
+        else { var pe = el("pendingEmail"); if (pe) pe.textContent = email || ""; }
+      }
       if (logoutBtn) logoutBtn.hidden = false;
       var who = el("whoami"); if (who) who.textContent = email || "";
+      var nav = el("subnav"); if (nav) nav.hidden = true;
+      var an = el("adminNav"); if (an) an.hidden = true;
+    }
+
+    function onAuthed(email) {
+      API.email = email;
 
       // Resolve the CALLER's tenant BEFORE the page queries, so every auxiliary
       // view scopes to the signed-in user's owner (not the hardcoded Hassan one).
       // Purely additive + fail-safe: if the tenancy SQL isn't applied yet (or the
       // resolver isn't loaded), API.owner stays cfg.OWNER and nothing changes.
       var proceed = function () {
+        var lv = el("loginView"), av = el("appView");
+        if (lv) lv.hidden = true; if (av) av.hidden = false;
+        var pv = el("pendingView"); if (pv) pv.hidden = true;
+        if (logoutBtn) logoutBtn.hidden = false;
+        var who = el("whoami"); if (who) who.textContent = email || "";
+        // (#subnav is revealed by each page's own onAuth — unchanged.)
+
         if (typeof opts.onAuth === "function") opts.onAuth(sb, email);
         // Admin link in the rail: visible only to admins (API.isAdmin resolved above).
         var an = el("adminNav"); if (an) an.hidden = !API.isAdmin;
@@ -188,6 +230,20 @@
           window.QWTour.onConsoleReady(sb, null);
         }
       };
+
+      // One round-trip resolves BOTH "is this account provisioned?" and "which
+      // tenant?". QWAccount fails OPEN on an inconclusive check (table missing /
+      // network error) so a legacy single-tenant install is never locked out.
+      if (window.QWAccount && typeof QWAccount.check === "function") {
+        QWAccount.check(sb).then(function (st) {
+          if (st && st.provisioned === false) { showPending(st, st.email || email); return; }
+          if (st && st.owner) { API.owner = st.owner; cfg.OWNER = st.owner; }
+          API.isAdmin = !!(st && st.isAdmin);
+          proceed();
+        }, proceed);
+        return;
+      }
+
       if (window.QWTenancy && typeof window.QWTenancy.resolve === "function") {
         window.QWTenancy.resolve(sb).then(function (p) {
           // Only an ACTIVE member with an assigned tenant narrows the scope. A
