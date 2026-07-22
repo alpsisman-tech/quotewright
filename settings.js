@@ -249,7 +249,11 @@
   //   1. DEPLOYED — does the backend wiring for this feature exist yet?
   //   2. costState — from sb.rpc('qw_cost_data_ready') (counts + a boolean only,
   //      never cost values). Fail CLOSED: unknown/error ⇒ locked, never open.
-  var DEPLOYED = { auto_send: true, thin_margin_alert: true, digest: true, letterhead_profile: false };
+  // auto_send + thin_margin_alert: backend NOT shipped yet (the Margin Scorer send/alert
+  // branch is staged pending review). Keep FALSE so these stay locked as "not switched on
+  // yet" — flip to true only when that workflow is published, so the toggle never unlocks
+  // ahead of a backend that can act on it. digest: shipped & live. letterhead_profile: not built.
+  var DEPLOYED = { auto_send: false, thin_margin_alert: false, digest: true, letterhead_profile: false };
   var costState = "checking";   // "checking" | "ready" | "notready" | "error"
   var coveragePct = null;       // integer % from the RPC (for the lock reason)
 
