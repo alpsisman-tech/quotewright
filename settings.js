@@ -98,7 +98,18 @@
       "set.missing.body": "The <code>autonomy_settings</code> table doesn't exist. Run <code>quotewright-intelligence.sql</code> then <code>quotewright-settings.sql</code> in the Supabase SQL editor — they create the table, add the settings columns and seed the row for <code>{owner}</code>.",
       "set.load.errH4": "Couldn't load settings",
       "set.load.errBody": "Something went wrong reaching the settings store.",
-      "set.load.netErr": "Network error — check your connection and try again."
+      "set.load.netErr": "Network error — check your connection and try again.",
+      // ── readiness locks ──
+      "set.lock.autoSend.notready": "Auto-send grades quotes by profit margin, which needs your product cost prices. Coverage is {pct}% — auto-send unlocks at 60%.",
+      "set.lock.thin.notready": "Thin-margin alerts need product cost prices to measure margin. Coverage is {pct}% — unlocks at 60%.",
+      "set.lock.cost.checking": "Checking whether your catalogue has enough cost data — this unlocks once that's confirmed.",
+      "set.lock.cost.error": "Couldn't check your cost-data readiness, so this stays locked until it can be confirmed. Reload to try again.",
+      "set.lock.notDeployed": "This isn't switched on for your account yet.",
+      "set.lock.profile": "Your quote letterhead currently uses a fixed Hassan footer. These fields will apply once custom letterhead is enabled for your account.",
+      "set.lock.savedInactive": "Saved earlier, but not in effect until this unlocks.",
+      "set.confirm.autoSend.title": "Turn on automatic sending?",
+      "set.confirm.autoSend.body": "This sends green-tier quotes to customers automatically, without a review step. Continue?",
+      "set.confirm.autoSend.ok": "Turn on auto-send"
     },
     tr: {
       "set.lang.label": "Konsol dili",
@@ -188,7 +199,18 @@
       "set.missing.body": "<code>autonomy_settings</code> tablosu yok. Supabase SQL düzenleyicisinde önce <code>quotewright-intelligence.sql</code> sonra <code>quotewright-settings.sql</code> dosyasını çalıştırın — bunlar tabloyu oluşturur, ayar sütunlarını ekler ve <code>{owner}</code> için satırı hazırlar.",
       "set.load.errH4": "Ayarlar yüklenemedi",
       "set.load.errBody": "Ayar deposuna erişirken bir şeyler ters gitti.",
-      "set.load.netErr": "Ağ hatası — bağlantınızı kontrol edip yeniden deneyin."
+      "set.load.netErr": "Ağ hatası — bağlantınızı kontrol edip yeniden deneyin.",
+      // ── hazırlık kilitleri ──
+      "set.lock.autoSend.notready": "Otomatik gönderim, teklifleri kâr marjına göre derecelendirir ve bunun için ürün maliyet fiyatlarınız gerekir. Kapsam %{pct} — otomatik gönderim %60'ta açılır.",
+      "set.lock.thin.notready": "İnce marj uyarıları, marjı ölçmek için ürün maliyet fiyatlarına ihtiyaç duyar. Kapsam %{pct} — %60'ta açılır.",
+      "set.lock.cost.checking": "Kataloğunuzda yeterli maliyet verisi olup olmadığı kontrol ediliyor — doğrulanınca açılır.",
+      "set.lock.cost.error": "Maliyet verisi hazırlığınız kontrol edilemedi; doğrulanana kadar kilitli kalır. Yeniden denemek için sayfayı yenileyin.",
+      "set.lock.notDeployed": "Bu özellik hesabınız için henüz açık değil.",
+      "set.lock.profile": "Teklif antetiniz şu anda sabit bir Hassan alt bilgisi kullanıyor. Bu alanlar, hesabınız için özel antet etkinleştirildiğinde geçerli olacak.",
+      "set.lock.savedInactive": "Daha önce kaydedildi, ancak bu açılana kadar yürürlükte değil.",
+      "set.confirm.autoSend.title": "Otomatik gönderim açılsın mı?",
+      "set.confirm.autoSend.body": "Bu, yeşil kademe teklifleri bir inceleme adımı olmadan müşterilere otomatik gönderir. Devam edilsin mi?",
+      "set.confirm.autoSend.ok": "Otomatik gönderimi aç"
     }
   });
   function tt(key, vars) { return (window.QWI18n && QWI18n.t) ? QWI18n.t(key, vars) : key; }
@@ -220,6 +242,21 @@
   var state = {}, snapshot = {};
   for (var k in DEFAULTS) state[k] = DEFAULTS[k];
 
+  // ── Readiness gating ──────────────────────────────────────────────────────
+  // A gated control stays LOCKED (visually disabled + a plain-language reason)
+  // until its precondition is met — then it unlocks itself on the next evaluate,
+  // no code change needed. Two precondition sources:
+  //   1. DEPLOYED — does the backend wiring for this feature exist yet?
+  //   2. costState — from sb.rpc('qw_cost_data_ready') (counts + a boolean only,
+  //      never cost values). Fail CLOSED: unknown/error ⇒ locked, never open.
+  // auto_send + thin_margin_alert: backend NOT shipped yet (the Margin Scorer send/alert
+  // branch is staged pending review). Keep FALSE so these stay locked as "not switched on
+  // yet" — flip to true only when that workflow is published, so the toggle never unlocks
+  // ahead of a backend that can act on it. digest: shipped & live. letterhead_profile: not built.
+  var DEPLOYED = { auto_send: false, thin_margin_alert: false, digest: true, letterhead_profile: false };
+  var costState = "checking";   // "checking" | "ready" | "notready" | "error"
+  var coveragePct = null;       // integer % from the RPC (for the lock reason)
+
   // key → text/number/select input id
   var TEXT = {
     f_display_name: "display_name", f_company: "company", f_role: "role",
@@ -233,13 +270,13 @@
     autoResolve: { key: "auto_resolve_enabled", row: "autoResolveRow", st: "arState",
       on: "set.sw.autoResolve.on", off: "set.sw.autoResolve.off" },
     autoSend: { key: "auto_send_enabled", row: "switchRow", st: "swState",
-      on: "set.sw.autoSend.on", off: "set.sw.autoSend.off" },
+      on: "set.sw.autoSend.on", off: "set.sw.autoSend.off", lock: "autoSendLock", gate: "auto_send", confirm: true },
     followupEnabled: { key: "followup_enabled", row: "followupRow", st: "fuState",
       on: "set.sw.followup.on", off: "set.sw.followup.off" },
     digestEnabled: { key: "digest_enabled", row: "digestRow", st: "dgState",
       on: "set.sw.digest.on", off: "set.sw.digest.off" },
     alertThinMargin: { key: "alert_thin_margin", row: "thinRow", st: "tmState",
-      on: "set.sw.thin.on", off: "set.sw.thin.off" }
+      on: "set.sw.thin.on", off: "set.sw.thin.off", lock: "thinLock", gate: "thin_margin_alert" }
   };
   var RANGES = {
     greenConf: { key: "green_min_confidence", val: "gcVal" },
@@ -266,7 +303,19 @@
     // switches
     Object.keys(SWITCHES).forEach(function (id) {
       var node = el(id); if (!node) return;
-      node.addEventListener("click", function () { setSwitch(id, !state[SWITCHES[id].key]); markDirty(); });
+      node.addEventListener("click", function () {
+        // Locked switches are non-interactive (disabled blocks most clicks; guard anyway).
+        if (node.disabled || !evalGate(id).active) return;
+        var next = !state[SWITCHES[id].key];
+        if (next && SWITCHES[id].confirm) {   // first-time enable → make the consequence explicit
+          confirmDialog(tt("set.confirm.autoSend.title"), tt("set.confirm.autoSend.body"),
+            tt("set.confirm.autoSend.ok"), true).then(function (ok) {
+              if (ok) { setSwitch(id, true); markDirty(); }
+            });
+          return;
+        }
+        setSwitch(id, next); markDirty();
+      });
     });
     // ranges
     Object.keys(RANGES).forEach(function (id) {
@@ -315,6 +364,7 @@
       // Re-translate switch-state lines + clarify segment without disturbing dirty state.
       Object.keys(SWITCHES).forEach(function (id) { if (el(id)) setSwitch(id, state[SWITCHES[id].key] === true); });
       setClarify(state.clarify_mode === "send" ? "send" : "draft");
+      applyGates();   // re-lock gated controls + re-translate their lock reasons
     });
   }
 
@@ -373,8 +423,113 @@
       el(r.val).textContent = state[r.key];
     });
     setClarify(state.clarify_mode === "send" ? "send" : "draft");
+    applyGates();   // lock/unlock gated controls over the top of the plain paint
     Object.keys(SECTIONS).forEach(snapSection);
     Object.keys(SECTIONS).forEach(function (s) { setDirtyNote(s, false); });
+  }
+
+  // ── readiness gating ──────────────────────────────────────────────────────
+  // Evaluate one gated control's precondition → { active, reasonKey?, vars? }.
+  // Fail CLOSED: a checking/error cost state keeps cost-dependent controls locked.
+  function evalGate(id) {
+    var s = SWITCHES[id];
+    if (!s || !s.gate) return { active: true };            // ungated switch
+    if (!DEPLOYED[s.gate]) return { active: false, reasonKey: "set.lock.notDeployed", vars: {} };
+    if (costState === "ready") return { active: true };
+    if (costState === "checking") return { active: false, reasonKey: "set.lock.cost.checking", vars: {} };
+    if (costState === "error") return { active: false, reasonKey: "set.lock.cost.error", vars: {} };
+    // notready → show live coverage in the reason
+    var pfx = id === "autoSend" ? "set.lock.autoSend" : "set.lock.thin";
+    return { active: false, reasonKey: pfx + ".notready", vars: { pct: (coveragePct == null ? "—" : coveragePct) } };
+  }
+  function profileGate() {
+    return DEPLOYED.letterhead_profile ? { active: true } : { active: false, reasonKey: "set.lock.profile", vars: {} };
+  }
+  function setLockNote(noteId, reasonKey, vars, savedInactive) {
+    var note = el(noteId); if (!note) return;
+    if (!reasonKey) { note.hidden = true; return; }
+    var txt = note.querySelector(".qc-locknote-txt");
+    var sav = note.querySelector(".qc-locknote-saved");
+    if (txt) txt.textContent = tt(reasonKey, vars || {});
+    if (sav) {
+      if (savedInactive) { sav.hidden = false; sav.textContent = tt("set.lock.savedInactive"); }
+      else { sav.hidden = true; sav.textContent = ""; }
+    }
+    note.hidden = false;
+  }
+  function applySwitchGate(id) {
+    var s = SWITCHES[id], sw = el(id); if (!sw) return;
+    var row = el(s.row), g = evalGate(id);
+    if (g.active) {
+      sw.disabled = false;
+      sw.removeAttribute("aria-disabled");
+      sw.removeAttribute("aria-describedby");
+      if (s.lock) setLockNote(s.lock, null);
+      setSwitch(id, state[s.key] === true);   // honest, interactive render
+      return;
+    }
+    // Locked: non-interactive + visually off. A value stored true is shown as
+    // locked-and-not-in-effect (never a live green switch); state is NOT mutated.
+    var storedOn = state[s.key] === true;
+    sw.disabled = true;
+    sw.setAttribute("aria-disabled", "true");
+    sw.setAttribute("aria-checked", "false");
+    if (row) row.classList.remove("on");
+    if (row) row.classList.add("locked");
+    if (el(s.st)) el(s.st).textContent = tt(s.off);
+    if (s.lock) { setLockNote(s.lock, g.reasonKey, g.vars, storedOn); sw.setAttribute("aria-describedby", s.lock); }
+  }
+  function applyProfileGate() {
+    var g = profileGate();
+    ["f_display_name", "f_company", "f_role", "f_phone", "f_country", "f_address"].forEach(function (fid) {
+      var n = el(fid); if (n) n.disabled = !g.active;
+    });
+    var saveBtn = document.querySelector('[data-save="profile"]');
+    if (saveBtn) saveBtn.disabled = !g.active;
+    setLockNote("profileLock", g.active ? null : g.reasonKey, g.vars);
+  }
+  function applyGates() {
+    Object.keys(SWITCHES).forEach(function (id) { if (SWITCHES[id].gate) applySwitchGate(id); });
+    applyProfileGate();
+  }
+
+  // Ask the DB whether the catalogue carries enough real cost data to grade
+  // margins. Counts + a boolean only — never cost values. Fail CLOSED on error.
+  function checkCostReady() {
+    costState = "checking"; coveragePct = null;
+    if (window.QWDemo && QWDemo.isOn()) { costState = "ready"; coveragePct = 100; return; }
+    if (!sb || typeof sb.rpc !== "function") { costState = "error"; return; }
+    sb.rpc("qw_cost_data_ready").then(function (res) {
+      if (res.error) { costState = "error"; coveragePct = null; }
+      else {
+        var row = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (row && typeof row === "object") {
+          coveragePct = (row.coverage_pct == null || isNaN(Number(row.coverage_pct))) ? null : Math.round(Number(row.coverage_pct));
+          costState = row.ready === true ? "ready" : "notready";
+        } else { costState = "error"; coveragePct = null; }
+      }
+      if (!el("settingsHub").hidden) applyGates();
+    }, function () {
+      costState = "error"; coveragePct = null;
+      if (!el("settingsHub").hidden) applyGates();
+    });
+  }
+
+  // Promise-based confirm — mirrors dashboard.js confirmDialog (native <dialog>
+  // + method="dialog" form → button value becomes returnValue). CSP-safe.
+  function confirmDialog(title, body, okLabel, danger) {
+    var dlg = el("confirmDialog");
+    if (!dlg || typeof dlg.showModal !== "function") return Promise.resolve(window.confirm(title + "\n\n" + body));
+    el("confirmTitle").textContent = title;
+    el("confirmBody").textContent = body;
+    var ok = el("confirmOk");
+    ok.textContent = okLabel || tt("common.confirm");
+    ok.classList.toggle("is-danger", !!danger);
+    return new Promise(function (resolve) {
+      function onClose() { dlg.removeEventListener("close", onClose); resolve(dlg.returnValue === "ok"); }
+      dlg.addEventListener("close", onClose);
+      dlg.showModal();
+    });
   }
 
   // ── dirty tracking (per section) ────────────────────────────────────────
@@ -454,6 +609,7 @@
 
   function load() {
     el("tableError").hidden = true;
+    checkCostReady();   // fires the readiness RPC (async in real mode; sync-ready in demo)
     // DEMO MODE (tour): show the hub with sample settings, never touch Supabase.
     if (window.QWDemo && QWDemo.isOn()) {
       state.display_name = "Sales Engineering"; state.company = "Hassan Tekstil A.Ş."; state.role = "Export Sales Manager";

@@ -192,6 +192,17 @@ dialog.qc-drawer[open]::backdrop { animation: qc-fade-in .34s var(--ease) both; 
 .qc-sendhint { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.55; color: var(--soft); margin: 12px 2px 0; }
 .qc-sendhint svg { flex: none; margin-top: 1px; stroke: var(--grey); }
 
+/* ── readiness gating: a locked control can't be flipped while it can't work ── */
+.qc-switchrow.locked { background: var(--row); border-color: var(--hair); }
+.qc-switch:disabled { cursor: not-allowed; opacity: .5; background: var(--hair); border-color: var(--line-strong); }
+.qc-switch:disabled::after { background: var(--grey); box-shadow: none; }
+.qc-locknote { display: flex; gap: 9px; align-items: flex-start; margin: 8px 2px 4px; font-size: 12.5px; line-height: 1.5; color: var(--soft); }
+.qc-locknote .qc-locknote-ico { flex: none; margin-top: 1px; stroke: var(--grey); }
+.qc-locknote-body { display: block; min-width: 0; }
+.qc-locknote-saved { display: block; margin-top: 5px; font-family: var(--mono); font-size: 11px; color: var(--grey); }
+.qc-field input:disabled, .qc-field textarea:disabled { opacity: .55; cursor: not-allowed; background: var(--hair); }
+.qc-field input:disabled::placeholder, .qc-field textarea:disabled::placeholder { color: var(--grey); }
+
 /* threshold sliders */
 .qc-thr { margin-top: 24px; }
 .qc-thr-item { padding: 18px 0; border-top: 1px solid var(--hair); }
