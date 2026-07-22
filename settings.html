@@ -141,6 +141,10 @@
           </div>
           <h3 data-i18n="set.profile.h3">Your profile</h3>
           <p class="ph-sub" data-i18n="set.profile.sub">Who the quotes come from. Your name and company appear on the sign-off; the rest is kept for the record.</p>
+          <div class="qc-locknote" id="profileLock" role="note" hidden>
+            <svg class="qc-locknote-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span class="qc-locknote-body"><span class="qc-locknote-txt"></span><span class="qc-locknote-saved" hidden></span></span>
+          </div>
           <div class="qc-form">
             <div class="qc-field">
               <label for="f_display_name" data-i18n="set.f.name">Your name</label>
@@ -250,6 +254,10 @@
             </div>
             <button type="button" class="qc-switch" id="autoSend" role="switch" aria-checked="false" aria-label="Auto-send green-tier quotes"></button>
           </div>
+          <div class="qc-locknote" id="autoSendLock" role="note" hidden>
+            <svg class="qc-locknote-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span class="qc-locknote-body"><span class="qc-locknote-txt"></span><span class="qc-locknote-saved" hidden></span></span>
+          </div>
           <div class="qc-sendhint">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v6c0 5 3.8 8.3 9 9 5.2-.7 9-4 9-9V7z"/></svg>
             <span data-i18n-html="set.auto.autoSendHint">The one money-facing switch. When on, only quotes that clear <b>both</b> green gates below send on their own. Amber and red always wait. When off, nothing sends — the pipeline just drafts.</span>
@@ -352,6 +360,10 @@
             </div>
             <button type="button" class="qc-switch" id="alertThinMargin" role="switch" aria-checked="true" aria-label="Thin-margin alerts"></button>
           </div>
+          <div class="qc-locknote" id="thinLock" role="note" hidden>
+            <svg class="qc-locknote-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span class="qc-locknote-body"><span class="qc-locknote-txt"></span><span class="qc-locknote-saved" hidden></span></span>
+          </div>
           <div class="qc-sendhint">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
             <span data-i18n="set.notif.thinHint">An immediate heads-up whenever a fresh quote lands under your thin-margin floor — so nothing underpriced slips past.</span>
@@ -381,6 +393,20 @@
     <div id="tableError" class="qc-tableerror qc-card" hidden></div>
     <div id="loadingCard" class="qc-panel"><div class="sk sk-row" style="height:220px"></div></div>
   </section>
+
+  <!-- Confirm dialog — mirrors the dashboard.js pattern (native <dialog> + method="dialog"
+       form so the button's value becomes returnValue). Wired in settings.js via
+       addEventListener; no inline handlers (site CSP is script-src 'self'). -->
+  <dialog id="confirmDialog" class="qc-confirm" aria-labelledby="confirmTitle">
+    <form method="dialog" class="qc-confirm-card">
+      <h3 id="confirmTitle" data-i18n="common.confirm">Confirm</h3>
+      <p id="confirmBody"></p>
+      <div class="qc-confirm-acts">
+        <button value="cancel" class="btn btn-ghost btn-sm" formnovalidate data-i18n="common.cancel">Cancel</button>
+        <button value="ok" id="confirmOk" class="btn btn-primary btn-sm" formnovalidate data-i18n="common.confirm">Confirm</button>
+      </div>
+    </form>
+  </dialog>
 
   <div id="bootError" class="qc-boot-error" hidden></div>
   <div id="toast" class="qc-toast" role="status" aria-live="polite"></div>
