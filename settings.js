@@ -1,5 +1,6 @@
-/* Settings hub. Reads + UPDATEs the single public.autonomy_settings row
-   (owner = QW_CONFIG.OWNER). RLS: authenticated SELECT + authenticated UPDATE.
+/* Settings hub. Reads + UPSERTs the single public.autonomy_settings row
+   (owner = QW_CONFIG.OWNER). RLS: authenticated SELECT + authenticated UPDATE
+   + owner-scoped INSERT (settings-autoseed.sql) so a first save creates the row.
    Four sections — Profile, Quoting voice, Automation & autonomy, Notifications —
    each loads current values and persists via an authenticated UPDATE with a toast.
    Degrades gracefully when the settings columns / table don't exist yet. */
@@ -553,13 +554,18 @@
     if (window.QWDemo && QWDemo.isOn()) { snapSection(section); setDirtyNote(section, false, tt("set.demoNotSaved")); toast(tt("set.toast.demo")); return; }
     var label = btn.textContent;
     btn.disabled = true; btn.textContent = tt("common.saving");
-    var patch = { updated_at: new Date().toISOString() };
+    var patch = { owner: owner, updated_at: new Date().toISOString() };
     keys.forEach(function (key) {
       var v = state[key];
       if (INT_KEYS[key]) v = Math.round(Number(v) || 0);
       patch[key] = v;
     });
-    sb.from("autonomy_settings").update(patch).eq("owner", owner).select().then(function (res) {
+    // UPSERT (not UPDATE): a brand-new tenant has no autonomy_settings row yet, and an
+    // UPDATE ... where owner=<new tenant> matches zero rows and silently saves nothing.
+    // Upserting on `owner` creates the row on first save. (settings-autoseed.sql also
+    // seeds the row at tenant-creation time and adds the owner-scoped INSERT policy this
+    // upsert relies on — run that migration before deploying.)
+    sb.from("autonomy_settings").upsert(patch, { onConflict: "owner" }).select().then(function (res) {
       btn.disabled = false; btn.textContent = label;
       if (res.error) {
         if (Q.isMissingTable(res.error)) { showMissing(); return; }

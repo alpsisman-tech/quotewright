@@ -427,7 +427,12 @@
           sb.auth.updateUser({ data: { onboarded: true } }).then(function () { cb(); }, function () { cb(); });
         } else { cb(); }
       }
-      sb.from("autonomy_settings").update(patch).eq("owner", owner).select().then(function (res) {
+      // UPSERT (not UPDATE): a brand-new tenant has no autonomy_settings row yet, so an
+      // UPDATE ... where owner=<new tenant> would match zero rows and save nothing.
+      // Upserting on `owner` creates the row on first onboarding save. (settings-autoseed.sql
+      // also seeds the row at tenant-creation and adds the owner-scoped INSERT policy.)
+      patch.owner = owner;
+      sb.from("autonomy_settings").upsert(patch, { onConflict: "owner" }).select().then(function (res) {
         markUser(function () {
           if (res.error || !res.data || !res.data.length) {
             // Tenant settings didn't save (e.g. schema not migrated) — the user is
