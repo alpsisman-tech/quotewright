@@ -101,11 +101,11 @@
       "set.load.errBody": "Something went wrong reaching the settings store.",
       "set.load.netErr": "Network error — check your connection and try again.",
       // ── readiness locks ──
-      "set.lock.autoSend.notready": "Auto-send grades quotes by profit margin, which needs your product cost prices. Coverage is {pct}% — auto-send unlocks at 60%.",
-      "set.lock.thin.notready": "Thin-margin alerts need product cost prices to measure margin. Coverage is {pct}% — unlocks at 60%.",
-      "set.lock.cost.checking": "Checking whether your catalogue has enough cost data — this unlocks once that's confirmed.",
-      "set.lock.cost.error": "Couldn't check your cost-data readiness, so this stays locked until it can be confirmed. Reload to try again.",
-      "set.lock.notDeployed": "This isn't switched on for your account yet.",
+      // Default fallback when the caller's feature_readiness row is absent (new tenant,
+      // table missing, or the Margin Scorer hasn't run yet). A present-but-not-ready row
+      // carries its own server-authored reason, which is shown verbatim instead of this.
+      "set.lock.readiness.waiting": "Waiting on your product cost data — this unlocks automatically once there's enough to grade quotes by margin.",
+      "set.lock.readiness.error": "Couldn't check whether this is ready for your account, so it stays locked. Reload to try again.",
       "set.lock.profile": "Your quote letterhead currently uses a fixed Hassan footer. These fields will apply once custom letterhead is enabled for your account.",
       "set.lock.savedInactive": "Saved earlier, but not in effect until this unlocks.",
       "set.confirm.autoSend.title": "Turn on automatic sending?",
@@ -202,11 +202,11 @@
       "set.load.errBody": "Ayar deposuna erişirken bir şeyler ters gitti.",
       "set.load.netErr": "Ağ hatası — bağlantınızı kontrol edip yeniden deneyin.",
       // ── hazırlık kilitleri ──
-      "set.lock.autoSend.notready": "Otomatik gönderim, teklifleri kâr marjına göre derecelendirir ve bunun için ürün maliyet fiyatlarınız gerekir. Kapsam %{pct} — otomatik gönderim %60'ta açılır.",
-      "set.lock.thin.notready": "İnce marj uyarıları, marjı ölçmek için ürün maliyet fiyatlarına ihtiyaç duyar. Kapsam %{pct} — %60'ta açılır.",
-      "set.lock.cost.checking": "Kataloğunuzda yeterli maliyet verisi olup olmadığı kontrol ediliyor — doğrulanınca açılır.",
-      "set.lock.cost.error": "Maliyet verisi hazırlığınız kontrol edilemedi; doğrulanana kadar kilitli kalır. Yeniden denemek için sayfayı yenileyin.",
-      "set.lock.notDeployed": "Bu özellik hesabınız için henüz açık değil.",
+      // Çağıranın feature_readiness satırı yoksa (yeni kiracı, tablo eksik veya Marj
+      // Puanlayıcı henüz çalışmadıysa) varsayılan metin. Mevcut ama hazır olmayan bir
+      // satır kendi sunucu-kaynaklı gerekçesini taşır ve bunun yerine o birebir gösterilir.
+      "set.lock.readiness.waiting": "Ürün maliyet verinizi bekliyor — teklifleri marja göre derecelendirmeye yetecek kadar veri olduğunda otomatik olarak açılır.",
+      "set.lock.readiness.error": "Bu özelliğin hesabınız için hazır olup olmadığı denetlenemedi; bu yüzden kilitli kalır. Yeniden denemek için sayfayı yenileyin.",
       "set.lock.profile": "Teklif antetiniz şu anda sabit bir Hassan alt bilgisi kullanıyor. Bu alanlar, hesabınız için özel antet etkinleştirildiğinde geçerli olacak.",
       "set.lock.savedInactive": "Daha önce kaydedildi, ancak bu açılana kadar yürürlükte değil.",
       "set.confirm.autoSend.title": "Otomatik gönderim açılsın mı?",
@@ -247,16 +247,21 @@
   // A gated control stays LOCKED (visually disabled + a plain-language reason)
   // until its precondition is met — then it unlocks itself on the next evaluate,
   // no code change needed. Two precondition sources:
-  //   1. DEPLOYED — does the backend wiring for this feature exist yet?
-  //   2. costState — from sb.rpc('qw_cost_data_ready') (counts + a boolean only,
-  //      never cost values). Fail CLOSED: unknown/error ⇒ locked, never open.
-  // auto_send + thin_margin_alert: backend NOT shipped yet (the Margin Scorer send/alert
-  // branch is staged pending review). Keep FALSE so these stay locked as "not switched on
-  // yet" — flip to true only when that workflow is published, so the toggle never unlocks
-  // ahead of a backend that can act on it. digest: shipped & live. letterhead_profile: not built.
-  var DEPLOYED = { auto_send: false, thin_margin_alert: false, digest: true, letterhead_profile: false };
-  var costState = "checking";   // "checking" | "ready" | "notready" | "error"
-  var coveragePct = null;       // integer % from the RPC (for the lock reason)
+  //   1. readiness — the per-account public.feature_readiness table, the SOURCE OF
+  //      TRUTH for auto_send + thin_margin_alert. The n8n Margin Scorer writes one
+  //      row per feature for the caller's own owner: { ready:boolean, reason:text }.
+  //      RLS returns only this tenant's rows, so nothing is hard-coded per owner.
+  //      A feature is ACTIVE iff its row exists AND ready===true; every other case
+  //      (no row, ready false/missing, query error, table absent) is LOCKED. Fail
+  //      CLOSED by construction — an empty map unlocks nothing.
+  //   2. DEPLOYED — build-time flag for features with no backend at all yet. Only
+  //      letterhead_profile remains here (custom letterhead isn't built). auto_send
+  //      and thin_margin_alert deliberately do NOT appear: their readiness is now
+  //      per-account and data-driven, so no stale constant can unlock them.
+  var DEPLOYED = { letterhead_profile: false };
+  // feature name → { ready:boolean, reason:string }. Only the caller's own rows (RLS).
+  var readiness = {};
+  var readinessErrored = false;   // true if the feature_readiness fetch hard-errored (still fail-closed → locked)
 
   // key → text/number/select input id
   var TEXT = {
@@ -430,28 +435,39 @@
   }
 
   // ── readiness gating ──────────────────────────────────────────────────────
-  // Evaluate one gated control's precondition → { active, reasonKey?, vars? }.
-  // Fail CLOSED: a checking/error cost state keeps cost-dependent controls locked.
+  // Evaluate one gated control's precondition. Returns { active } when unlocked,
+  // else { active:false } plus EITHER a literal server `reason` (from the
+  // feature_readiness row) OR a localized { reasonKey, vars } fallback.
+  // Fail CLOSED: no ready row ⇒ locked, for any reason (missing row, ready false,
+  // query error, table absent, still loading).
   function evalGate(id) {
     var s = SWITCHES[id];
     if (!s || !s.gate) return { active: true };            // ungated switch
-    if (!DEPLOYED[s.gate]) return { active: false, reasonKey: "set.lock.notDeployed", vars: {} };
-    if (costState === "ready") return { active: true };
-    if (costState === "checking") return { active: false, reasonKey: "set.lock.cost.checking", vars: {} };
-    if (costState === "error") return { active: false, reasonKey: "set.lock.cost.error", vars: {} };
-    // notready → show live coverage in the reason
-    var pfx = id === "autoSend" ? "set.lock.autoSend" : "set.lock.thin";
-    return { active: false, reasonKey: pfx + ".notready", vars: { pct: (coveragePct == null ? "—" : coveragePct) } };
+    var row = readiness[s.gate];                           // caller's own feature_readiness row (RLS), or undefined
+    if (row && row.ready === true) return { active: true };
+    // LOCKED. Prefer the row's server-authored reason; else a localized default.
+    if (row && row.reason) return { active: false, reason: row.reason };
+    if (readinessErrored) return { active: false, reasonKey: "set.lock.readiness.error", vars: {} };
+    return { active: false, reasonKey: "set.lock.readiness.waiting", vars: {} };
   }
   function profileGate() {
     return DEPLOYED.letterhead_profile ? { active: true } : { active: false, reasonKey: "set.lock.profile", vars: {} };
   }
-  function setLockNote(noteId, reasonKey, vars, savedInactive) {
+  // Resolve a locked gate result to display text: a literal server reason wins,
+  // otherwise translate the fallback key. (Server reasons are shown verbatim — they
+  // are not i18n keys, so they must NOT be passed through tt().)
+  function gateText(g) {
+    if (!g) return "";
+    if (g.reason != null && g.reason !== "") return g.reason;
+    if (g.reasonKey) return tt(g.reasonKey, g.vars || {});
+    return "";
+  }
+  function setLockNote(noteId, text, savedInactive) {
     var note = el(noteId); if (!note) return;
-    if (!reasonKey) { note.hidden = true; return; }
+    if (!text) { note.hidden = true; return; }
     var txt = note.querySelector(".qc-locknote-txt");
     var sav = note.querySelector(".qc-locknote-saved");
-    if (txt) txt.textContent = tt(reasonKey, vars || {});
+    if (txt) txt.textContent = text;
     if (sav) {
       if (savedInactive) { sav.hidden = false; sav.textContent = tt("set.lock.savedInactive"); }
       else { sav.hidden = true; sav.textContent = ""; }
@@ -465,6 +481,7 @@
       sw.disabled = false;
       sw.removeAttribute("aria-disabled");
       sw.removeAttribute("aria-describedby");
+      if (row) row.classList.remove("locked");
       if (s.lock) setLockNote(s.lock, null);
       setSwitch(id, state[s.key] === true);   // honest, interactive render
       return;
@@ -478,7 +495,7 @@
     if (row) row.classList.remove("on");
     if (row) row.classList.add("locked");
     if (el(s.st)) el(s.st).textContent = tt(s.off);
-    if (s.lock) { setLockNote(s.lock, g.reasonKey, g.vars, storedOn); sw.setAttribute("aria-describedby", s.lock); }
+    if (s.lock) { setLockNote(s.lock, gateText(g), storedOn); sw.setAttribute("aria-describedby", s.lock); }
   }
   function applyProfileGate() {
     var g = profileGate();
@@ -487,31 +504,41 @@
     });
     var saveBtn = document.querySelector('[data-save="profile"]');
     if (saveBtn) saveBtn.disabled = !g.active;
-    setLockNote("profileLock", g.active ? null : g.reasonKey, g.vars);
+    setLockNote("profileLock", g.active ? null : gateText(g));
   }
   function applyGates() {
     Object.keys(SWITCHES).forEach(function (id) { if (SWITCHES[id].gate) applySwitchGate(id); });
     applyProfileGate();
   }
 
-  // Ask the DB whether the catalogue carries enough real cost data to grade
-  // margins. Counts + a boolean only — never cost values. Fail CLOSED on error.
-  function checkCostReady() {
-    costState = "checking"; coveragePct = null;
-    if (window.QWDemo && QWDemo.isOn()) { costState = "ready"; coveragePct = 100; return; }
-    if (!sb || typeof sb.rpc !== "function") { costState = "error"; return; }
-    sb.rpc("qw_cost_data_ready").then(function (res) {
-      if (res.error) { costState = "error"; coveragePct = null; }
-      else {
-        var row = Array.isArray(res.data) ? res.data[0] : res.data;
-        if (row && typeof row === "object") {
-          coveragePct = (row.coverage_pct == null || isNaN(Number(row.coverage_pct))) ? null : Math.round(Number(row.coverage_pct));
-          costState = row.ready === true ? "ready" : "notready";
-        } else { costState = "error"; coveragePct = null; }
+  // Load the caller's per-account readiness signals from public.feature_readiness.
+  // RLS returns only this tenant's rows, so the map is inherently owner-scoped —
+  // nothing hard-codes an owner. This is the SOURCE OF TRUTH for auto_send +
+  // thin_margin_alert. Fail CLOSED: any error (incl. a missing table) leaves the
+  // map empty and the features locked; the error must never surface as an uncaught
+  // throw or the settings error card — it is just "not ready".
+  function fetchReadiness() {
+    readiness = {}; readinessErrored = false;
+    // DEMO/tour: no real rows — present both features as available so the console
+    // demonstrates its full, unlocked shape.
+    if (window.QWDemo && QWDemo.isOn()) {
+      readiness = { auto_send: { ready: true, reason: "" }, thin_margin_alert: { ready: true, reason: "" } };
+      return;
+    }
+    if (!sb || typeof sb.from !== "function") { readinessErrored = true; return; }   // fail closed
+    sb.from("feature_readiness").select("feature,ready,reason").then(function (res) {
+      var map = {};
+      if (res.error) {
+        readinessErrored = true;   // includes "relation does not exist" (table not created yet)
+      } else if (Array.isArray(res.data)) {
+        res.data.forEach(function (r) {
+          if (r && r.feature) map[r.feature] = { ready: r.ready === true, reason: (r.reason == null ? "" : String(r.reason)) };
+        });
       }
+      readiness = map;
       if (!el("settingsHub").hidden) applyGates();
     }, function () {
-      costState = "error"; coveragePct = null;
+      readiness = {}; readinessErrored = true;   // network reject → fail closed
       if (!el("settingsHub").hidden) applyGates();
     });
   }
@@ -615,7 +642,7 @@
 
   function load() {
     el("tableError").hidden = true;
-    checkCostReady();   // fires the readiness RPC (async in real mode; sync-ready in demo)
+    fetchReadiness();   // loads per-account feature_readiness (async in real mode; sync in demo)
     // DEMO MODE (tour): show the hub with sample settings, never touch Supabase.
     if (window.QWDemo && QWDemo.isOn()) {
       state.display_name = "Sales Engineering"; state.company = "Hassan Tekstil A.Ş."; state.role = "Export Sales Manager";
