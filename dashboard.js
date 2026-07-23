@@ -696,7 +696,12 @@
     // Supabase → Auth → URL Configuration → Redirect URLs (and Google's console).
     sb.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + window.location.pathname }
+      options: {
+        redirectTo: window.location.origin + window.location.pathname,
+        // Always show Google's account chooser instead of silently reusing the
+        // last-signed-in session (which auto-logs into the admin account).
+        queryParams: { prompt: "select_account" }
+      }
     }).then(function (res) {
       if (res && res.error) { if (btn) btn.disabled = false; if (err) err.textContent = res.error.message; }
     }).catch(function () { if (btn) btn.disabled = false; if (err) err.textContent = tt("common.networkError"); });
