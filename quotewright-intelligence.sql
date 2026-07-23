@@ -11,9 +11,24 @@
 --   digest             — daily rollup the dashboard reads (learning & digest workflow writes it)
 -- plus additive columns on public.quotes.
 --
--- RLS model (single-firm console, same as the rest of the schema):
---   * authenticated may SELECT every new table.
---   * autonomy_settings: authenticated may UPDATE (dashboard edits the gates).
+-- ⚠️⚠️  RE-RUN SAFETY — READ BEFORE EDITING (cross-tenant leak hazard) ⚠️⚠️
+--   Section 7 of this file USED TO create blanket `using (true)` SELECT policies on
+--   customers / resolutions / catalog_gaps / autonomy_settings / digest, plus a blanket
+--   `using(true) with check(true)` UPDATE on autonomy_settings. That is correct ONLY on a
+--   pre-tenancy, single-firm database. quotewright-tenancy.sql REPLACES each of them with
+--   an owner-scoped `*_tenant_read` / `autonomy_settings_tenant_update` policy. Postgres
+--   OR's permissive policies together, so re-running the OLD version of this file AFTER
+--   tenancy would put the blanket policy BACK alongside the tenant one — the permissive
+--   blanket WINS and every tenant would read (and, for autonomy_settings, WRITE) every
+--   other tenant's rows. Section 7 is now GUARDED (see there): it always drops the blanket
+--   policy and only installs an owner-scoped fallback when tenancy's policy is absent.
+--   Net: safe to re-run in any order. Do NOT reintroduce an unconditional
+--   `create policy ... using (true)` here. Verify a live DB with verify-live-policies.sql.
+--
+-- RLS model (owner-scoped; tenancy-aware):
+--   * authenticated may SELECT their OWN tenant's rows on every new table
+--     (owner = auth_owner() or admin; single-firm fallback owner='hassannonwovens').
+--   * autonomy_settings: authenticated may UPDATE their OWN tenant's row (dashboard gates).
 --   * everything else is written by the n8n pipeline / webhooks with the
 --     service_role key, which BYPASSES RLS. The anon key can never read or write.
 --
@@ -162,8 +177,9 @@ create index if not exists quotes_gmail_thread_idx on public.quotes (gmail_threa
 create index if not exists quotes_autonomy_tier_idx on public.quotes (autonomy_tier);
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 7. RLS — enable + policies on the new tables
---    authenticated SELECT everywhere; authenticated UPDATE only on autonomy_settings.
+-- 7. RLS — enable + GUARDED owner-scoped policies on the new tables.
+--    Owner-scoped SELECT on all; owner-scoped UPDATE only on autonomy_settings.
+--    NEVER a blanket using(true) (see the ⚠️ banner at the top of this file).
 --    (quotes already has read + update policies from dashboard-rls / quote-analytics.)
 -- ─────────────────────────────────────────────────────────────────────────────
 alter table public.customers         enable row level security;
@@ -172,32 +188,89 @@ alter table public.catalog_gaps      enable row level security;
 alter table public.autonomy_settings enable row level security;
 alter table public.digest            enable row level security;
 
-drop policy if exists customers_authenticated_read on public.customers;
-create policy customers_authenticated_read
-  on public.customers for select to authenticated using (true);
+-- GUARDED policy install (mirrors clients-page.sql / dashboard-rls.sql / quote-analytics.sql).
+-- For EVERY table below we ALWAYS drop the legacy blanket `*_authenticated_read`
+-- (and the blanket autonomy_settings_authenticated_update) so a re-run self-heals a DB
+-- where a prior run of THIS file had re-opened the leak next to tenancy's scoped policy.
+-- We (re)install an owner-scoped fallback ONLY when tenancy's tenant-scoped policy is
+-- absent — and even then it is owner-scoped, NEVER a literal `using (true)`. The
+-- tenant policy names we key on come from quotewright-tenancy.sql:
+--   customers_tenant_read · resolutions_tenant_read · catalog_gaps_tenant_read ·
+--   digest_tenant_read · autonomy_settings_tenant_read · autonomy_settings_tenant_update.
+do $$
+declare
+  scope text;
+begin
+  -- Tenant-aware predicate when quotewright-tenancy.sql is applied; single-tenant
+  -- fallback otherwise. Either way the caller must be `authenticated` and owner-scoped.
+  if to_regprocedure('public.auth_owner()') is not null then
+    scope := '(owner = public.auth_owner() or public.auth_is_admin())';
+  else
+    scope := '(owner = ''hassannonwovens'')';
+  end if;
 
-drop policy if exists resolutions_authenticated_read on public.resolutions;
-create policy resolutions_authenticated_read
-  on public.resolutions for select to authenticated using (true);
+  -- customers: SELECT ----------------------------------------------------------
+  execute 'drop policy if exists customers_authenticated_read on public.customers';
+  if not exists (select 1 from pg_policies
+                 where schemaname='public' and tablename='customers'
+                   and policyname='customers_tenant_read') then
+    execute 'drop policy if exists customers_owner_read on public.customers';
+    execute 'create policy customers_owner_read on public.customers
+               for select to authenticated using ' || scope;
+  end if;
 
-drop policy if exists catalog_gaps_authenticated_read on public.catalog_gaps;
-create policy catalog_gaps_authenticated_read
-  on public.catalog_gaps for select to authenticated using (true);
+  -- resolutions: SELECT --------------------------------------------------------
+  execute 'drop policy if exists resolutions_authenticated_read on public.resolutions';
+  if not exists (select 1 from pg_policies
+                 where schemaname='public' and tablename='resolutions'
+                   and policyname='resolutions_tenant_read') then
+    execute 'drop policy if exists resolutions_owner_read on public.resolutions';
+    execute 'create policy resolutions_owner_read on public.resolutions
+               for select to authenticated using ' || scope;
+  end if;
 
-drop policy if exists autonomy_settings_authenticated_read on public.autonomy_settings;
-create policy autonomy_settings_authenticated_read
-  on public.autonomy_settings for select to authenticated using (true);
+  -- catalog_gaps: SELECT -------------------------------------------------------
+  execute 'drop policy if exists catalog_gaps_authenticated_read on public.catalog_gaps';
+  if not exists (select 1 from pg_policies
+                 where schemaname='public' and tablename='catalog_gaps'
+                   and policyname='catalog_gaps_tenant_read') then
+    execute 'drop policy if exists catalog_gaps_owner_read on public.catalog_gaps';
+    execute 'create policy catalog_gaps_owner_read on public.catalog_gaps
+               for select to authenticated using ' || scope;
+  end if;
 
-drop policy if exists digest_authenticated_read on public.digest;
-create policy digest_authenticated_read
-  on public.digest for select to authenticated using (true);
+  -- digest: SELECT -------------------------------------------------------------
+  execute 'drop policy if exists digest_authenticated_read on public.digest';
+  if not exists (select 1 from pg_policies
+                 where schemaname='public' and tablename='digest'
+                   and policyname='digest_tenant_read') then
+    execute 'drop policy if exists digest_owner_read on public.digest';
+    execute 'create policy digest_owner_read on public.digest
+               for select to authenticated using ' || scope;
+  end if;
 
--- Dashboard edits the autonomy gates. Single-firm console: `to authenticated` IS the
--- server-side authorization; the anon key alone can never write. Pipeline/webhook
--- writes use service_role and bypass RLS regardless.
-drop policy if exists autonomy_settings_authenticated_update on public.autonomy_settings;
-create policy autonomy_settings_authenticated_update
-  on public.autonomy_settings for update to authenticated using (true) with check (true);
+  -- autonomy_settings: SELECT --------------------------------------------------
+  execute 'drop policy if exists autonomy_settings_authenticated_read on public.autonomy_settings';
+  if not exists (select 1 from pg_policies
+                 where schemaname='public' and tablename='autonomy_settings'
+                   and policyname='autonomy_settings_tenant_read') then
+    execute 'drop policy if exists autonomy_settings_owner_read on public.autonomy_settings';
+    execute 'create policy autonomy_settings_owner_read on public.autonomy_settings
+               for select to authenticated using ' || scope;
+  end if;
+
+  -- autonomy_settings: UPDATE (dashboard edits the confidence/margin gates) -----
+  -- `to authenticated` + owner scope IS the server-side authorization; the anon key
+  -- alone can never write. Pipeline/webhook writes use service_role and bypass RLS.
+  execute 'drop policy if exists autonomy_settings_authenticated_update on public.autonomy_settings';
+  if not exists (select 1 from pg_policies
+                 where schemaname='public' and tablename='autonomy_settings'
+                   and policyname='autonomy_settings_tenant_update') then
+    execute 'drop policy if exists autonomy_settings_owner_update on public.autonomy_settings';
+    execute 'create policy autonomy_settings_owner_update on public.autonomy_settings
+               for update to authenticated using ' || scope || ' with check ' || scope;
+  end if;
+end $$;
 
 -- No INSERT/UPDATE/DELETE policies on customers / resolutions / catalog_gaps / digest
 -- for authenticated => those are written only by service_role (pipeline + webhooks).

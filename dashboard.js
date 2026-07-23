@@ -467,8 +467,24 @@
   var MARGIN_LOW = 15, MARGIN_MID = 30;
   var CONF_HIGH = 85, CONF_MID = 60;
 
-  // The firm's own mailbox — used to tell "us" from "the customer" in a thread.
-  var FIRM_HINTS = ["hassannonwovensrfq", "hassan.com.tr", "@hassan"];
+  // Hints that identify the FIRM's own mailbox — used to tell "us" from "the customer"
+  // when a thread message carries no explicit direction. Cosmetic only (thread bubbles).
+  // Multi-tenant: a deploy may set QW_CONFIG.FIRM_HINTS (array or comma string) to its
+  // own inbox/domain; otherwise we keep the proven Hassan defaults. The resolved tenant
+  // key is always added as an extra hint. Hassan (no override) is byte-identical: the
+  // defaults still match its outbound mail exactly.
+  var DEFAULT_FIRM_HINTS = ["hassannonwovensrfq", "hassan.com.tr", "@hassan"];
+  function firmHintList() {
+    var base = DEFAULT_FIRM_HINTS;
+    var override = cfg.FIRM_HINTS;
+    if (typeof override === "string") override = override.split(",");
+    if (Array.isArray(override) && override.length) base = override;
+    var hints = base.slice();
+    if (resolvedOwner) hints.push(String(resolvedOwner));
+    return hints
+      .map(function (h) { return String(h).toLowerCase().trim(); })
+      .filter(Boolean);
+  }
 
   // SECURITY: intercept the login submit FIRST so email+password can never land
   // in the URL via a native GET submit.
@@ -1801,7 +1817,7 @@
     var outbound;
     if (dir === "outbound" || dir === "sent" || dir === "firm" || dir === "agent" || dir === "us") outbound = true;
     else if (dir === "inbound" || dir === "received" || dir === "customer") outbound = false;
-    else outbound = FIRM_HINTS.some(function (h) { return String(from).toLowerCase().indexOf(h) !== -1; });
+    else { var lf = String(from).toLowerCase(); outbound = firmHintList().some(function (h) { return lf.indexOf(h) !== -1; }); }
     // A message with no sender is still attributable: outbound is us, inbound is
     // whoever this quote is for.
     if (!String(from).trim()) {
@@ -2389,22 +2405,30 @@
     // `products` is RLS-locked to the pipeline's service role, so the console
     // always read zero rows from it. `products_public` is the restricted view
     // (sale-side columns only — no cost, no margin) meant for this search.
+    // Multi-tenancy: scope the search to the caller's own tenant. Members filter to
+    // their owner; admins see every tenant (RLS/view permits it). The owner filter
+    // needs the `owner` column on products_public (products-public-owner.sql). If the
+    // view predates that migration the filtered query errors, so we transparently retry
+    // WITHOUT the owner filter — restoring the pre-tenancy single-firm behaviour (all of
+    // Hassan's rows are owner='hassannonwovens', so its results are identical either way).
+    var ownerScope = (resolvedOwner && !isAdminUser) ? resolvedOwner : null;
     function fail(err) {
       var m = (err && err.message) || "";
       host.innerHTML = '<div class="qc-empty-mini">' +
         esc(/products_public|does not exist|schema cache|relation|permission/i.test(m)
               ? tt("dash.catNoView") : tt("dash.catFail", { msg: m })) + "</div>";
     }
-    function run(cols, retry) {
-    sb.from("products_public")
-      .select(cols)
-      .or(orExpr).limit(8)
+    function run(cols, triedStar, withOwner) {
+    var q = sb.from("products_public").select(cols);
+    if (ownerScope && withOwner) q = q.eq("owner", ownerScope);
+    q.or(orExpr).limit(8)
       .then(function (res) {
         if (openId == null) return;
         // A failed query is NOT an empty result — say so, or the operator reads
         // "no match" and believes the catalogue genuinely lacks the product.
         if (res.error) {
-          if (retry) { run("*", false); return; }   // view may expose a different column set
+          if (!triedStar) { run("*", true, withOwner); return; }        // view may expose a different column set
+          if (ownerScope && withOwner) { run(cols, false, false); return; } // view may predate the `owner` column
           fail(res.error); return;
         }
         var rows = res.data || [];
@@ -2425,7 +2449,7 @@
         if (host) host.innerHTML = '<div class="qc-empty-mini">' + esc(tt("dash.catFailNet")) + "</div>";
       });
     }
-    run("sku,urun_adi,gsm,color,product_line,satis_eur,satis_usd,is_microfiber", true);
+    run("sku,urun_adi,gsm,color,product_line,satis_eur,satis_usd,is_microfiber", false, true);
   }
 
   function resolveLine(id, ref, sku, btn) {
